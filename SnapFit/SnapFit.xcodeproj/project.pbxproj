@@ -19,7 +19,7 @@
 		6428A50B2C3F9ECA00C47990 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6428A50A2C3F9ECA00C47990 /* KakaoSDKAuth */; };
 		6428A50D2C3F9ECA00C47990 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 6428A50C2C3F9ECA00C47990 /* KakaoSDKCommon */; };
 		6428A50F2C3F9ECA00C47990 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 6428A50E2C3F9ECA00C47990 /* KakaoSDKUser */; };
-		6428A5132C3FA32B00C47990 /* kakaoAuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6428A5122C3FA32B00C47990 /* kakaoAuthViewModel.swift */; };
+		6428A5132C3FA32B00C47990 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6428A5122C3FA32B00C47990 /* LoginViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +34,8 @@
 		6428A5012C3EAA9700C47990 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6428A5032C3F978600C47990 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6428A5052C3F98F200C47990 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		6428A5122C3FA32B00C47990 /* kakaoAuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = kakaoAuthViewModel.swift; sourceTree = "<group>"; };
+		6428A5122C3FA32B00C47990 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		6428A5142C3FB2FB00C47990 /* SnapFit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapFit.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +73,7 @@
 		6428A48B2C3D20C600C47990 /* SnapFit */ = {
 			isa = PBXGroup;
 			children = (
+				6428A5142C3FB2FB00C47990 /* SnapFit.entitlements */,
 				6428A5002C3EA9C000C47990 /* Info.plist */,
 				6428A5012C3EAA9700C47990 /* Config.xcconfig */,
 				6428A49C2C3D22F900C47990 /* Data */,
@@ -161,7 +163,7 @@
 		6428A5102C3FA2F400C47990 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				6428A5122C3FA32B00C47990 /* kakaoAuthViewModel.swift */,
+				6428A5122C3FA32B00C47990 /* LoginViewModel.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -248,7 +250,7 @@
 			files = (
 				6428A5062C3F98F200C47990 /* SceneDelegate.swift in Sources */,
 				6428A5042C3F978600C47990 /* AppDelegate.swift in Sources */,
-				6428A5132C3FA32B00C47990 /* kakaoAuthViewModel.swift in Sources */,
+				6428A5132C3FA32B00C47990 /* LoginViewModel.swift in Sources */,
 				6428A48F2C3D20C600C47990 /* ContentView.swift in Sources */,
 				6428A48D2C3D20C600C47990 /* SnapFitApp.swift in Sources */,
 				6428A4C42C3D64D200C47990 /* SplashView.swift in Sources */,
@@ -385,6 +387,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SnapFit/SnapFit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapFit/Preview Content\"";
@@ -417,6 +420,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SnapFit/SnapFit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapFit/Preview Content\"";

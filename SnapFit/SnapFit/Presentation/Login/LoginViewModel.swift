@@ -9,11 +9,16 @@ import Foundation
 import Combine
 import KakaoSDKAuth
 import KakaoSDKUser
+import AuthenticationServices
 
-class KakaoAuthViewModel: ObservableObject {
+class LoginViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelegate {
     
     @Published var isKakaoLogin = false
     @Published var isKakaoLogout = false
+    
+    @Published var isAppleLoggedIn = false // Apple 로그인 상태를 추적하는 상태 변수
+    @Published var appleUserIdentifier: String? = nil // Apple 사용자 식별자를 추적하는 상태 변수
+
     /*
      애플로그인 플로우
      ios > 애플서버 > 응답받음(id token) > 우리 서버로 전송 - 클라
@@ -76,6 +81,45 @@ class KakaoAuthViewModel: ObservableObject {
                 print("logout() success.")
             }
         }
+    }
+    
+    func handleAppleLogin(request: ASAuthorizationAppleIDRequest) {
+        request.requestedScopes = [.fullName, .email]
+    }
+    
+    func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authResults):
+            print("Apple Login Successful")
+            switch authResults.credential {
+            case let appleIDCredential as ASAuthorizationAppleIDCredential:
+                // 계정 정보 가져오기
+                let userIdentifier = appleIDCredential.user
+                let fullName = appleIDCredential.fullName
+                let name = (fullName?.familyName ?? "") + (fullName?.givenName ?? "")
+                let email = appleIDCredential.email
+                let identityToken = String(data: appleIDCredential.identityToken!, encoding: .utf8)
+                let authorizationCode = String(data: appleIDCredential.authorizationCode!, encoding: .utf8)
+                
+                // 로그인 상태 업데이트
+                self.isAppleLoggedIn = true
+                self.appleUserIdentifier = userIdentifier
+
+            default:
+                break
+            }
+        case .failure(let error):
+            print(error.localizedDescription)
+            print("Apple Login Error")
+        }
+    }
+    
+    func handleAppleLogout() {
+        // Apple 로그인 관련 사용자 정보를 지우는 로직
+        isAppleLoggedIn = false
+        appleUserIdentifier = nil
+        // 추가적으로 키체인이나 로컬 저장소에서 데이터 삭제 필요
+        print("Apple Logout Successful")
     }
 
 }
