@@ -8,12 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @StateObject var kakaoAuthVM = KakaoAuthViewModel()
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Button {
+                // Action
+                kakaoAuthVM.handleKakaoLogin()
+                
+            } label: {
+                Text("카카오 로그인")
+            }
+            
+            Button {
+                // Action
+                kakaoAuthVM.handleKakaoLogout()
+            } label: {
+                Text("카카오 로그아웃")
+            }
         }
         .padding()
     }

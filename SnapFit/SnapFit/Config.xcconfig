@@ -1,0 +1,12 @@
+//
+//  Config.xcconfig
+//  SnapFit
+//
+//  Created by 정정욱 on 7/10/24.
+//
+
+// 고유 키 값 여기에서 설정해서 변수 처럼 사용 가능
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+KAKAO_NATIVE_APP_KEY = d2a009be6a813c4242ff535f07a088c1
