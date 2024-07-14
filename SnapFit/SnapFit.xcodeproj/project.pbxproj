@@ -26,6 +26,7 @@
 		6496CB442C42CECA00381F0F /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3E2C42CECA00381F0F /* LoginView.swift */; };
 		6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3F2C42CECA00381F0F /* LoginModel.swift */; };
 		6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB402C42CECA00381F0F /* LoginConfigurator.swift */; };
+		6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB482C43B81B00381F0F /* AuthWorker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		6496CB3E2C42CECA00381F0F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		6496CB3F2C42CECA00381F0F /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		6496CB402C42CECA00381F0F /* LoginConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginConfigurator.swift; sourceTree = "<group>"; };
+		6496CB482C43B81B00381F0F /* AuthWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthWorker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,7 +173,6 @@
 		6428A5102C3FA2F400C47990 /* Login2 */ = {
 			isa = PBXGroup;
 			children = (
-				6428A5122C3FA32B00C47990 /* LoginViewModel.swift */,
 			);
 			path = Login2;
 			sourceTree = "<group>";
@@ -206,6 +207,8 @@
 				6496CB3E2C42CECA00381F0F /* LoginView.swift */,
 				6496CB3F2C42CECA00381F0F /* LoginModel.swift */,
 				6496CB402C42CECA00381F0F /* LoginConfigurator.swift */,
+				6496CB482C43B81B00381F0F /* AuthWorker.swift */,
+				6428A5122C3FA32B00C47990 /* LoginViewModel.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -298,6 +301,7 @@
 				6496CB442C42CECA00381F0F /* LoginView.swift in Sources */,
 				6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */,
 				6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */,
+				6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */,
 				6428A5132C3FA32B00C47990 /* LoginViewModel.swift in Sources */,
 				6428A48F2C3D20C600C47990 /* ContentView.swift in Sources */,
 				6428A48D2C3D20C600C47990 /* SnapFitApp.swift in Sources */,
@@ -443,6 +447,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapFit/App/Config/info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "SnapFit 에서 Face ID를 사용하려고 합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -476,6 +481,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapFit/App/Config/info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "SnapFit 에서 Face ID를 사용하려고 합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

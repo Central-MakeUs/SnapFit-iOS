@@ -8,34 +8,51 @@
 import SwiftUI
 import _AuthenticationServices_SwiftUI
 
+
+// Presenter에서 전달 받을 기능들을 정의 UI 업데이트 관현 
 protocol LoginDisplayLogic {
     func display(viewModel: Login.LoadLogin.ViewModel)
 }
 
-extension LoginView: LoginDisplayLogic {
-    // 확장으로 프리젠터에서 뷰모델로 들어와 값을 변경 뷰를 바뀌 하는 부분
-    func display(viewModel: Login.LoadLogin.ViewModel) {}
-    func fetch() {}
-}
-
-struct LoginView: View {
+struct LoginView: View, LoginDisplayLogic {
+    
+    // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직 
+    func display(viewModel: Login.LoadLogin.ViewModel) {
+        self.viewModel.loginMessage = viewModel.message
+        if viewModel.success {
+            if viewModel.message.contains("Kakao login successful") {
+                self.viewModel.isKakaoLogin = true
+            } 
+            else if viewModel.message.contains("Kakao logout successful") {
+                self.viewModel.isKakaoLogin = false
+            }
+            else if viewModel.message.contains("Apple login successful") {
+                self.viewModel.isAppleLoggedIn = true
+            } else if viewModel.message.contains("Apple logout successful") {
+                self.viewModel.isAppleLoggedIn = false
+            }
+        }
+    }
+    
+    /*
+     위치 대신에 분위기만
+     카드 UI 동일
+     */
+    
+    @ObservedObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
-    
-    //@ObservedObject var Login = LoginDataStore()
-    
-    @StateObject var loginVM = LoginViewModel()
-    
+
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                Spacer().frame(height: 110) // Push the logo down by 110 points
+                Spacer().frame(height: 110)
                 
                 Group {
                     Image("appLogo")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 141.33, height: 38.12)
-                        .padding(.bottom, 10) // Add some bottom padding
+                        .padding(.bottom, 10)
                     
                     Text("나에게 맞는 사진을 만날 수 있는,")
                     Text("스냅핏에 오신걸 환영합니다!")
@@ -44,20 +61,14 @@ struct LoginView: View {
                 .font(.title3)
                 .padding(.trailing, 80)
                 
-                //   .frame(maxWidth: .infinity)
                 Spacer()
                 
-                
-                LoginViewGroup(loginViewModel: loginVM)
-                // 애플로그인 버튼
-                
-                
+                LoginViewGroup(interactor: interactor, viewModel: viewModel)
                 
                 Spacer().frame(height: 110)
-                
             }
             .padding(.horizontal, 15)
-            .frame(width: geometry.size.width, height: geometry.size.height) // Ensure the VStack takes up the full screen
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .background(
                 Image("splash")
                     .resizable()
@@ -66,27 +77,33 @@ struct LoginView: View {
                     .clipped()
             )
         }
-        .ignoresSafeArea() // Ensure the content extends to the safe area edges
+        .ignoresSafeArea()
         .task {
-            fetch()
+            interactor?.load(request: Login.LoadLogin.Request())
+        }
+        .alert(isPresented: Binding<Bool>(get: {
+            !viewModel.loginMessage.isEmpty
+        }, set: { _ in })) {
+            Alert(title: Text("Login"), message: Text(viewModel.loginMessage), dismissButton: .default(Text("OK")))
+        }
+        .onAppear {
+            interactor?.load(request: Login.LoadLogin.Request())
         }
     }
 }
 
-
-
-// MARK: - 로그인 묶음 뷰
 private struct LoginViewGroup: View {
-    @ObservedObject private var loginVM: LoginViewModel
+    private var interactor: LoginBusinessLogic?
     
-    // fileprivate 같은 파일 내에서만 접근 가능
-    fileprivate init(loginViewModel: LoginViewModel) {
-        self.loginVM = loginViewModel
+    @ObservedObject var viewModel: LoginViewModel
+    
+    init(interactor: LoginBusinessLogic?, viewModel: LoginViewModel) {
+        self.interactor = interactor
+        self.viewModel = viewModel
     }
     
     fileprivate var body: some View {
         VStack(spacing: 20) {
-            
             Image("LoginDscription")
                 .resizable()
                 .scaledToFill()
@@ -102,15 +119,11 @@ private struct LoginViewGroup: View {
                             .font(.caption)
                             .foregroundColor(.black)
                     }
-                    .offset(y: -5)  // Adjust the y-offset value as needed
+                    .offset(y: -5)
                 }
             
-            
-            // 카카오 로그인 버튼
             Button {
-                // Action
-                loginVM.handleKakaoLogin()
-                
+                interactor?.handleKakaoLogin()
             } label: {
                 HStack(spacing: 70) {
                     Image("kakaoButton")
@@ -127,21 +140,27 @@ private struct LoginViewGroup: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    Color.yellow
-                    
-                )
+                .background(Color.yellow)
             }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             
+            // 카카오 로그아웃 버튼
+            if viewModel.isKakaoLogin {
+                Button {
+                    interactor?.handleKakaoLogout()
+                } label: {
+                    Text("카카오 로그아웃")
+                }
+            }
             
-            // 애플 로그인 버튼
+            
+            
             SignInWithAppleButton(
-                onRequest: loginVM.handleAppleLogin,
-                onCompletion: loginVM.handleAppleLoginCompletion
+                onRequest: { request in interactor?.handleAppleLogin(request: request) },
+                onCompletion: { result in interactor?.handleAppleLoginCompletion(result: result) }
             )
-            .overlay(content: {
+            .overlay {
                 HStack(spacing: 70) {
                     Image("AppleButton")
                         .resizable()
@@ -157,39 +176,35 @@ private struct LoginViewGroup: View {
                     Spacer()
                 }
                 .padding()
-                .background(
-                    Color.black
-                    
-                )
-            })
+                .background(Color.black)
+                .allowsHitTesting(false)  // 터치 이벤트를 허용하지 않음
+                // 오버레이를 사용하되 터치 이벤트를 하위뷰로 전달할 수 있음
+            }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             
-            // 둘러보기 버튼
-            Button {
-                // Action
-            } label: {
-                Text("둘러보기")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(white: 0.7))  // Adjust this value for a brighter gray
-                    .underline()
-            }
             
-            
-            if loginVM.isAppleLoggedIn {
+            // Apple 로그아웃 버튼
+            if viewModel.isAppleLoggedIn {
                 Button {
-                    // Apple 로그아웃 액션
-                    loginVM.handleAppleLogout()
+                    interactor?.handleAppleLogout()
                 } label: {
-                    Text("Apple 로그아웃")
+                    Text("애플 로그아웃")
                 }
             }
             
-            
+            Button {
+                // Action for "둘러보기"
+            } label: {
+                Text("둘러보기")
+                    .font(.system(size: 15))
+                    .foregroundColor(Color(white: 0.7))
+                    .underline()
+            }
         }
-        
     }
 }
+
 
 
 private struct AppleSigninButton : View{
@@ -229,6 +244,6 @@ private struct AppleSigninButton : View{
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        return LoginView()
+        return LoginView(viewModel: LoginViewModel(), interactor: nil)
     }
 }
