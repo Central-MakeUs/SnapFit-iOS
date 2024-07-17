@@ -18,6 +18,8 @@ struct TermsView: View {
     @State private var isMarketingAgreed = false // 광고성 정보 수신 및 마케팅 활용 동의 토글 상태
     @State private var isConfirmButtonEnabled = false // 확인 버튼 활성화 상태
 
+    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    
     var body: some View {
         VStack(alignment: .leading) {
             
@@ -104,18 +106,33 @@ struct TermsView: View {
                 // Action for "확인"
             } label: {
                 HStack(spacing: 20) {
-                    Spacer()
-                     
-                    Text("다음")
-                        .font(.headline)
-                        .bold()
-                        .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
-
-                    Spacer()
+                    NavigationLink(destination: NicknameSettingsView().navigationBarBackButtonHidden(true)) {
+                        Spacer()
+                        
+                        Text("다음")
+                            .font(.headline)
+                            .bold()
+                            .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
+                        
+                        Spacer()
+                    }
                 }
                 .padding()
                 .background(isConfirmButtonEnabled ? Color(.black) : Color(.systemGray4))
             
+            }
+            .disabled(!isConfirmButtonEnabled)
+            
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
             }
         }
     }

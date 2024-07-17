@@ -16,18 +16,23 @@ protocol LoginDisplayLogic {
 
 struct LoginView: View, LoginDisplayLogic {
     
-    // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직 
+    // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직
     func display(viewModel: Login.LoadLogin.ViewModel) {
         self.viewModel.loginMessage = viewModel.message
         if viewModel.success {
             if viewModel.message.contains("Kakao login successful") {
                 self.viewModel.isKakaoLogin = true
-            } 
+                self.viewModel.shouldNavigate.toggle()
+                print("shouldNavigate \(self.viewModel.shouldNavigate)")
+            }
             else if viewModel.message.contains("Kakao logout successful") {
                 self.viewModel.isKakaoLogin = false
             }
             else if viewModel.message.contains("Apple login successful") {
                 self.viewModel.isAppleLoggedIn = true
+                self.viewModel.shouldNavigate.toggle()
+                print("shouldNavigate \(self.viewModel.shouldNavigate)")
+                
             } else if viewModel.message.contains("Apple logout successful") {
                 self.viewModel.isAppleLoggedIn = false
             }
@@ -41,55 +46,69 @@ struct LoginView: View, LoginDisplayLogic {
     
     @ObservedObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
-
+    
+    @State var stack = NavigationPath() // 초기 설정
+    
     var body: some View {
-        GeometryReader { geometry in
-            VStack(alignment: .leading) {
-                Spacer().frame(height: 110)
-                
-                Group {
-                    Image("appLogo")
+        NavigationStack(path: $stack) {
+            GeometryReader { geometry in
+                VStack(alignment: .leading) {
+                    Spacer().frame(height: 110)
+                    
+                    Group {
+                        Image("appLogo")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 141.33, height: 38.12)
+                            .padding(.bottom, 10)
+                        
+                        Text("나에게 맞는 사진을 만날 수 있는,")
+                        Text("스냅핏에 오신걸 환영합니다!")
+                    }
+                    .foregroundColor(.white)
+                    .font(.title3)
+                    .padding(.trailing, 80)
+                    
+                    Spacer()
+                    
+                    LoginViewGroup(interactor: interactor, viewModel: viewModel)
+                    
+                    Spacer().frame(height: 110)
+                }
+                .padding(.horizontal, 15)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .background(
+                    Image("splash")
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 141.33, height: 38.12)
-                        .padding(.bottom, 10)
-                    
-                    Text("나에게 맞는 사진을 만날 수 있는,")
-                    Text("스냅핏에 오신걸 환영합니다!")
-                }
-                .foregroundColor(.white)
-                .font(.title3)
-                .padding(.trailing, 80)
-                
-                Spacer()
-                
-                LoginViewGroup(interactor: interactor, viewModel: viewModel)
-                
-                Spacer().frame(height: 110)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                )
             }
-            .padding(.horizontal, 15)
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .background(
-                Image("splash")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-            )
-        }
-        .ignoresSafeArea()
-        .task {
-            interactor?.load(request: Login.LoadLogin.Request())
-        }
-        .alert(isPresented: Binding<Bool>(get: {
-            !viewModel.loginMessage.isEmpty
-        }, set: { _ in })) {
-            Alert(title: Text("Login"), message: Text(viewModel.loginMessage), dismissButton: .default(Text("OK")))
-        }
-        .onAppear {
-            interactor?.load(request: Login.LoadLogin.Request())
-        }
+            .navigationDestination(isPresented: $viewModel.shouldNavigate) {
+                TermsView()
+                    .navigationBarBackButtonHidden(true)
+            }
+            .ignoresSafeArea()
+            .task {
+                interactor?.load(request: Login.LoadLogin.Request())
+            }
+//            .alert(isPresented: Binding<Bool>(get: {
+//                !viewModel.loginMessage.isEmpty
+//            }, set: { _ in })) {
+//                Alert(title: Text("Login"), message: Text(viewModel.loginMessage), dismissButton: .default(Text("OK")))
+//            }
+            .onAppear {
+                interactor?.load(request: Login.LoadLogin.Request())
+                
+            }
+          
+        } // NavigationView
+        .navigationViewStyle(StackNavigationViewStyle())
+        
     }
+  
+
 }
 
 private struct LoginViewGroup: View {
@@ -119,7 +138,7 @@ private struct LoginViewGroup: View {
                             .font(.caption)
                             .foregroundColor(.black)
                     }
-                    .offset(y: -5)
+                    .offset(y: -7)
                 }
             
             Button {

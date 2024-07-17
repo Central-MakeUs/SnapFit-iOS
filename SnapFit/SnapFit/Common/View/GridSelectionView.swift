@@ -13,6 +13,8 @@ struct GridSelectionView: View {
     
     let moods: [String]
     
+    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    
     var body: some View {
         VStack(alignment: .leading) {
             
@@ -65,12 +67,15 @@ struct GridSelectionView: View {
             
             Button {
                 // Action for "다음"
+                /*
+                💁 API 통신 작업 들어가야함 (사용자 닉네임,선택한 분위기 데이터 및 토큰 값 전송)
+                 */
             } label: {
                 HStack(spacing: 20) {
                     Spacer()
                     
-                    Text("다음")
-                        .font(.system(size: 20))
+                    Text("시작하기")
+                        .font(.headline)
                         .bold()
                         .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
                     
@@ -82,6 +87,17 @@ struct GridSelectionView: View {
                 .padding(EdgeInsets(top: 0, leading: 20, bottom: 20, trailing: 20))
             }
             .disabled(!isConfirmButtonEnabled)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+            }
         }
         .overlay(
             ZStack {

@@ -15,8 +15,10 @@ import AuthenticationServices
 class LoginViewModel: NSObject, ObservableObject {
     @Published var isKakaoLogin = false
     @Published var isAppleLoggedIn = false
+    @Published var shouldNavigate: Bool = false
     @Published var appleUserIdentifier: String? = nil
     @Published var loginMessage: String = ""
+   
     
     // 뷰에서 해당 메서드를 통해 값을 바꿈 -> 프리젠터에서 값을 받아 뷰를 업데이트
 //    func display(viewModel: Login.LoadLogin.ViewModel) {
