@@ -15,6 +15,9 @@ struct GridSelectionView: View {
     
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
+    @ObservedObject var viewModel: LoginViewModel
+    var interactor: LoginBusinessLogic?
+    
     var body: some View {
         VStack(alignment: .leading) {
             
@@ -68,8 +71,18 @@ struct GridSelectionView: View {
             Button {
                 // Action for "다음"
                 /*
-                💁 API 통신 작업 들어가야함 (사용자 닉네임,선택한 분위기 데이터 및 토큰 값 전송)
+                 💁 API 통신 작업 들어가야함 (사용자 닉네임,선택한 분위기 데이터 및 토큰 값 전송)
                  */
+                // Action for "시작하기"
+                interactor?.userCreated(request: Login.LoadLogin.Request(
+                    social: viewModel.social,
+                    nickName: viewModel.nickName,
+                    isMarketing: viewModel.isMarketing
+                ))
+                
+                // 화면을 사라지게 하는 코드
+                presentationMode.wrappedValue.dismiss()
+               
             } label: {
                 HStack(spacing: 20) {
                     Spacer()
@@ -152,6 +165,6 @@ struct CustomAlertView: View {
 
 struct GridSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"])
+        GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel: LoginViewModel(), interactor: nil)
     }
 }

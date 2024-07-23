@@ -11,7 +11,7 @@ import AuthenticationServices
 
 // 뷰에게 전달할 Presenter 기능들을 정의
 protocol LoginPresentationLogic {
-    func presentKakaoLoginSuccess(_ oauthToken: OAuthToken?)
+    func presentKakaoLoginSuccess(_ oauthToken: String?)
     func presentKakaoLoginFailure(_ error: Error)
     func presentKakaoLogoutSuccess()
     
@@ -19,12 +19,16 @@ protocol LoginPresentationLogic {
     func presentAppleLoginFailure(_ error: Error)
     func presentAppleLogoutSuccess()
     func presentAppleLogoutFailure(_ error: Error)
+    
+    func presentUserCreated(_ tokens: Tokens)
+    func presentUserCreationFailed(_ error: ApiError)
+    
 }
 
 class LoginPresenter: LoginPresentationLogic {
     var view: LoginDisplayLogic?
     
-    func presentKakaoLoginSuccess(_ oauthToken: OAuthToken?) {
+    func presentKakaoLoginSuccess(_ oauthToken: String?) {
         // 뷰모델에게 값을 전달 하여 뷰를 업데이트
         let viewModel = Login.LoadLogin.ViewModel(success: true, message: "Kakao login successful")
         view?.display(viewModel: viewModel)
@@ -59,4 +63,12 @@ class LoginPresenter: LoginPresentationLogic {
         let viewModel = Login.LoadLogin.ViewModel(success: false, message: "Apple logout failed: \(error.localizedDescription)")
         view?.display(viewModel: viewModel)
     }
+    
+    func presentUserCreated(_ tokens: Tokens) {
+         //viewController?.displayUserCreated()
+     }
+     
+     func presentUserCreationFailed(_ error: ApiError) {
+         //viewController?.displayUserCreationFailed(error)
+     }
 }

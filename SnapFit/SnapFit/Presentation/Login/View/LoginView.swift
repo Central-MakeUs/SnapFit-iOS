@@ -21,6 +21,8 @@ struct LoginView: View, LoginDisplayLogic {
         self.viewModel.loginMessage = viewModel.message
         if viewModel.success {
             if viewModel.message.contains("Kakao login successful") {
+                self.viewModel.social = "kakao"
+                print("viewModel.social \(self.viewModel.social)")
                 self.viewModel.isKakaoLogin = true
                 self.viewModel.shouldNavigate.toggle()
                 print("shouldNavigate \(self.viewModel.shouldNavigate)")
@@ -29,8 +31,10 @@ struct LoginView: View, LoginDisplayLogic {
                 self.viewModel.isKakaoLogin = false
             }
             else if viewModel.message.contains("Apple login successful") {
+                self.viewModel.social = "APPLE"
                 self.viewModel.isAppleLoggedIn = true
                 self.viewModel.shouldNavigate.toggle()
+                print("viewModel.social \(self.viewModel.social)")
                 print("shouldNavigate \(self.viewModel.shouldNavigate)")
                 
             } else if viewModel.message.contains("Apple logout successful") {
@@ -86,12 +90,12 @@ struct LoginView: View, LoginDisplayLogic {
                 )
             }
             .navigationDestination(isPresented: $viewModel.shouldNavigate) {
-                TermsView()
+                TermsView(viewModel: viewModel, interactor: interactor)
                     .navigationBarBackButtonHidden(true)
             }
             .ignoresSafeArea()
             .task {
-                interactor?.load(request: Login.LoadLogin.Request())
+                //interactor?.load(request: Login.LoadLogin.Request())
             }
 //            .alert(isPresented: Binding<Bool>(get: {
 //                !viewModel.loginMessage.isEmpty
@@ -99,7 +103,7 @@ struct LoginView: View, LoginDisplayLogic {
 //                Alert(title: Text("Login"), message: Text(viewModel.loginMessage), dismissButton: .default(Text("OK")))
 //            }
             .onAppear {
-                interactor?.load(request: Login.LoadLogin.Request())
+                //interactor?.load(request: Login.LoadLogin.Request())
                 
             }
           

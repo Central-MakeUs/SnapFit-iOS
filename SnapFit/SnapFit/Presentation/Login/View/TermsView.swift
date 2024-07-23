@@ -15,10 +15,19 @@ struct TermsView: View {
     @State private var isAllAgreed = false // 전체동의 토글 상태
     @State private var isTermsAgreed = false // 이용약관 동의 토글 상태
     @State private var isPrivacyPolicyAgreed = false // 개인정보 처리 방침 동의 토글 상태
-    @State private var isMarketingAgreed = false // 광고성 정보 수신 및 마케팅 활용 동의 토글 상태
+    
+    @State private var isMarketingAgreed = false {
+         didSet {
+             viewModel.is_marketing = isMarketingAgreed
+         }
+     } // 광고성 정보 수신 및 마케팅 활용 동의 토글 상태
+    
     @State private var isConfirmButtonEnabled = false // 확인 버튼 활성화 상태
 
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    
+    @ObservedObject var viewModel: LoginViewModel
+    var interactor: LoginBusinessLogic?
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -106,7 +115,7 @@ struct TermsView: View {
                 // Action for "확인"
             } label: {
                 HStack(spacing: 20) {
-                    NavigationLink(destination: NicknameSettingsView().navigationBarBackButtonHidden(true)) {
+                    NavigationLink(destination: NicknameSettingsView(viewModel: viewModel,  interactor: interactor).navigationBarBackButtonHidden(true)) {
                         Spacer()
                         
                         Text("다음")
@@ -205,5 +214,5 @@ struct TermsToggleButton: View {
 }
 
 #Preview {
-    TermsView()
+    TermsView(viewModel: LoginViewModel())
 }
