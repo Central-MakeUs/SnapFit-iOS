@@ -24,65 +24,22 @@ struct DibsView: View {
     
     var body: some View {
         VStack{
-            HStack {
-                TabButton(title: "상품", isSelected: selectedTab == 0) {
-                    withAnimation {
-                        selectedTab = 0
-                    }
-                }
-                TabButton(title: "작가", isSelected: selectedTab == 1) {
-                    withAnimation {
-                        selectedTab = 1
+            
+            
+            
+            // 상품 탭의 내용
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(0..<10, id: \.self) { item in
+                        CardView(sizeType: .middle)
+                            .frame(width: 174, height: 322)
+                            .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
                     }
                 }
             }
-            .frame(height: 57)
-            .background(Color.white)
-            .overlay(
-                RoundedRectangle(cornerRadius: 0)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-            )
+            .padding(.horizontal)
+            .padding(.bottom)
             
-            
-            // Indicator
-            GeometryReader { geometry in
-                Rectangle()
-                    .frame(width: geometry.size.width / 2, height: 2)
-                    .foregroundColor(.black)
-                    .offset(x: selectedTab == 0 ? 0 : geometry.size.width / 2)
-            }
-            .frame(height: 2)
-            
-            
-            
-            // Content based on selected tab
-            if selectedTab == 0 {
-                // 상품 탭의 내용
-                ScrollView(.vertical, showsIndicators: false) {
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(0..<10, id: \.self) { item in
-                            CardView(sizeType: .middle)
-                                .frame(width: 174, height: 322)
-                                .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-            } else if selectedTab == 1 {
-                // 작가 탭의 내용
-                ScrollView(.vertical, showsIndicators: false) {
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(0..<10, id: \.self) { item in
-                            CardView(sizeType: .middle)
-                                .frame(width: 174, height: 322)
-                                .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -104,25 +61,27 @@ struct DibsView: View {
     }
 }
 
-
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
+struct DibsEmptyView: View {
     var body: some View {
-        Button(action: action) {
-            VStack {
-                Text(title)
-                    .foregroundColor(isSelected ? .black : .gray)
-                    .font(.headline)
-                
-            }
+        VStack(alignment: .center ,spacing: 15){
+            
+            Image("EmptyLogo")
+                .resizable()
+                .frame(width: 30, height: 47)
+            
+            Text("상품을 찜해보세요!")
+                .bold()
+        
+            Text("찜한 상품이 없습니다.")
+                .foregroundStyle(Color(.systemGray))
         }
-        .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
     DibsView()
+}
+
+#Preview {
+    DibsEmptyView()
 }

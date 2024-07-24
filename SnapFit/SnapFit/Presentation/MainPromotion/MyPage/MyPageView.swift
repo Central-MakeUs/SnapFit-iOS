@@ -16,27 +16,35 @@ struct MyPageView: View {
         NavigationStack(path: $stack) {
             ScrollView {
                 VStack(alignment: .leading){
-                    Rectangle()
-                        .foregroundColor(.black)
-                        .frame(width: .infinity, height: 168)
-                        .overlay {
-                            PhotosPicker(selection: $viewModel.selectedItem) {
-                                if let profileImage = viewModel.profileImage {
-                                    profileImage
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 86, height: 86)
-                                        .clipShape(Circle())
-                                } else {
-                                    Image("profile")
-                                        .resizable()
-                                        .frame(width: 86, height: 86)
-                                        .foregroundStyle(Color(.systemGray4))
-                                }
-                                
+                    ZStack {
+                        Rectangle()
+                            .foregroundColor(.black)
+                            .frame(width: .infinity, height: 168)
+                            .overlay {
+                                Image("profile")
+                                    .resizable()
+                                    .frame(width: 86, height: 86)
+                                    .foregroundStyle(Color(.systemGray4))
+                                    .offset(x: -130, y: 81)
                             }
-                            .offset(x: -130, y: 81)
+                        
+                        Button(action: {
+                            // 예약 내역 버튼 액션
+                        }) {
+                            NavigationLink(destination: MyProfileEdit(viewModel : viewModel).navigationBarBackButtonHidden(true)) {
+                                
+                                Image(systemName: "pencil.line")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24)
+                                    .foregroundColor(.white)
+                            }
+                            
                         }
+                        .offset(x: 160, y: -50)
+                     
+                    }
+                   
                     
                     Group {
                         Text("한소희")
@@ -56,7 +64,8 @@ struct MyPageView: View {
                         }
                         .padding(.vertical, 10) // 세로 패딩을 줄임
                         .padding(.horizontal, 10) // 가로 패딩을 줄임
-                        .background(Color("profileLabelColor"))
+                        //.background(Color("profileLabelColor"))
+                        .background(Color(.black))
                         .cornerRadius(5)
                     }
                     .padding(.horizontal)
@@ -64,27 +73,6 @@ struct MyPageView: View {
                     
                 }
                 
-                /*
-                 Button {
-                 // Action for "확인"
-                 } label: {
-                 HStack(spacing: 20) {
-                 NavigationLink(destination: NicknameSettingsView().navigationBarBackButtonHidden(true)) {
-                 Spacer()
-                 
-                 Text("다음")
-                 .font(.headline)
-                 .bold()
-                 .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
-                 
-                 Spacer()
-                 }
-                 }
-                 .padding()
-                 .background(isConfirmButtonEnabled ? Color(.black) : Color(.systemGray4))
-                 
-                 }
-                 */
                 
                 HStack(spacing: 0) {
                     Button(action: {
@@ -165,11 +153,10 @@ struct MyPageView: View {
                 
                 GroupBox {
                     // content
-                    AppInfoContent(name: "설정")
                     AppInfoContent(name: "고객센터")
-                    
+                    AppInfoContent(name: "이용약관")
                 } label: {
-                    AppInfoLabel(labelText: "SnapFit 정보")
+                    AppInfoLabel(labelText: "SnapFit 설정")
                 }//: GROUPBOX
                 .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
                 
@@ -181,6 +168,7 @@ struct MyPageView: View {
                 
             }
         }
+        .accentColor(.black) // 내비게이션 링크 색상을 검정색으로 변경
         .ignoresSafeArea(.container, edges: .top)
     }
     
