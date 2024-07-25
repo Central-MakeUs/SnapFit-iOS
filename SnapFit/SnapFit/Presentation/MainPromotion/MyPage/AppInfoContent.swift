@@ -21,35 +21,47 @@ struct AppInfoContent: View {
                 .padding(.vertical, 5)
             
             HStack {
-                Text(name)
-                    .foregroundColor(.black)
-                    .font(.system(size: 14))
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                // Condition
-                if (linkLabel != nil && linkDestination != nil) {
-                    // 2. LinkLabel, LinkDestination 이 있는 겨우
-                    Link(
-                        destination: URL(string: "https://\(linkDestination!)")!) {
-                            // label
-                            
-                            Spacer()
-                            
-                            Text(linkLabel!)
-                                .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
-                        } //: LINK
+                // Conditional NavigationLink
+                if name == "상품관리" {
+                    NavigationLink(destination: ProductManagementView().navigationBarBackButtonHidden(true)) {
+                        Text(name)
+                            .foregroundColor(.black)
+                            .font(.system(size: 14))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                } else if name == "예약관리" {
+                    NavigationLink(destination: ReservationManagementView().navigationBarBackButtonHidden(true)) {
+                        Text(name)
+                            .foregroundColor(.black)
+                            .font(.system(size: 14))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                } else {
+                    Text(name)
+                        .foregroundColor(.black)
+                        .font(.system(size: 14))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+
+                // Link condition
+                if let linkLabel = linkLabel, let linkDestination = linkDestination {
+                    Link(destination: URL(string: "https://\(linkDestination)")!) {
+                        Spacer()
+                        Text(linkLabel)
+                            .fontWeight(.bold)
+                            .foregroundColor(.accentColor)
+                    }
                     Image(systemName: "arrow.up.right.square").foregroundColor(.accentColor)
                 } else {
-                    // 3. 아무것도 없을때
                     EmptyView()
                 }
             } //: HSTACK
         } //: VSTACK
     }
 }
-
 
 
 struct AppInfoLabel: View {
@@ -62,13 +74,9 @@ struct AppInfoLabel: View {
             Text(labelText)
                 .font(.system(size: 16))
                 .fontWeight(.bold)
-            
-
-           
-        } //: HSTACKt
+        } //: HSTACK
     }
 }
-
 
 #Preview {
     Group {

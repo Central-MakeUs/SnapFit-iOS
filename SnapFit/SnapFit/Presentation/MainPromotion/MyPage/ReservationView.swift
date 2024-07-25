@@ -81,6 +81,39 @@ struct ReservationCardView: View {
     }
 }
 
+struct ReservationInfoCardView: View {
+    
+    
+    var body: some View {
+        HStack(spacing: 24){
+            Image("demo1")
+                .resizable()
+                .scaledToFill()
+                .frame(width: 130, height: 130)
+                .clipShape(RoundedRectangle(cornerRadius: 10)) // Apply corner radius
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("고급퀄리티 | 15년 경력, 홍대")
+                    .font(.system(size: 14))
+                
+                Text("유저 닉네임")
+                    .font(.caption)
+                    .foregroundStyle(Color(.systemGray5))
+                
+                Text("snap@naver.com")
+                    .font(.caption)
+                
+                Text("예약일시 24.02.22(목) 오후 5:00")
+                    .font(.system(size: 14))
+                
+               
+            }
+            
+        }
+    }
+}
+
+
 
 #Preview {
     ReservationView()
