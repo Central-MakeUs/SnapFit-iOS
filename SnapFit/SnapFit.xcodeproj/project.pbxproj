@@ -107,7 +107,6 @@
 			children = (
 				644EDABB2C4552AA00745DDD /* Common */,
 				6496CB2C2C42CE3900381F0F /* App */,
-				6428A49C2C3D22F900C47990 /* Data */,
 				6428A49A2C3D22E900C47990 /* Presentation */,
 				6428A4902C3D20C900C47990 /* Assets.xcassets */,
 				6428A4FD2C3E891E00C47990 /* LaunchScreen.storyboard */,
@@ -172,6 +171,7 @@
 				6496CB482C43B81B00381F0F /* AuthWorker.swift */,
 				6496CB3C2C42CECA00381F0F /* LoginDataStore.swift */,
 				64FDCCE82C5006030033447D /* ApiError.swift */,
+				6428A49C2C3D22F900C47990 /* Data */,
 			);
 			path = "Interactor & Worker";
 			sourceTree = "<group>";

@@ -15,6 +15,7 @@ struct NicknameSettingsView: View {
     
     @ObservedObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
+    @State private var shouldNavigate = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -50,9 +51,10 @@ struct NicknameSettingsView: View {
                 // Action for "확인"
                 // 서버랑 액션이 들어갈듯
                 viewModel.nickName = inputText
+                shouldNavigate.toggle()
             } label: {
                 HStack(spacing: 20) {
-                    NavigationLink(destination: GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)) {
+                   
                         Spacer()
                         
                         Text("다음")
@@ -61,8 +63,9 @@ struct NicknameSettingsView: View {
                             .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
                         
                         Spacer()
-                    }
+                    
                 }
+                
                 .padding()
                 .background(isConfirmButtonEnabled ? Color(.black) : Color(.systemGray4))
                 .cornerRadius(10)
@@ -70,6 +73,9 @@ struct NicknameSettingsView: View {
             }
             .disabled(!isConfirmButtonEnabled)
             // true일 때는 뷰가 비활성화되고, false일 때는 뷰가 활성화
+        }
+        .navigationDestination(isPresented: $shouldNavigate) {
+            GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -82,6 +88,7 @@ struct NicknameSettingsView: View {
                 }
             }
         }
+      
     }
 
 }

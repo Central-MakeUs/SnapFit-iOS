@@ -10,7 +10,7 @@ import _AuthenticationServices_SwiftUI
 
 struct ContentView: View {
     
-    //@StateObject var loginVM = LoginViewModel()
+    @StateObject var loginVM = LoginViewModel()
     var body: some View {
         VStack {
 //            Image(systemName: "globe")
@@ -47,7 +47,7 @@ struct ContentView: View {
 //                }
 //            }
             
-            LoginView(viewModel: LoginViewModel()).configureView()
+            LoginView(viewModel: loginVM).configureView()
         }
 
     }

@@ -74,10 +74,12 @@ struct GridSelectionView: View {
                  💁 API 통신 작업 들어가야함 (사용자 닉네임,선택한 분위기 데이터 및 토큰 값 전송)
                  */
                 // Action for "시작하기"
+            
                 interactor?.userCreated(request: Login.LoadLogin.Request(
                     social: viewModel.social,
                     nickName: viewModel.nickName,
-                    isMarketing: viewModel.isMarketing
+                    isMarketing: viewModel.isMarketing,
+                    oauthToken: viewModel.oauthToken
                 ))
                 
                 // 화면을 사라지게 하는 코드

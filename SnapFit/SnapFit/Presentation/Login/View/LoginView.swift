@@ -1,57 +1,39 @@
-//
-//  LoginView.swift
-//  SnapFit
-//
-//  Created by 정정욱 on 7/14/24.
-//
-//
 import SwiftUI
 import _AuthenticationServices_SwiftUI
 
-
-// Presenter에서 전달 받을 기능들을 정의 UI 업데이트 관현 
+// Presenter에서 전달 받을 기능들을 정의 UI 업데이트 관련
 protocol LoginDisplayLogic {
     func display(viewModel: Login.LoadLogin.ViewModel)
 }
 
 struct LoginView: View, LoginDisplayLogic {
     
+    @ObservedObject var viewModel: LoginViewModel
+    var interactor: LoginBusinessLogic?
+    @State private var stack = NavigationPath() // 초기 설정
+    
     // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직
     func display(viewModel: Login.LoadLogin.ViewModel) {
         self.viewModel.loginMessage = viewModel.message
-        if viewModel.success {
-            if viewModel.message.contains("Kakao login successful") {
-                self.viewModel.social = "kakao"
-                print("viewModel.social \(self.viewModel.social)")
-                self.viewModel.isKakaoLogin = true
-                self.viewModel.shouldNavigate.toggle()
-                print("shouldNavigate \(self.viewModel.shouldNavigate)")
-            }
-            else if viewModel.message.contains("Kakao logout successful") {
-                self.viewModel.isKakaoLogin = false
-            }
-            else if viewModel.message.contains("Apple login successful") {
-                self.viewModel.social = "APPLE"
-                self.viewModel.isAppleLoggedIn = true
-                self.viewModel.shouldNavigate.toggle()
-                print("viewModel.social \(self.viewModel.social)")
-                print("shouldNavigate \(self.viewModel.shouldNavigate)")
-                
-            } else if viewModel.message.contains("Apple logout successful") {
-                self.viewModel.isAppleLoggedIn = false
-            }
+        guard viewModel.success else { return }
+        
+        // 상태와 메시지에 따른 분기 처리
+        if viewModel.message.contains("Kakao login successful") {
+            self.viewModel.social = "kakao"
+            self.viewModel.isKakaoLogin = true
+            self.viewModel.oauthToken = viewModel.oauthToken
+            self.viewModel.shouldNavigate.toggle()
+        } else if viewModel.message.contains("Kakao logout successful") {
+            self.viewModel.isKakaoLogin = false
+        } else if viewModel.message.contains("Apple login successful") {
+            self.viewModel.social = "APPLE"
+            self.viewModel.isAppleLoggedIn = true
+            self.viewModel.oauthToken = viewModel.oauthToken
+            self.viewModel.shouldNavigate.toggle()
+        } else if viewModel.message.contains("Apple logout successful") {
+            self.viewModel.isAppleLoggedIn = false
         }
     }
-    
-    /*
-     위치 대신에 분위기만
-     카드 UI 동일
-     */
-    
-    @ObservedObject var viewModel: LoginViewModel
-    var interactor: LoginBusinessLogic?
-    
-    @State var stack = NavigationPath() // 초기 설정
     
     var body: some View {
         NavigationStack(path: $stack) {
@@ -95,29 +77,20 @@ struct LoginView: View, LoginDisplayLogic {
             }
             .ignoresSafeArea()
             .task {
-                //interactor?.load(request: Login.LoadLogin.Request())
+                // View가 로드될 때 초기 작업을 실행할 수 있음
+                // interactor?.load(request: Login.LoadLogin.Request())
             }
-//            .alert(isPresented: Binding<Bool>(get: {
-//                !viewModel.loginMessage.isEmpty
-//            }, set: { _ in })) {
-//                Alert(title: Text("Login"), message: Text(viewModel.loginMessage), dismissButton: .default(Text("OK")))
-//            }
             .onAppear {
-                //interactor?.load(request: Login.LoadLogin.Request())
-                
+                // View가 나타날 때 실행할 작업
+                // interactor?.load(request: Login.LoadLogin.Request())
             }
-          
-        } // NavigationView
+        }
         .navigationViewStyle(StackNavigationViewStyle())
-        
     }
-  
-
 }
 
 private struct LoginViewGroup: View {
     private var interactor: LoginBusinessLogic?
-    
     @ObservedObject var viewModel: LoginViewModel
     
     init(interactor: LoginBusinessLogic?, viewModel: LoginViewModel) {
@@ -146,7 +119,7 @@ private struct LoginViewGroup: View {
                 }
             
             Button {
-                interactor?.handleKakaoLogin()
+                interactor?.handleKakaoLogin() // Kakao 로그인 처리
             } label: {
                 HStack(spacing: 70) {
                     Image("kakaoButton")
@@ -168,16 +141,13 @@ private struct LoginViewGroup: View {
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             
-            // 카카오 로그아웃 버튼
             if viewModel.isKakaoLogin {
                 Button {
-                    interactor?.handleKakaoLogout()
+                    interactor?.handleKakaoLogout() // Kakao 로그아웃 처리
                 } label: {
                     Text("카카오 로그아웃")
                 }
             }
-            
-            
             
             SignInWithAppleButton(
                 onRequest: { request in interactor?.handleAppleLogin(request: request) },
@@ -200,24 +170,21 @@ private struct LoginViewGroup: View {
                 }
                 .padding()
                 .background(Color.black)
-                .allowsHitTesting(false)  // 터치 이벤트를 허용하지 않음
-                // 오버레이를 사용하되 터치 이벤트를 하위뷰로 전달할 수 있음
+                .allowsHitTesting(false)
             }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             
-            
-            // Apple 로그아웃 버튼
             if viewModel.isAppleLoggedIn {
                 Button {
-                    interactor?.handleAppleLogout()
+                    interactor?.handleAppleLogout() // Apple 로그아웃 처리
                 } label: {
                     Text("애플 로그아웃")
                 }
             }
             
             Button {
-                // Action for "둘러보기"
+                // 둘러보기 액션 처리
             } label: {
                 Text("둘러보기")
                     .font(.system(size: 15))
@@ -228,10 +195,8 @@ private struct LoginViewGroup: View {
     }
 }
 
-
-
-private struct AppleSigninButton : View{
-    var body: some View{
+private struct AppleSigninButton: View {
+    var body: some View {
         SignInWithAppleButton(
             onRequest: { request in
                 request.requestedScopes = [.fullName, .email]
@@ -240,15 +205,15 @@ private struct AppleSigninButton : View{
                 switch result {
                 case .success(let authResults):
                     print("Apple Login Successful")
-                    switch authResults.credential{
+                    switch authResults.credential {
                     case let appleIDCredential as ASAuthorizationAppleIDCredential:
-                        // 계정 정보 가져오기
-                        let UserIdentifier = appleIDCredential.user
+                        // Apple ID Credential에서 필요한 정보를 추출
+                        let userIdentifier = appleIDCredential.user
                         let fullName = appleIDCredential.fullName
-                        let name =  (fullName?.familyName ?? "") + (fullName?.givenName ?? "")
+                        let name = (fullName?.familyName ?? "") + (fullName?.givenName ?? "")
                         let email = appleIDCredential.email
-                        let IdentityToken = String(data: appleIDCredential.identityToken!, encoding: .utf8)
-                        let AuthorizationCode = String(data: appleIDCredential.authorizationCode!, encoding: .utf8)
+                        let identityToken = String(data: appleIDCredential.identityToken!, encoding: .utf8)
+                        let authorizationCode = String(data: appleIDCredential.authorizationCode!, encoding: .utf8)
                     default:
                         break
                     }
@@ -258,12 +223,10 @@ private struct AppleSigninButton : View{
                 }
             }
         )
-        .frame(width : UIScreen.main.bounds.width * 0.9, height:50)
+        .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
         .cornerRadius(5)
     }
-    
 }
-
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {

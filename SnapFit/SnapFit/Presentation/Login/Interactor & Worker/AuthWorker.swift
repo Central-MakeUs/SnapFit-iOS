@@ -46,7 +46,7 @@ final class AuthWorker {
     
     
     
-    func createUser(with oauthToken: String, request: Login.LoadLogin.Request) -> AnyPublisher< Tokens, ApiError> {
+    func createUser(request: Login.LoadLogin.Request) -> AnyPublisher< Tokens, ApiError> {
         
         let urlString = AuthWorker.baseURL + "/signUp"
 
@@ -57,15 +57,20 @@ final class AuthWorker {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        //urlRequest.addValue(oauthToken, forHTTPHeaderField: "accessToken")
+        urlRequest.addValue("Bearer \(request.oauthToken)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
-
+    
         // JSON 요청 본문 생성
+        print("request.social\(request.social)")
+        print("oauthToken \(request.oauthToken)")
+        print("request.nickName\(request.nickName)")
+        print("request.isMarketing\(request.isMarketing)")
+                
         let requestBody: [String: Any] = [
             "social": request.social,
             "vibes": ["테스트"],
             "deviceType": "apple",
-            "deviceToken": oauthToken,
+            "deviceToken": request.oauthToken,
             "nickName": request.nickName,
             "marketing": request.isMarketing
         ]
@@ -75,7 +80,10 @@ final class AuthWorker {
         } catch {
             return Fail(error: ApiError.jsonEncoding).eraseToAnyPublisher()
         }
-
+        
+        // 디버그용 프린트
+        print("URLRequest: \(urlRequest)")
+        print("Request Body: \(String(data: urlRequest.httpBody!, encoding: .utf8)!)")
 
         // 2. urlSession 으로 API를 호출한다
         // 3. API 호출에 대한 응답을 받는다

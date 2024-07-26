@@ -16,6 +16,7 @@ enum ApiError : Error {
     case notAllowedUrl
     case badStatus(code: Int)
     case unknown(_ err: Error?)
+    case invalidAccessToken
     case badRequest(message: String, errorCode: Int)
     
     var info : String {
@@ -27,13 +28,14 @@ enum ApiError : Error {
         case .notAllowedUrl :       return "올바른 URL 형식이 아닙니다."
         case let .badStatus(code):  return "에러 상태코드 : \(code)"
         case .unknown(let err):     return "알 수 없는 에러입니다 \n \(err)"
+        case .invalidAccessToken:   return "로그인 토큰값이 비어있습니다."
         case let .badRequest(message, errorCode):
                   return "잘못된 요청입니다: \(message) (코드: \(errorCode))"
         }
     }
 }
 
-// 에러 응답을 디코딩하기 위한 구조체를 추가합니다.
+// 서버에러 응답을 디코딩하기 위한 구조체를 추가합니다.
 struct ErrorResponse: Codable {
     let message: String
     let errorCode: Int

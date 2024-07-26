@@ -22,5 +22,5 @@ class LoginViewModel: NSObject, ObservableObject {
     @Published var social: String = ""
     @Published var nickName: String = ""
     @Published var isMarketing: Bool = false
-
+    @Published var oauthToken: String = ""
 }

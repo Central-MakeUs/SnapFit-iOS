@@ -25,11 +25,18 @@ enum Login {
             let social: String
             let nickName: String
             let isMarketing: Bool
+            let oauthToken: String
         }
-        struct Response { }
+        struct Response {
+            let success: Bool
+            let message: String
+            let tokens: Tokens?
+            let error: ApiError?
+        }
         struct ViewModel {
             let success: Bool
             let message: String
+            let oauthToken: String 
         }
     }
 }
