@@ -13,12 +13,29 @@ import Combine
 import CombineExt
 import MultipartForm
 
-// API 통신 워커 기능 정의
-final class AuthWorker {
+
+// AuthWorker의 기능을 정의하는 프로토콜
+protocol AuthWorkingLogic {
+    func handleKakaoLogin(completion: @escaping (Result<String, Error>) -> Void)
+    func createUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func userKakaoLogin(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func handleKakaoLogout(completion: @escaping (Result<Void, Error>) -> Void)
+    func handleAppleLogin(request: ASAuthorizationAppleIDRequest)
+    func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void)
+    func handleAppleLogout(completion: @escaping (Result<Void, Error>) -> Void)
+    func userMemberVerification(completion: @escaping (Result<Bool, Error>) -> Void)
+}
+
+final class AuthWorker: AuthWorkingLogic{
+    
     
     static let baseURL = "http://34.47.94.218/snapfit" // 서버 주소
     
+    
    
+    func userMemberVerification(completion: @escaping (Result<Bool, any Error>) -> Void) {
+        completion(.success(false))
+    }
     
     func handleKakaoLogin(completion: @escaping (Result<String, Error>) -> Void) {
          if UserApi.isKakaoTalkLoginAvailable() {
@@ -68,7 +85,7 @@ final class AuthWorker {
                 
         let requestBody: [String: Any] = [
             "social": request.social,
-            "vibes": ["테스트"],
+            "vibes": request.moods,
             "deviceType": "apple",
             "deviceToken": request.oauthToken,
             "nickName": request.nickName,
@@ -99,7 +116,67 @@ final class AuthWorker {
                 }
                 
                 switch httpResponse.statusCode {
-                case 400:
+                case (400...410):
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                    // 젠장 error badRequest(message: "유저가 존재합니다.", errorCode: 4) => 로그인넘기기
+                case 204:
+                    throw ApiError.noContent
+                    
+                default: print("default")
+                }
+                
+                if !(200...299).contains(httpResponse.statusCode){
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+                
+                return data
+            })
+            .decode(type: Tokens.self, decoder: JSONDecoder())
+            .mapError({ err -> ApiError in
+                if let error = err as? ApiError { // ApiError 라면
+                    return error
+                }
+                
+                if let _ = err as? DecodingError { // 디코딩 에러라면
+                    return ApiError.decodingError
+                }
+                
+                return ApiError.unknown(nil)
+            }).eraseToAnyPublisher()
+     }
+    
+    func userKakaoLogin(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
+        
+        let urlString = AuthWorker.baseURL + "/login?SocialType=kakao"
+
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(request.oauthToken)", forHTTPHeaderField: "Authorization")
+       
+
+        // 2. urlSession 으로 API를 호출한다
+        // 3. API 호출에 대한 응답을 받는다
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap({ (data: Data, urlResponse: URLResponse) -> Data in
+                
+                // 디버그용 프린트
+                print("urlResponse: \(urlResponse)")
+                     
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    print("bad status code")
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case (400...410):
                     let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
                     let message = errorResponse?.message ?? "Bad Request"
                     let errorCode = errorResponse?.errorCode ?? 0
@@ -128,7 +205,7 @@ final class AuthWorker {
                 
                 return ApiError.unknown(nil)
             }).eraseToAnyPublisher()
-     }
+    }
 
     
     

@@ -23,4 +23,11 @@ class LoginViewModel: NSObject, ObservableObject {
     @Published var nickName: String = ""
     @Published var isMarketing: Bool = false
     @Published var oauthToken: String = ""
+    @Published var moods: [String] = []
+    @Published var destination: Destination = .termsView
+    
+    enum Destination {
+            case termsView
+            case snapFitTabView
+    }
 }

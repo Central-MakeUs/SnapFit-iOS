@@ -26,6 +26,7 @@ enum Login {
             let nickName: String
             let isMarketing: Bool
             let oauthToken: String
+            let moods: [String]
         }
         struct Response {
             let success: Bool
@@ -34,9 +35,9 @@ enum Login {
             let error: ApiError?
         }
         struct ViewModel {
-            let success: Bool
-            let message: String
-            let oauthToken: String 
+            let socialLoginType: String
+            let oauthToken: String?
+            var userVerification: Bool = false
         }
     }
 }

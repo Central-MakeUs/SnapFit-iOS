@@ -14,26 +14,44 @@ struct LoginView: View, LoginDisplayLogic {
     
     // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직
     func display(viewModel: Login.LoadLogin.ViewModel) {
-        self.viewModel.loginMessage = viewModel.message
-        guard viewModel.success else { return }
-        
-        // 상태와 메시지에 따른 분기 처리
-        if viewModel.message.contains("Kakao login successful") {
-            self.viewModel.social = "kakao"
-            self.viewModel.isKakaoLogin = true
-            self.viewModel.oauthToken = viewModel.oauthToken
-            self.viewModel.shouldNavigate.toggle()
-        } else if viewModel.message.contains("Kakao logout successful") {
-            self.viewModel.isKakaoLogin = false
-        } else if viewModel.message.contains("Apple login successful") {
-            self.viewModel.social = "APPLE"
-            self.viewModel.isAppleLoggedIn = true
-            self.viewModel.oauthToken = viewModel.oauthToken
-            self.viewModel.shouldNavigate.toggle()
-        } else if viewModel.message.contains("Apple logout successful") {
-            self.viewModel.isAppleLoggedIn = false
+        // Reset or update UI elements based on the social login type
+        switch viewModel.socialLoginType {
+        case "kakao":
+            if viewModel.userVerification == false {
+                self.viewModel.social = "kakao"
+                self.viewModel.isKakaoLogin = true
+                self.viewModel.oauthToken = viewModel.oauthToken ?? ""
+                print("Kakao login failed verification\(viewModel.oauthToken ?? "")")
+                
+            } else {
+                print("Kakao login successful ")
+            }
+            
+        case "apple":
+            if viewModel.userVerification {
+                self.viewModel.social = "apple"
+                self.viewModel.isAppleLoggedIn = true
+                self.viewModel.oauthToken = viewModel.oauthToken ?? ""
+                print("Apple login successful with token: \(viewModel.oauthToken ?? "")")
+            } else {
+                print("Apple login failed verification")
+            }
+            
+        default:
+            print("Unsupported social login type")
         }
+        
+        // Navigate to SnapFitTabView if userVerification is true
+        if viewModel.userVerification {
+            self.viewModel.destination = .snapFitTabView
+        } else {
+            self.viewModel.destination = .termsView
+        }
+        self.viewModel.shouldNavigate.toggle()
+        
     }
+    
+    
     
     var body: some View {
         NavigationStack(path: $stack) {
@@ -72,18 +90,25 @@ struct LoginView: View, LoginDisplayLogic {
                 )
             }
             .navigationDestination(isPresented: $viewModel.shouldNavigate) {
-                TermsView(viewModel: viewModel, interactor: interactor)
-                    .navigationBarBackButtonHidden(true)
-            }
-            .ignoresSafeArea()
-            .task {
-                // View가 로드될 때 초기 작업을 실행할 수 있음
-                // interactor?.load(request: Login.LoadLogin.Request())
-            }
-            .onAppear {
-                // View가 나타날 때 실행할 작업
-                // interactor?.load(request: Login.LoadLogin.Request())
-            }
+                switch viewModel.destination {
+                case .termsView:
+                    TermsView(viewModel: viewModel, interactor: interactor)
+                        .navigationBarBackButtonHidden(true)
+                case .snapFitTabView:
+                    SnapFitTabView()
+                        .navigationBarBackButtonHidden(true)
+                }
+            }     .navigationBarBackButtonHidden(true)
+            
+                .ignoresSafeArea()
+                .task {
+                    // View가 로드될 때 초기 작업을 실행할 수 있음
+                    // interactor?.load(request: Login.LoadLogin.Request())
+                }
+                .onAppear {
+                    // View가 나타날 때 실행할 작업
+                    // interactor?.load(request: Login.LoadLogin.Request())
+                }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -120,6 +145,7 @@ private struct LoginViewGroup: View {
             
             Button {
                 interactor?.handleKakaoLogin() // Kakao 로그인 처리
+                
             } label: {
                 HStack(spacing: 70) {
                     Image("kakaoButton")
@@ -177,7 +203,7 @@ private struct LoginViewGroup: View {
             
             if viewModel.isAppleLoggedIn {
                 Button {
-                    interactor?.handleAppleLogout() // Apple 로그아웃 처리
+                    //interactor?.handleAppleLogout() // Apple 로그아웃 처리
                 } label: {
                     Text("애플 로그아웃")
                 }

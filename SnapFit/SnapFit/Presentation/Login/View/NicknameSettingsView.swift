@@ -75,8 +75,9 @@ struct NicknameSettingsView: View {
             // true일 때는 뷰가 비활성화되고, false일 때는 뷰가 활성화
         }
         .navigationDestination(isPresented: $shouldNavigate) {
-            GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)
+            GridSelectionView(moods: [  "러블리", "시크", "키치", "차분함", "하이틴", "빈티지", "몽환적", "밝은"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)
         }
+       
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

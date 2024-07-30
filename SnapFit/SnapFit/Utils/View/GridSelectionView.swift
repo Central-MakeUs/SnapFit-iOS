@@ -5,6 +5,7 @@ struct GridSelectionView: View {
     @State private var isConfirmButtonEnabled = false
     @State private var selectedItems: Set<Int> = []
     @State private var showAlert = false
+    @State private var navigateToSnapFitTabView = false // 상태 변수 추가
     
     let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 6, alignment: nil),
@@ -17,6 +18,7 @@ struct GridSelectionView: View {
     
     @ObservedObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
+    
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -44,8 +46,10 @@ struct GridSelectionView: View {
                             Button {
                                 if selectedItems.contains(index) {
                                     selectedItems.remove(index)
+                                    viewModel.moods.removeAll { $0 as! String == moods[index] }
                                 } else if selectedItems.count < 2 {
                                     selectedItems.insert(index)
+                                    viewModel.moods.append(moods[index])
                                 } else {
                                     showAlert = true
                                 }
@@ -68,6 +72,11 @@ struct GridSelectionView: View {
             }
             Spacer()
             
+            
+            NavigationLink(destination: SnapFitTabView().navigationBarBackButtonHidden(), isActive: $navigateToSnapFitTabView) {
+                EmptyView()
+            }
+            
             Button {
                 // Action for "다음"
                 /*
@@ -75,16 +84,16 @@ struct GridSelectionView: View {
                  */
                 // Action for "시작하기"
             
-                interactor?.userCreated(request: Login.LoadLogin.Request(
+                interactor?.snapFitJoin(request: Login.LoadLogin.Request(
                     social: viewModel.social,
                     nickName: viewModel.nickName,
                     isMarketing: viewModel.isMarketing,
-                    oauthToken: viewModel.oauthToken
+                    oauthToken: viewModel.oauthToken,
+                    moods: viewModel.moods
                 ))
                 
-                // 화면을 사라지게 하는 코드
-                presentationMode.wrappedValue.dismiss()
-               
+                // 상태 변수 업데이트
+                navigateToSnapFitTabView = true
             } label: {
                 HStack(spacing: 20) {
                     Spacer()

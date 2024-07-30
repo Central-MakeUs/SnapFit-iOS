@@ -25,8 +25,8 @@
 		642D9EA42C4D46BA00B31B51 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 642D9EA32C4D46BA00B31B51 /* MultipartForm */; };
 		644EDABE2C4552FF00745DDD /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABD2C4552FF00745DDD /* WebView.swift */; };
 		644EDAC02C4636DE00745DDD /* NicknameSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */; };
+		64795A4B2C5908FD0018BE0D /* SnapFitTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A4A2C5908FD0018BE0D /* SnapFitTabView.swift */; };
 		6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */; };
-		6496CB422C42CECA00381F0F /* LoginDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3C2C42CECA00381F0F /* LoginDataStore.swift */; };
 		6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */; };
 		6496CB442C42CECA00381F0F /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3E2C42CECA00381F0F /* LoginView.swift */; };
 		6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3F2C42CECA00381F0F /* LoginModel.swift */; };
@@ -35,8 +35,19 @@
 		6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB4B2C43F85C00381F0F /* TermsView.swift */; };
 		64ACDAEC2C4642A200A4C169 /* GridSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ACDAEB2C4642A200A4C169 /* GridSelectionView.swift */; };
 		64ACDAEE2C46627000A4C169 /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ACDAED2C46627000A4C169 /* Path.swift */; };
+		64D7334B2C53D457005A217E /* LoginInteractorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D7334A2C53D457005A217E /* LoginInteractorTest.swift */; };
 		64FDCCE92C5006030033447D /* ApiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FDCCE82C5006030033447D /* ApiError.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		64D7333C2C53D323005A217E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6428A4812C3D20C600C47990 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6428A4882C3D20C600C47990;
+			remoteInfo = SnapFit;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		6428A4892C3D20C600C47990 /* SnapFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,8 +66,8 @@
 		642D9E9D2C4D458500B31B51 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		644EDABD2C4552FF00745DDD /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NicknameSettingsView.swift; sourceTree = "<group>"; };
+		64795A4A2C5908FD0018BE0D /* SnapFitTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapFitTabView.swift; sourceTree = "<group>"; };
 		6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPresenter.swift; sourceTree = "<group>"; };
-		6496CB3C2C42CECA00381F0F /* LoginDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDataStore.swift; sourceTree = "<group>"; };
 		6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInteractor.swift; sourceTree = "<group>"; };
 		6496CB3E2C42CECA00381F0F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		6496CB3F2C42CECA00381F0F /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
@@ -65,6 +76,8 @@
 		6496CB4B2C43F85C00381F0F /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
 		64ACDAEB2C4642A200A4C169 /* GridSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridSelectionView.swift; sourceTree = "<group>"; };
 		64ACDAED2C46627000A4C169 /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
+		64D733382C53D323005A217E /* SnapFitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapFitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		64D7334A2C53D457005A217E /* LoginInteractorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInteractorTest.swift; sourceTree = "<group>"; };
 		64FDCCE82C5006030033447D /* ApiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,6 +95,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		64D733352C53D323005A217E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -90,6 +110,7 @@
 			children = (
 				6428A48B2C3D20C600C47990 /* SnapFit */,
 				6428A48A2C3D20C600C47990 /* Products */,
+				64D733392C53D323005A217E /* SnapFitTests */,
 				6428A5072C3F9ECA00C47990 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -98,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				6428A4892C3D20C600C47990 /* SnapFit.app */,
+				64D733382C53D323005A217E /* SnapFitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,12 +127,12 @@
 		6428A48B2C3D20C600C47990 /* SnapFit */ = {
 			isa = PBXGroup;
 			children = (
-				644EDABB2C4552AA00745DDD /* Common */,
 				6496CB2C2C42CE3900381F0F /* App */,
+				64795A452C58C8EE0018BE0D /* Data */,
+				64795A462C58C8F30018BE0D /* Domain */,
 				6428A49A2C3D22E900C47990 /* Presentation */,
-				6428A4902C3D20C900C47990 /* Assets.xcassets */,
-				6428A4FD2C3E891E00C47990 /* LaunchScreen.storyboard */,
 				6428A4922C3D20C900C47990 /* Preview Content */,
+				644EDABB2C4552AA00745DDD /* Utils */,
 			);
 			path = SnapFit;
 			sourceTree = "<group>";
@@ -129,16 +151,9 @@
 				6496CB3A2C42CEA400381F0F /* Login */,
 				6428A48E2C3D20C600C47990 /* ContentView.swift */,
 				6428A4C32C3D64D200C47990 /* SplashView.swift */,
+				64795A4A2C5908FD0018BE0D /* SnapFitTabView.swift */,
 			);
 			path = Presentation;
-			sourceTree = "<group>";
-		};
-		6428A49C2C3D22F900C47990 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				6428A49D2C3D23D100C47990 /* Repositories */,
-			);
-			path = Data;
 			sourceTree = "<group>";
 		};
 		6428A49D2C3D23D100C47990 /* Repositories */ = {
@@ -156,26 +171,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		642D9E982C4D362600B31B51 /* Presenter */ = {
-			isa = PBXGroup;
-			children = (
-				6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */,
-			);
-			path = Presenter;
-			sourceTree = "<group>";
-		};
-		642D9E992C4D367300B31B51 /* Interactor & Worker */ = {
-			isa = PBXGroup;
-			children = (
-				6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */,
-				6496CB482C43B81B00381F0F /* AuthWorker.swift */,
-				6496CB3C2C42CECA00381F0F /* LoginDataStore.swift */,
-				64FDCCE82C5006030033447D /* ApiError.swift */,
-				6428A49C2C3D22F900C47990 /* Data */,
-			);
-			path = "Interactor & Worker";
-			sourceTree = "<group>";
-		};
 		642D9E9A2C4D36D300B31B51 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
@@ -184,13 +179,13 @@
 			path = UseCases;
 			sourceTree = "<group>";
 		};
-		644EDABB2C4552AA00745DDD /* Common */ = {
+		644EDABB2C4552AA00745DDD /* Utils */ = {
 			isa = PBXGroup;
 			children = (
 				644EDABC2C4552BD00745DDD /* View */,
 				64ACDAED2C46627000A4C169 /* Path.swift */,
 			);
-			path = Common;
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		644EDABC2C4552BD00745DDD /* View */ = {
@@ -202,10 +197,36 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		64795A452C58C8EE0018BE0D /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6428A49D2C3D23D100C47990 /* Repositories */,
+				64795A482C58C96F0018BE0D /* Network */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		64795A462C58C8F30018BE0D /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				642D9E9A2C4D36D300B31B51 /* UseCases */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		64795A482C58C96F0018BE0D /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				64FDCCE82C5006030033447D /* ApiError.swift */,
+				6496CB482C43B81B00381F0F /* AuthWorker.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
 		6496CB2C2C42CE3900381F0F /* App */ = {
 			isa = PBXGroup;
 			children = (
-				6496CB2D2C42CE5A00381F0F /* Config */,
+				6496CB2D2C42CE5A00381F0F /* Resources */,
 				6428A48C2C3D20C600C47990 /* SnapFitApp.swift */,
 				6428A5032C3F978600C47990 /* AppDelegate.swift */,
 				6428A5052C3F98F200C47990 /* SceneDelegate.swift */,
@@ -213,24 +234,25 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		6496CB2D2C42CE5A00381F0F /* Config */ = {
+		6496CB2D2C42CE5A00381F0F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				6428A5002C3EA9C000C47990 /* Info.plist */,
 				6428A5142C3FB2FB00C47990 /* SnapFit.entitlements */,
 				6428A5012C3EAA9700C47990 /* Config.xcconfig */,
+				6428A4902C3D20C900C47990 /* Assets.xcassets */,
+				6428A4FD2C3E891E00C47990 /* LaunchScreen.storyboard */,
 			);
-			path = Config;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		6496CB3A2C42CEA400381F0F /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				642D9E9A2C4D36D300B31B51 /* UseCases */,
-				642D9E992C4D367300B31B51 /* Interactor & Worker */,
-				642D9E982C4D362600B31B51 /* Presenter */,
-				6496CB4A2C43F7D400381F0F /* View */,
+				6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */,
+				6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */,
 				6496CB402C42CECA00381F0F /* LoginConfigurator.swift */,
+				6496CB4A2C43F7D400381F0F /* View */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -244,6 +266,14 @@
 				6428A5122C3FA32B00C47990 /* LoginViewModel.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		64D733392C53D323005A217E /* SnapFitTests */ = {
+			isa = PBXGroup;
+			children = (
+				64D7334A2C53D457005A217E /* LoginInteractorTest.swift */,
+			);
+			path = SnapFitTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -274,6 +304,24 @@
 			productReference = 6428A4892C3D20C600C47990 /* SnapFit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		64D733372C53D323005A217E /* SnapFitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 64D733402C53D323005A217E /* Build configuration list for PBXNativeTarget "SnapFitTests" */;
+			buildPhases = (
+				64D733342C53D323005A217E /* Sources */,
+				64D733352C53D323005A217E /* Frameworks */,
+				64D733362C53D323005A217E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				64D7333D2C53D323005A217E /* PBXTargetDependency */,
+			);
+			name = SnapFitTests;
+			productName = SnapFitTests;
+			productReference = 64D733382C53D323005A217E /* SnapFitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -286,6 +334,11 @@
 				TargetAttributes = {
 					6428A4882C3D20C600C47990 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					64D733372C53D323005A217E = {
+						CreatedOnToolsVersion = 15.4;
+						LastSwiftMigration = 1540;
+						TestTargetID = 6428A4882C3D20C600C47990;
 					};
 				};
 			};
@@ -308,6 +361,7 @@
 			projectRoot = "";
 			targets = (
 				6428A4882C3D20C600C47990 /* SnapFit */,
+				64D733372C53D323005A217E /* SnapFitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -323,6 +377,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		64D733362C53D323005A217E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -334,13 +395,13 @@
 				6428A5042C3F978600C47990 /* AppDelegate.swift in Sources */,
 				6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */,
 				642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */,
-				6496CB422C42CECA00381F0F /* LoginDataStore.swift in Sources */,
 				6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */,
 				64ACDAEC2C4642A200A4C169 /* GridSelectionView.swift in Sources */,
 				6496CB442C42CECA00381F0F /* LoginView.swift in Sources */,
 				644EDABE2C4552FF00745DDD /* WebView.swift in Sources */,
 				644EDAC02C4636DE00745DDD /* NicknameSettingsView.swift in Sources */,
 				6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */,
+				64795A4B2C5908FD0018BE0D /* SnapFitTabView.swift in Sources */,
 				6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */,
 				6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */,
 				64FDCCE92C5006030033447D /* ApiError.swift in Sources */,
@@ -353,7 +414,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		64D733342C53D323005A217E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64D7334B2C53D457005A217E /* LoginInteractorTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		64D7333D2C53D323005A217E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6428A4882C3D20C600C47990 /* SnapFit */;
+			targetProxy = 64D7333C2C53D323005A217E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		6428A4952C3D20C900C47990 /* Debug */ = {
@@ -483,14 +560,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SnapFit/App/Config/SnapFit.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SnapFit/App/Resources/SnapFit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapFit/Preview Content\"";
 				DEVELOPMENT_TEAM = 9S8KMMC3YH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SnapFit/App/Config/info.plist;
+				INFOPLIST_FILE = SnapFit/App/Resources/info.plist;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "SnapFit 에서 Face ID를 사용하려고 합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -517,14 +594,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SnapFit/App/Config/SnapFit.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SnapFit/App/Resources/SnapFit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapFit/Preview Content\"";
 				DEVELOPMENT_TEAM = 9S8KMMC3YH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SnapFit/App/Config/info.plist;
+				INFOPLIST_FILE = SnapFit/App/Resources/info.plist;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "SnapFit 에서 Face ID를 사용하려고 합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -545,6 +622,49 @@
 			};
 			name = Release;
 		};
+		64D7333E2C53D323005A217E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9S8KMMC3YH;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.woogie.SnapFitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SnapFitTests/SnapFitTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SnapFit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SnapFit";
+			};
+			name = Debug;
+		};
+		64D7333F2C53D323005A217E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9S8KMMC3YH;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.woogie.SnapFitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SnapFitTests/SnapFitTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SnapFit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SnapFit";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -562,6 +682,15 @@
 			buildConfigurations = (
 				6428A4982C3D20C900C47990 /* Debug */,
 				6428A4992C3D20C900C47990 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		64D733402C53D323005A217E /* Build configuration list for PBXNativeTarget "SnapFitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				64D7333E2C53D323005A217E /* Debug */,
+				64D7333F2C53D323005A217E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
