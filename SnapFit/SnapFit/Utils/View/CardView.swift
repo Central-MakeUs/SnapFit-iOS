@@ -12,7 +12,7 @@ struct MiniCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Image("demo6")
+            Image("demo3")
                 .resizable()
                 .scaledToFill()
                 .frame(width: 130, height: 130)
@@ -60,7 +60,7 @@ struct MiddleCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Image("demo6")
+            Image("demo3")
                 .resizable()
                 .scaledToFill()
                 .frame(width: 174, height: 200)
@@ -81,9 +81,8 @@ struct MiddleCardView: View {
 
             Group {
                 Text("고급퀄리티 | 15년 경력, 홍대출신 전문 포토스냅작가 영상프로필...")
-                    .font(.callout)
+                    .font(.footnote)
                     .lineLimit(2)
-                    .frame(width: 140)
 
                 Text("서울 중구")
                     .font(.caption)
@@ -91,16 +90,14 @@ struct MiddleCardView: View {
 
                 Text("36,500원")
                     .font(.caption)
+                    .bold()
                     .foregroundColor(.black)
 
-                Text("시크")
-                    .font(.caption)
-                    .bold()
-                    .foregroundColor(Color("profileLabelColor"))
-                    .padding(.vertical, 5)
-                    .padding(.horizontal, 10)
-                    .background(Color("DibsLabelColor").opacity(0.2))
-                    .cornerRadius(5)
+                HStack{
+                    MoodsLabel(text: "시크")
+                    InOutLabel(text: "야외스냅")
+                }
+                
             }
             .padding(EdgeInsets(top: 0, leading: 10, bottom: 5, trailing: 10))
         }

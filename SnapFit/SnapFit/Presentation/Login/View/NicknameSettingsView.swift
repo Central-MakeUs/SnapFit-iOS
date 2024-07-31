@@ -76,7 +76,7 @@ struct NicknameSettingsView: View {
             // true일 때는 뷰가 비활성화되고, false일 때는 뷰가 활성화
         }
         .navigationDestination(isPresented: $shouldNavigate) {
-            GridSelectionView(moods: [  "러블리", "시크", "키치", "차분함", "하이틴", "빈티지", "몽환적", "밝은"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)
+            GridSelectionView(columnsCount: 2, moods: [  "러블리", "시크", "키치", "차분함", "하이틴", "빈티지", "몽환적", "밝은"], viewModel : viewModel, interactor : interactor).navigationBarBackButtonHidden(true)
         }
        
         .navigationBarTitleDisplayMode(.inline)

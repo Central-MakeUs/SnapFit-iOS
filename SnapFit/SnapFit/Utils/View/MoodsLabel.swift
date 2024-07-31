@@ -22,9 +22,32 @@ struct MoodsLabel: View {
     }
 }
 
+
+struct InOutLabel: View {
+    var text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .bold()
+            .foregroundColor(Color("InOutLableFontColor")) // 폰트 색상
+            .padding(.vertical, 5) // 세로 패딩을 줄임
+            .padding(.horizontal, 10) // 가로 패딩을 줄임
+            .background(Color("InOutLableBackColor").opacity(0.3)) // 배경색
+            .cornerRadius(5)
+    }
+}
+
 struct MoodsLabel_Previews: PreviewProvider {
     static var previews: some View {
         MoodsLabel(text: "시크")
+            .previewLayout(.sizeThatFits) // 프리뷰에서 크기 맞춤
+    }
+}
+
+struct InOutLabel_Previews: PreviewProvider {
+    static var previews: some View {
+        InOutLabel(text: "야외스냅")
             .previewLayout(.sizeThatFits) // 프리뷰에서 크기 맞춤
     }
 }

@@ -7,10 +7,17 @@ struct GridSelectionView: View {
     @State private var showAlert = false
     @State private var navigateToSnapFitTabView = false // 상태 변수 추가
     
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 6, alignment: nil),
-        GridItem(.flexible(), spacing: 6, alignment: nil),
-    ]
+   
+    let columnsCount: Int
+    var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 6, alignment: nil), count: columnsCount)
+        /*
+         Array(repeating:count:):
+
+         repeating: GridItem(.flexible(), spacing: 6, alignment: nil): 이 GridItem을 반복합니다.
+         count: columnsCount: columnsCount 변수가 지정한 수만큼 반복합니다. 예제에서는 columnsCount가 2이므로 GridItem을 2번 반복합니다.
+         */
+    }
     
     let moods: [String]
     
@@ -176,6 +183,7 @@ struct CustomAlertView: View {
 
 struct GridSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        GridSelectionView(moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel: LoginViewModel(), interactor: nil)
+        GridSelectionView(columnsCount: 2, moods: ["분위기 1", "분위기 2", "분위기 3", "분위기 4", "분위기 5", "분위기 6", "분위기 7", "분위기 8", "분위기 9", "분위기 10", "분위기 11", "분위기 12", "분위기 13", "분위기 14", "분위기 15", "분위기 16", "분위기 17", "분위기 18", "분위기 19", "분위기 20"], viewModel: LoginViewModel(), interactor: nil)
     }
 }
+
