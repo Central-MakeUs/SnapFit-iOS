@@ -11,9 +11,7 @@ struct SnapFitTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            VStack {
-                Text("둘러보기 화면")
-            }
+            MainPromotionView()
             .tabItem {
                 VStack {
                     // 선택된 탭에 따라 이미지 변경
@@ -43,9 +41,7 @@ struct SnapFitTabView: View {
             }
             .tag(1)
 
-            VStack {
-                Text("프로필 화면")
-            }
+            MyPageView()
             .tabItem {
                 VStack {
                     // 선택된 탭에 따라 이미지 변경
