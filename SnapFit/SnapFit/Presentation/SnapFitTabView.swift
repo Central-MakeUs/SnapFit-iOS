@@ -4,36 +4,62 @@
 //
 //  Created by 정정욱 on 7/30/24.
 //
-
 import SwiftUI
 
 struct SnapFitTabView: View {
-    @State var initPageNumber: Int = 0
-    
+    @State private var selectedTab = 0 // 선택된 탭을 저장할 상태 변수
+
     var body: some View {
-        // selection: TabView 가 어디 페이지를 가리키는지 설정하는것
-        TabView(selection: $initPageNumber) {
-            Text("둘러보기 화면")
-                .tabItem {
-                    Image("icoHome")
-                    Text("Home")
+        TabView(selection: $selectedTab) {
+            VStack {
+                Text("둘러보기 화면")
+            }
+            .tabItem {
+                VStack {
+                    // 선택된 탭에 따라 이미지 변경
+                    if selectedTab == 0 {
+                        Image("iconHome")
+                    } else {
+                        Image("iconHomeNoTab")
+                    }
+                    Text("홈")
                 }
-                .tag(0) // 0번 화면
-            
-            Text("둘러보기 화면")
-                .tabItem {
-                    Image("iconList")
-                    Text("Browse")
+            }
+            .tag(0)
+
+            VStack {
+                Text("둘러보기 화면")
+            }
+            .tabItem {
+                VStack {
+                    // 선택된 탭에 따라 이미지 변경
+                    if selectedTab == 1 {
+                        Image("iconList")
+                    } else {
+                        Image("iconListNoTab")
+                    }
+                    Text("사진리스트")
                 }
-                .tag(1)// 1번 화면
-            
-            Text("프로필 화면")
-                .tabItem {
-                    Image("iconMypage")
-                    Text("Profile")
+            }
+            .tag(1)
+
+            VStack {
+                Text("프로필 화면")
+            }
+            .tabItem {
+                VStack {
+                    // 선택된 탭에 따라 이미지 변경
+                    if selectedTab == 2 {
+                        Image("iconMypage")
+                    } else {
+                        Image("iconMypageNoTab")
+                    }
+                    Text("마이페이지")
                 }
-                .tag(2)// 2번 화면
+            }
+            .tag(2)
         }
+        .accentColor(.black) // 선택된 탭 아이콘 색상
     }
 }
 

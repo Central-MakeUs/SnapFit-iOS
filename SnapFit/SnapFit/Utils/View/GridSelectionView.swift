@@ -84,7 +84,7 @@ struct GridSelectionView: View {
                  */
                 // Action for "시작하기"
             
-                interactor?.snapFitJoin(request: Login.LoadLogin.Request(
+                interactor?.registerSnapFitUser(request: Login.LoadLogin.Request(
                     social: viewModel.social,
                     nickName: viewModel.nickName,
                     isMarketing: viewModel.isMarketing,

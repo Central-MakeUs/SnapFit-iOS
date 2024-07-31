@@ -16,14 +16,14 @@ import MultipartForm
 
 // AuthWorker의 기능을 정의하는 프로토콜
 protocol AuthWorkingLogic {
-    func handleKakaoLogin(completion: @escaping (Result<String, Error>) -> Void)
-    func createUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
-    func userKakaoLogin(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
-    func handleKakaoLogout(completion: @escaping (Result<Void, Error>) -> Void)
-    func handleAppleLogin(request: ASAuthorizationAppleIDRequest)
-    func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void)
-    func handleAppleLogout(completion: @escaping (Result<Void, Error>) -> Void)
-    func userMemberVerification(completion: @escaping (Result<Bool, Error>) -> Void)
+    func loginWithKakao(completion: @escaping (Result<String, Error>) -> Void)
+    func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func loginUserWithKakao(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func logoutFromKakao(completion: @escaping (Result<Void, Error>) -> Void)
+    func initiateAppleLogin(request: ASAuthorizationAppleIDRequest)
+    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void)
+    func logoutFromApple(completion: @escaping (Result<Void, Error>) -> Void)
+    func verifyUserMembership(completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 final class AuthWorker: AuthWorkingLogic{
@@ -32,12 +32,17 @@ final class AuthWorker: AuthWorkingLogic{
     static let baseURL = "http://34.47.94.218/snapfit" // 서버 주소
     
     
-   
-    func userMemberVerification(completion: @escaping (Result<Bool, any Error>) -> Void) {
+    
+    // MARK: - 사용자 회원 여부를 확인하는 메서드
+    func verifyUserMembership(completion: @escaping (Result<Bool, any Error>) -> Void) {
         completion(.success(false))
     }
     
-    func handleKakaoLogin(completion: @escaping (Result<String, Error>) -> Void) {
+    
+    
+    
+    // MARK: - 카카오 로그인 처리
+    func loginWithKakao(completion: @escaping (Result<String, Error>) -> Void) {
          if UserApi.isKakaoTalkLoginAvailable() {
              UserApi.shared.loginWithKakaoTalk { oauthToken, error in
                  if let error = error {
@@ -63,7 +68,8 @@ final class AuthWorker: AuthWorkingLogic{
     
     
     
-    func createUser(request: Login.LoadLogin.Request) -> AnyPublisher< Tokens, ApiError> {
+    // MARK: - 스냅핏 서버에 사용자 등록 요청
+    func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher< Tokens, ApiError> {
         
         let urlString = AuthWorker.baseURL + "/signUp"
 
@@ -148,7 +154,10 @@ final class AuthWorker: AuthWorkingLogic{
             }).eraseToAnyPublisher()
      }
     
-    func userKakaoLogin(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
+    
+    
+    // MARK: - 카카오 계정으로 스냅핏 서버에 사용자 로그인
+    func loginUserWithKakao(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
         
         let urlString = AuthWorker.baseURL + "/login?SocialType=kakao"
 
@@ -209,7 +218,8 @@ final class AuthWorker: AuthWorkingLogic{
 
     
     
-    func handleKakaoLogout(completion: @escaping (Result<Void, Error>) -> Void) {
+    // MARK: - 카카오 로그아웃 처리
+    func logoutFromKakao(completion: @escaping (Result<Void, Error>) -> Void) {
         UserApi.shared.logout { error in
             if let error = error {
                 completion(.failure(error))
@@ -219,11 +229,15 @@ final class AuthWorker: AuthWorkingLogic{
         }
     }
 
-    func handleAppleLogin(request: ASAuthorizationAppleIDRequest) {
+    
+    // MARK: - 카카오 로그아웃 처리
+    func initiateAppleLogin(request: ASAuthorizationAppleIDRequest) {
         request.requestedScopes = [.fullName, .email]
     }
 
-    func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void) {
+    
+    // MARK: - 애플 로그인 요청 초기화
+    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void) {
         switch result {
         case .success(let authResults):
             if let appleIDCredential = authResults.credential as? ASAuthorizationAppleIDCredential {
@@ -236,7 +250,9 @@ final class AuthWorker: AuthWorkingLogic{
         }
     }
     
-    func handleAppleLogout(completion: @escaping (Result<Void, Error>) -> Void) {
+    
+    // MARK: - 애플 로그인 완료 처리
+    func logoutFromApple(completion: @escaping (Result<Void, Error>) -> Void) {
         // 예시로, 클라이언트 측에서는 로그아웃 시 로컬 데이터를 초기화하는 것을 보여줍니다.
         // 실제로는 Apple ID 자격 증명과 관련된 데이터를 서버에서도 삭제해야 할 수 있습니다.
         

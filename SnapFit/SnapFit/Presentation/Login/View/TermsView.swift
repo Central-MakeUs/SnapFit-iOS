@@ -17,10 +17,11 @@ struct TermsView: View {
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     @ObservedObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
-
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
+            
+            VStack {
                 Text("스냅핏 서비스 이용약관에\n동의해주세요.")
                     .font(.title2)
                     .bold()
@@ -30,9 +31,11 @@ struct TermsView: View {
                 Text("서비스 시작 및 가입을 위해 먼저\n가입 및 정보 제공에 동의해 주세요.")
                     .font(.subheadline)
                     .foregroundColor(Color(.systemGray))
-                    .padding(.bottom)
+                    
             }
-            .padding(.horizontal)
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 88, trailing: 20))
+          
+    
             
             Group {
                 Button {
@@ -49,7 +52,7 @@ struct TermsView: View {
                             .scaledToFill()
                             .frame(width: 20, height: 30)
                             .padding(.leading, 5)
-
+                        
                         Text("전체동의(선택 정보 포함)")
                             .font(.subheadline)
                             .bold()
@@ -58,10 +61,12 @@ struct TermsView: View {
                         Spacer()
                     }
                     .padding()
+                    .frame(height: 48)
                     .background(isAllAgreed ? .black : Color(.systemGray4))
                     .cornerRadius(5)
                 }
-
+                
+                
                 TermsToggleButton(
                     isAgreed: $isTermsAgreed,
                     title: "이용약관 동의",
@@ -71,7 +76,7 @@ struct TermsView: View {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
                 }
-
+                
                 TermsToggleButton(
                     isAgreed: $isPrivacyPolicyAgreed,
                     title: "개인정보 처리 방침 동의",
@@ -81,7 +86,7 @@ struct TermsView: View {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
                 }
-
+                
                 TermsToggleButton(
                     isAgreed: $isMarketingAgreed,
                     title: "광고성 정보 수신 및 마케팅 활용 동의",
@@ -92,26 +97,35 @@ struct TermsView: View {
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
                 }
                 
-                Spacer()
+                
             }
             .padding(.horizontal)
             
+            Spacer()
+            
             // 기존의 Button 대신 NavigationLink를 직접 사용
             NavigationLink(destination: NicknameSettingsView(viewModel: viewModel, interactor: interactor).navigationBarBackButtonHidden(true)) {
-                HStack(spacing: 20) {
-                    Spacer()
+                ZStack {
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill(isConfirmButtonEnabled ? Color.black : Color(.systemGray4))
+                        .frame(height: 48)
                     
-                    Text("다음")
-                        .font(.headline)
-                        .bold()
-                        .foregroundColor(isConfirmButtonEnabled ? .white : Color(.systemGray))
-                    
-                    Spacer()
+                    HStack(spacing: 20) {
+                        Spacer()
+                        
+                        Text("다음")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundColor(isConfirmButtonEnabled ? .white : Color(.systemGray))
+                        
+                        Spacer()
+                    }
                 }
-                .padding()
-                .background(isConfirmButtonEnabled ? .black : Color(.systemGray4))
             }
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
             .disabled(!isConfirmButtonEnabled)
+            
+         
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -125,12 +139,12 @@ struct TermsView: View {
             }
         }
     }
-
+    
     private func updateAllAgreed() {
         // 전체 동의 상태는 개별 동의 상태에 따라 업데이트
         isAllAgreed = isTermsAgreed && isPrivacyPolicyAgreed && isMarketingAgreed
     }
-
+    
     private func updateConfirmButtonState() {
         // 확인 버튼 활성화 상태는 개별 동의 상태에 따라 결정
         isConfirmButtonEnabled = isTermsAgreed && isPrivacyPolicyAgreed
@@ -143,9 +157,9 @@ struct TermsToggleButton: View {
     let isRequired: Bool
     let url: URL
     let action: () -> Void
-
+    
     @State private var isShowingSheet = false
-
+    
     var body: some View {
         Button {
             isAgreed.toggle()
@@ -157,7 +171,7 @@ struct TermsToggleButton: View {
                     .scaledToFill()
                     .frame(width: 20, height: 30)
                     .padding(.leading, 5)
-
+                
                 if isRequired {
                     Text("[필수] \(title)")
                         .font(.subheadline)
@@ -172,9 +186,9 @@ struct TermsToggleButton: View {
                     .bold()
                     .foregroundColor(isAgreed ? .black : Color(.systemGray2))
                 }
-
+                
                 Spacer()
-
+                
                 Button {
                     isShowingSheet.toggle()
                 } label: {
@@ -186,8 +200,9 @@ struct TermsToggleButton: View {
                 .padding(.trailing, 5)
             }
             .padding()
+            .frame(height: 48)
         }
-        .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
+        .frame(width: UIScreen.main.bounds.width * 0.9)
         .cornerRadius(2)
         .sheet(isPresented: $isShowingSheet) {
             WebView(url: url)

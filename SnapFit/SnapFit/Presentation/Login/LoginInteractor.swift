@@ -13,9 +13,9 @@ import AuthenticationServices
 import Combine
 
 protocol LoginBusinessLogic {
-    func handleKakaoLogin()
-    func handleKakaoLogout()
-    func snapFitJoin(request: Login.LoadLogin.Request)
+    func loginWithKakao()
+    func logoutFromKakao()
+    func registerSnapFitUser(request: Login.LoadLogin.Request)
     func handleAppleLogin(request: ASAuthorizationAppleIDRequest)
     func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>)
     //func handleAppleLogout()
@@ -40,12 +40,12 @@ final class LoginInteractor: LoginBusinessLogic {
     // MARK: - Step 1
     /// 실제 카카오 서버에 로그인 요청 후 인증 토큰을 가져오는 메서드
     /// userMemberVerification를 호출하여 우리 서버에 이미 회원가입 된 사용자인지 확인
-    func handleKakaoLogin() {
-        authWorker.handleKakaoLogin { [weak self] result in
+    func loginWithKakao() {
+        authWorker.loginWithKakao { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let accessToken):
-                self.userMemberVerification(accessToken: accessToken)
+                self.verifyUserMembership(accessToken: accessToken)
             case .failure(let error):
                 self.presenter?.presentLoginFailure(error)
             }
@@ -54,8 +54,8 @@ final class LoginInteractor: LoginBusinessLogic {
     
     // MARK: - Step 2
     /// 카카오, 애플 로그인 버튼을 눌렀을때 이미 실 서버에 가입이 되어있는지 확인하는 메서드 입니다
-    func userMemberVerification(accessToken: String) {
-        authWorker.userMemberVerification { [weak self] verification in
+    func verifyUserMembership(accessToken: String) {
+        authWorker.verifyUserMembership { [weak self] verification in
             guard let self = self else { return }
             switch verification { // 회원 가입한 사용자인지 확인 참/거짓을 반환
             case .success(let isVerified):
@@ -67,7 +67,7 @@ final class LoginInteractor: LoginBusinessLogic {
                         oauthToken: accessToken,
                         moods: [""]
                     )
-                    self.snapFitKakaoLogin(request: request) // 이미 회원가입한 사람이라면 로그인로직 처리
+                    self.loginKakaoSnapFitUser(request: request) // 이미 회원가입한 사람이라면 로그인로직 처리
                 }
                 else {
                     self.presenter?.presentKakaoLoginFailure(false, accessToken: accessToken)
@@ -79,10 +79,10 @@ final class LoginInteractor: LoginBusinessLogic {
         }
     }
     
-    // MARK: - Step 1
+    // MARK: - Step 3
     // 스냅핏 서버에 카카오로그인을 요청
-    func snapFitKakaoLogin(request: Login.LoadLogin.Request) {
-        authWorker.userKakaoLogin(request: request)
+    func loginKakaoSnapFitUser(request: Login.LoadLogin.Request) {
+        authWorker.loginUserWithKakao(request: request)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -118,8 +118,8 @@ final class LoginInteractor: LoginBusinessLogic {
     }
     
     
-    func handleKakaoLogout() {
-        authWorker.handleKakaoLogout { [weak self] result in
+    func logoutFromKakao() {
+        authWorker.logoutFromKakao { [weak self] result in
             switch result {
             case .success:
                 self?.presenter?.presentKakaoLogoutSuccess()
@@ -130,10 +130,10 @@ final class LoginInteractor: LoginBusinessLogic {
         }
     }
     
-    // MARK: - Step 1
+    // MARK: - Step 4 (회원이 아닐때)
     // 스냅핏 서버에 회원가입 요청
-    func snapFitJoin(request: Login.LoadLogin.Request) {
-        authWorker.createUser(request: request)
+    func registerSnapFitUser(request: Login.LoadLogin.Request) {
+        authWorker.registerUser(request: request)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -153,11 +153,11 @@ final class LoginInteractor: LoginBusinessLogic {
     
     
     func handleAppleLogin(request: ASAuthorizationAppleIDRequest) {
-        authWorker.handleAppleLogin(request: request)
+        authWorker.initiateAppleLogin(request: request)
     }
     
     func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>) {
-        authWorker.handleAppleLoginCompletion(result: result) { [weak self] completionResult in
+        authWorker.completeAppleLogin(result: result) { [weak self] completionResult in
             switch completionResult {
             case .success(let appleIDCredential):
                 //self?.presenter?.presentAppleLoginSuccess(appleIDCredential)

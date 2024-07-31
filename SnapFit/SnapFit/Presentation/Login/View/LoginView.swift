@@ -144,7 +144,7 @@ private struct LoginViewGroup: View {
                 }
             
             Button {
-                interactor?.handleKakaoLogin() // Kakao 로그인 처리
+                interactor?.loginWithKakao() // Kakao 로그인 처리
                 
             } label: {
                 HStack(spacing: 70) {
@@ -169,7 +169,7 @@ private struct LoginViewGroup: View {
             
             if viewModel.isKakaoLogin {
                 Button {
-                    interactor?.handleKakaoLogout() // Kakao 로그아웃 처리
+                    interactor?.logoutFromKakao() // Kakao 로그아웃 처리
                 } label: {
                     Text("카카오 로그아웃")
                 }
