@@ -28,6 +28,6 @@ class LoginViewModel: NSObject, ObservableObject {
     
     enum Destination {
             case termsView
-            case snapFitTabView
+            case splashAndTabView
     }
 }

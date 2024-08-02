@@ -80,7 +80,7 @@ struct GridSelectionView: View {
             Spacer()
             
             
-            NavigationLink(destination: SnapFitTabView().navigationBarBackButtonHidden(), isActive: $navigateToSnapFitTabView) {
+            NavigationLink(destination: SplashAndTabView().navigationBarBackButtonHidden(), isActive: $navigateToSnapFitTabView) {
                 EmptyView()
             }
             

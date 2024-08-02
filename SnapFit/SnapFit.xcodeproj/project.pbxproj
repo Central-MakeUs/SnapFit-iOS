@@ -44,6 +44,7 @@
 		64795A732C5A2C100018BE0D /* AccordionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A722C5A2C100018BE0D /* AccordionView.swift */; };
 		64795A752C5A2C260018BE0D /* ReservationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A742C5A2C260018BE0D /* ReservationSheetView.swift */; };
 		64795A792C5A51980018BE0D /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A782C5A51980018BE0D /* SectionHeaderView.swift */; };
+		64795A7B2C5A68FB0018BE0D /* SplashAndTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A7A2C5A68FA0018BE0D /* SplashAndTabView.swift */; };
 		6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */; };
 		6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */; };
 		6496CB442C42CECA00381F0F /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB3E2C42CECA00381F0F /* LoginView.swift */; };
@@ -103,6 +104,7 @@
 		64795A722C5A2C100018BE0D /* AccordionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccordionView.swift; sourceTree = "<group>"; };
 		64795A742C5A2C260018BE0D /* ReservationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationSheetView.swift; sourceTree = "<group>"; };
 		64795A782C5A51980018BE0D /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
+		64795A7A2C5A68FA0018BE0D /* SplashAndTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashAndTabView.swift; sourceTree = "<group>"; };
 		6496CB3B2C42CECA00381F0F /* LoginPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPresenter.swift; sourceTree = "<group>"; };
 		6496CB3D2C42CECA00381F0F /* LoginInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInteractor.swift; sourceTree = "<group>"; };
 		6496CB3E2C42CECA00381F0F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				64795A4C2C5A105B0018BE0D /* MainPromotion */,
 				6496CB3A2C42CEA400381F0F /* Login */,
 				6428A48E2C3D20C600C47990 /* ContentView.swift */,
+				64795A7A2C5A68FA0018BE0D /* SplashAndTabView.swift */,
 				6428A4C32C3D64D200C47990 /* SplashView.swift */,
 				64795A4A2C5908FD0018BE0D /* SnapFitTabView.swift */,
 			);
@@ -508,6 +511,7 @@
 				64795A6C2C5A2ADE0018BE0D /* ReservationView.swift in Sources */,
 				6428A5062C3F98F200C47990 /* SceneDelegate.swift in Sources */,
 				6428A5042C3F978600C47990 /* AppDelegate.swift in Sources */,
+				64795A7B2C5A68FB0018BE0D /* SplashAndTabView.swift in Sources */,
 				6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */,
 				642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */,
 				6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */,

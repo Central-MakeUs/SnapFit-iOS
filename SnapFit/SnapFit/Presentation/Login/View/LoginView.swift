@@ -43,7 +43,7 @@ struct LoginView: View, LoginDisplayLogic {
         
         // Navigate to SnapFitTabView if userVerification is true
         if viewModel.userVerification {
-            self.viewModel.destination = .snapFitTabView
+            self.viewModel.destination = .splashAndTabView
         } else {
             self.viewModel.destination = .termsView
         }
@@ -57,17 +57,18 @@ struct LoginView: View, LoginDisplayLogic {
         NavigationStack(path: $stack) {
             GeometryReader { geometry in
                 VStack(alignment: .leading) {
-                    Spacer().frame(height: 110)
+                    Spacer().frame(height: 130)
                     
                     Group {
                         Image("appLogo")
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 141.33, height: 38.12)
+                            .frame(width: 155, height: 63)
                             .padding(.bottom, 10)
                         
-                        Text("나에게 맞는 사진을 만날 수 있는,")
-                        Text("스냅핏에 오신걸 환영합니다!")
+                        Text("당신의 아름다운 순간을 담다.")
+                            .font(.callout)
+            
                     }
                     .foregroundColor(.white)
                     .font(.title3)
@@ -82,11 +83,14 @@ struct LoginView: View, LoginDisplayLogic {
                 .padding(.horizontal, 15)
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .background(
-                    Image("splash")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
+                    Color.black
+                        .ignoresSafeArea()
+                    
+//                    Image("splash")
+//                        .resizable()
+//                        .scaledToFill()
+//                        .frame(width: geometry.size.width, height: geometry.size.height)
+//                        .clipped()
                 )
             }
             .navigationDestination(isPresented: $viewModel.shouldNavigate) {
@@ -94,8 +98,8 @@ struct LoginView: View, LoginDisplayLogic {
                 case .termsView:
                     TermsView(viewModel: viewModel, interactor: interactor)
                         .navigationBarBackButtonHidden(true)
-                case .snapFitTabView:
-                    SnapFitTabView()
+                case .splashAndTabView:
+                    SplashAndTabView()
                         .navigationBarBackButtonHidden(true)
                 }
             }     .navigationBarBackButtonHidden(true)
@@ -184,18 +188,18 @@ private struct LoginViewGroup: View {
                     Image("AppleButton")
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 20, height: 20)
+                        .frame(width: 24, height: 24)
                         .padding(.leading)
                     
                     Text("Apple로 계속하기")
                         .font(.system(size: 15))
                         .bold()
-                        .foregroundColor(.white)
+                        .foregroundColor(.black)
                     
                     Spacer()
                 }
                 .padding()
-                .background(Color.black)
+                .background(Color.white)
                 .allowsHitTesting(false)
             }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)

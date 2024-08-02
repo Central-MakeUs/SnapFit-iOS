@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "AppleButton.png",
+      "filename" : "AppleButton.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
