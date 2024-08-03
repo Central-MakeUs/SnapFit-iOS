@@ -47,11 +47,11 @@ struct MiniCardView: View {
                     .bold()
                     .foregroundColor(.black)
             }
-            .padding(EdgeInsets(top: 0, leading: 10, bottom: 5, trailing: 10))
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
         }
         .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 4)
+//        .cornerRadius(10)
+//        .shadow(radius: 4)
     }
 }
 
@@ -63,7 +63,7 @@ struct MiddleCardView: View {
             Image("demo3")
                 .resizable()
                 .scaledToFill()
-                .frame(width: 174, height: 200)
+                .frame(width: 175, height: 170)
                 .clipped()
                 .overlay {
                     Button(action: {
@@ -99,11 +99,11 @@ struct MiddleCardView: View {
                 }
                 
             }
-            .padding(EdgeInsets(top: 0, leading: 10, bottom: 5, trailing: 10))
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
         }
         .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 2)
+//        .cornerRadius(10)
+//        .shadow(radius: 2)
     }
 }
 
@@ -143,11 +143,11 @@ struct BigCardView: View {
                 }
                
             }
-            .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10))
         }
         .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 4)
+//        .cornerRadius(10)
+//        .shadow(radius: 4)
     }
 }
 

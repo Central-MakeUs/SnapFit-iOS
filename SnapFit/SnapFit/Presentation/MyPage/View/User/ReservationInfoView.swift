@@ -176,15 +176,6 @@ struct InfoRow: View {
     }
 }
 
-struct CustomDividerView: View {
-    var body: some View {
-        Rectangle()
-            .fill(Color(UIColor.systemGray6))
-            .frame(height: 5)
-            .edgesIgnoringSafeArea(.horizontal)
-    }
-}
-
 
 
 struct ReservationInfoView_Previews: PreviewProvider {

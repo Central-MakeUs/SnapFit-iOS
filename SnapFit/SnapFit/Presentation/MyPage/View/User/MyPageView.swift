@@ -75,22 +75,8 @@ struct UserInfoView: View {
                 .font(.title3)
                 .padding(.top, 40)
             
-            HStack(spacing: 8) {
-                Image("profileLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 15, height: 15)
-                
-                Text("러블리")
-                    .font(.caption)
-                    .bold()
-                    .foregroundColor(.white)
-            }
-            .padding(.vertical, 10) // 세로 패딩을 줄임
-            .padding(.horizontal, 10) // 가로 패딩을 줄임
-            //.background(Color("profileLabelColor"))
-            .background(Color(.black))
-            .cornerRadius(5)
+            StarImageLabel(text: "귀여운")
+            
         }
     }
 }
