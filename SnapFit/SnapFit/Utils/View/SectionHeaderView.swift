@@ -10,7 +10,8 @@ import SwiftUI
 // 섹션 헤더 뷰
 struct SectionHeaderView: View {
     let title: String
-    
+    var showRequired: Bool = false // 기본값을 false로 설정
+
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Rectangle()
@@ -18,11 +19,19 @@ struct SectionHeaderView: View {
             Text(title)
                 .font(.callout)
                 .bold()
+            if showRequired {
+                Text("[필수]")
+                    .font(.footnote)
+                    .foregroundColor(Color(.systemGray2))
+            }
             Spacer()
         }
     }
 }
 
 #Preview {
-    SectionHeaderView(title: "닉네임")
+    VStack {
+        SectionHeaderView(title: "닉네임")
+        SectionHeaderView(title: "이메일", showRequired: true)
+    }
 }

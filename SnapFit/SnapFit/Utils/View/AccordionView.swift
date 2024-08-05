@@ -22,14 +22,16 @@ struct AccordionView: View {
             }) {
                 HStack {
                     Text(selectedTime)
-                        .foregroundColor(.black)
+                        .foregroundStyle(Color(.systemGray2))
+                        .font(.callout)
+                        
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .foregroundColor(.gray)
                 }
                 .padding()
                 .overlay(
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 5)
                         .stroke(Color.gray, lineWidth: 1)
                 )
             }

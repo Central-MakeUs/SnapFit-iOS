@@ -77,6 +77,10 @@ struct ReservationCardView: View {
                         .font(.callout) // Equivalent to font size 16
                         .bold()
                         .foregroundColor(.black) // 텍스트 색상을 검정색으로 설정
+                    HStack(spacing: 8){
+                        MoodsLabel(text: "시크")
+                        InOutLabel(text: "야외스냅")
+                    }
                 }
                 
             }
