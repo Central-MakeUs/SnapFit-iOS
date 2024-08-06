@@ -10,7 +10,7 @@ import SwiftUI
 struct AuthorReservationView: View {
     @State private var selectedTab: Int = 0
     @Environment(\.presentationMode) var presentationMode
-
+    
     @State var locationText: String = ""
     @State var dateText: String = ""
     @State var emailText: String = ""
@@ -193,9 +193,7 @@ struct PhoneSection: View {
 
 struct SubmitButton: View {
     var body: some View {
-        Button {
-            // Action for "예약하기"
-        } label: {
+        NavigationLink(destination: AuthorReservationReceptionView().navigationBarBackButtonHidden(true)) {
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")

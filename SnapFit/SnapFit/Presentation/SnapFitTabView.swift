@@ -25,9 +25,7 @@ struct SnapFitTabView: View {
             }
             .tag(0)
 
-            VStack {
-                Text("둘러보기 화면")
-            }
+            AuthorListView()
             .tabItem {
                 VStack {
                     // 선택된 탭에 따라 이미지 변경

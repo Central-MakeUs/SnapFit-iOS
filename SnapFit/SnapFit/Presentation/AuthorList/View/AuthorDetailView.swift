@@ -29,11 +29,37 @@ struct AuthorDetailView: View {
                         .foregroundColor(.black)
                 }
             }
-            ToolbarItem(placement: .principal) {
-                Text("찜한내역")
-                    .font(.headline)
-                    .foregroundColor(.black)
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    Button(action: {
+                        // Action for heart button
+                    }) {
+                        Image(systemName: "heart")
+                            .foregroundColor(.black)
+                    }
+                    Menu {
+                        Button(action: {
+                            // 공유하기 액션
+                            print("공유하기")
+                        }) {
+                            Label("공유하기", systemImage: "square.and.arrow.up")
+                        }
+                        
+                        Button(action: {
+                            // 신고하기 액션
+                            print("신고하기")
+                        }) {
+                            Label("신고하기", systemImage: "exclamationmark.bubble")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.black)
+                    }
+                    
+                }
             }
+           
         }
     }
 }
@@ -138,13 +164,12 @@ struct DividerAndRegulationView: View {
 
 // 다음 버튼 뷰
 struct NextButton: View {
+   
     var body: some View {
-        Button {
-            // Action for "다음"
-        } label: {
+        NavigationLink(destination: AuthorReservationView().navigationBarBackButtonHidden(true)) {
             HStack(spacing: 20) {
                 Spacer()
-                Text("다음")
+                Text("예약하기")
                     .font(.headline)
                     .bold()
                     .foregroundColor(.white)
