@@ -57,40 +57,43 @@ struct LoginView: View, LoginDisplayLogic {
         NavigationStack(path: $stack) {
             GeometryReader { geometry in
                 VStack(alignment: .leading) {
-                    Spacer().frame(height: 130)
+                    Spacer().frame(height: 148)
                     
                     Group {
                         Image("appLogo")
                             .resizable()
                             .scaledToFill()
                             .frame(width: 155, height: 63)
-                            .padding(.bottom, 10)
+                            .padding(.bottom, 24)
                         
                         Text("당신의 아름다운 순간을 담다.")
                             .font(.callout)
+                            .foregroundStyle(Color("LoginFontColor"))
             
                     }
+                    
                     .foregroundColor(.white)
                     .font(.title3)
-                    .padding(.trailing, 80)
+                  
                     
                     Spacer()
                     
                     LoginViewGroup(interactor: interactor, viewModel: viewModel)
                     
-                    Spacer().frame(height: 110)
+                    Spacer().frame(height: 32)
                 }
-                .padding(.horizontal, 15)
+                .padding(.horizontal, 16)
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .background(
-                    Color.black
-                        .ignoresSafeArea()
-                    
-//                    Image("splash")
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(width: geometry.size.width, height: geometry.size.height)
-//                        .clipped()
+                    ZStack {
+                        Color.black
+                            .ignoresSafeArea()
+                        Image("LoginImages")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 211, height: 426)
+                            .position(x: geometry.size.width - 16 - 211 / 2, y: 224 + 426 / 2)
+                    }
                 )
             }
             .navigationDestination(isPresented: $viewModel.shouldNavigate) {

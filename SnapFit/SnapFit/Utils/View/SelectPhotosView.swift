@@ -22,7 +22,7 @@ struct SelectPhotosView: View {
                 HStack(spacing: 10){
                     PhotosPicker(
                         selection: $selectedItems,
-                        maxSelectionCount: 5,
+                        maxSelectionCount: 8,
                         matching: .images
                     ) {
                         ZStack {
@@ -41,7 +41,7 @@ struct SelectPhotosView: View {
                                 HStack(spacing: 0){
                                     Text("\(selectedItemsCounts)")
                                         .foregroundColor(.gray)
-                                    Text("/5")
+                                    Text("/8")
                                         .foregroundColor(.gray)
                                 }
                                 Spacer()

@@ -19,17 +19,9 @@
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="appLogo" translatesAutoresizingMaskIntoConstraints="NO" id="cqU-Bu-OwI">
-                                <rect key="frame" x="38" y="279" width="317" height="39"/>
-                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="IaD-e2-SKz"/>
                         <color key="backgroundColor" red="0.98039215800000001" green="0.98039215800000001" blue="0.98039215800000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                        <constraints>
-                            <constraint firstItem="cqU-Bu-OwI" firstAttribute="leading" secondItem="IaD-e2-SKz" secondAttribute="leading" constant="38.119999999999997" id="Pjr-lf-uET"/>
-                            <constraint firstItem="cqU-Bu-OwI" firstAttribute="top" secondItem="IaD-e2-SKz" secondAttribute="top" constant="220" id="jvg-sA-fyJ"/>
-                            <constraint firstItem="IaD-e2-SKz" firstAttribute="trailing" secondItem="cqU-Bu-OwI" secondAttribute="trailing" constant="38.119999999999997" id="kWc-1Q-b6V"/>
-                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="a3h-ss-Iz1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -38,7 +30,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="appLogo" width="142" height="39"/>
-        <image name="splash" width="360" height="720"/>
+        <image name="splash" width="1170" height="2532"/>
     </resources>
 </document>
