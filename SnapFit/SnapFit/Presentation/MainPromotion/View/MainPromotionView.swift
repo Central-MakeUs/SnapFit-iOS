@@ -1,0 +1,126 @@
+//
+//  MainPromotionView.swift
+//  SnapFit
+//
+//  Created by 정정욱 on 7/31/24.
+//
+import SwiftUI
+
+struct MainPromotionView: View {
+    
+    @State private var isLiked = false // 좋아요 상태를 관리하는 변수
+    
+    let layout: [GridItem] = [ GridItem(.flexible()) ]
+    
+    let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // 상단 로고 및 인사말
+                    HeaderView()
+                        .padding(.bottom, 30)
+                    
+                    // 섹션 1: 추천 사진
+                    SectionHeaderView(title: "이런 사진은 어때요?")
+                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                        MainPromotionRandomCardView()
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    // 섹션 2: 미니 카드 뷰
+                    SectionMiniCardsView()
+                        .padding(.bottom, 40)
+                    
+                    // 섹션 3: 메이커와 추억 만들기
+                    SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
+                    SectionBigCardsView()
+                        .padding(.bottom, 40)
+                }
+                
+            }
+        }
+    }
+}
+
+struct HeaderView: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            HStack {
+                Image("mainSnapFitLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 20)
+                Spacer()
+            }
+            .padding(.bottom, 24)
+            
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 7) {
+                    Text("안녕하세요, 한소희님")
+                        .font(.title2)
+                        .bold()
+                    Text("스냅핏에서는 원하는\n분위기의 사진을 찾을 수 있어요.")
+                        .font(.subheadline)
+                        .foregroundColor(Color(.systemGray))
+                        .padding(.bottom)
+                }
+                Spacer()
+                Image("SnapFitProfileLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct SectionMiniCardsView: View {
+    let layout: [GridItem] = [ GridItem(.flexible()) ]
+    
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHGrid(rows: layout, spacing: 8) {
+                ForEach(0..<10, id: \.self) { item in
+                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                        MiniCardView()
+                            .frame(width: 130, height: 202)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
+        }
+    }
+}
+
+struct SectionBigCardsView: View {
+    let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
+    
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(0..<10, id: \.self) { item in
+                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                        BigCardView()
+                            .frame(width: 175, height: 288)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
+#Preview {
+    MainPromotionView()
+}
