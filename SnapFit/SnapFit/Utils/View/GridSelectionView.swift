@@ -104,18 +104,17 @@ struct GridSelectionView: View {
             } label: {
                 HStack(spacing: 20) {
                     Spacer()
-                    
                     Text("시작하기")
-                        .font(.headline)
+                        .font(.callout)
                         .bold()
                         .foregroundColor(isConfirmButtonEnabled ? Color(.white) : Color(.systemGray))
-                    
                     Spacer()
                 }
                 .padding()
+                .frame(height: 48)
                 .background(isConfirmButtonEnabled ? Color(.black) : Color(.systemGray4))
-                .cornerRadius(10)
-                .padding(EdgeInsets(top: 0, leading: 20, bottom: 20, trailing: 20))
+                .cornerRadius(5)
+                .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
             }
             .disabled(!isConfirmButtonEnabled)
         }
@@ -140,7 +139,7 @@ struct GridSelectionView: View {
                         showAlert = false
                     }
                     .frame(width: 300)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2.5)
                     // 해당 View를 화면의 정중앙에 위치
                 }
             }

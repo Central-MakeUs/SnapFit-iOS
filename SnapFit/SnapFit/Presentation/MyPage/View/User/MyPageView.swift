@@ -16,8 +16,11 @@ struct MyPageView: View {
                         .padding(.horizontal)
                     
                     NavigationButtonsView()
-                    
+                        .padding(.bottom, 32)
                     GroupBoxViews()
+                   
+                    Spacer()
+                        .frame(height: 40)
                     
                     Spacer()
                 }
@@ -38,7 +41,7 @@ struct ProfileHeaderView: View {
                 .foregroundColor(.black)
                 .frame(width: .infinity, height: 168)
                 .overlay {
-                    Image("profile")
+                    Image("starBigLogo")
                         .resizable()
                         .frame(width: 86, height: 86)
                         .foregroundStyle(Color(.systemGray4))
@@ -127,6 +130,7 @@ struct NavigationButton<Destination: View>: View {
             }
             .frame(maxWidth: .infinity, maxHeight: 108)
             .background(Color.white)
+          
         }
     }
 }
@@ -134,22 +138,30 @@ struct NavigationButton<Destination: View>: View {
 // 그룹 박스 뷰
 struct GroupBoxViews: View {
     var body: some View {
-        GroupBox {
+        
+        SectionHeaderView(title: "메이커 관리")
+            .padding(.bottom, 16)
+        Group {
             AppInfoContent(name: "사진작가로 전환")
+         
             AppInfoContent(name: "상품관리")
+        
             AppInfoContent(name: "예약관리")
-        } label: {
-            AppInfoLabel(labelText: "메이커 관리")
+                .padding(.bottom, 24)
+                
         }
         .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
-        
-        GroupBox {
+        .padding(.horizontal, 16)
+       
+        SectionHeaderView(title: "SnapFit 설정")
+        Group{
             AppInfoContent(name: "고객센터")
             AppInfoContent(name: "이용약관")
-        } label: {
-            AppInfoLabel(labelText: "SnapFit 설정")
+            AppInfoContent(name: "로그아웃")
+            AppInfoContent(name: "탈퇴하기")
         }
         .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
+        .padding(.horizontal, 16)
     }
 }
 

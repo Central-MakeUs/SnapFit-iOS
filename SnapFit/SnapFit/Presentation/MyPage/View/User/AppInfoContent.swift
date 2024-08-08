@@ -17,9 +17,7 @@ struct AppInfoContent: View {
     
     var body: some View {
         VStack {
-            Divider()
-                .padding(.vertical, 5)
-            
+            Spacer()
             HStack {
                 // Conditional NavigationLink
                 if name == "상품관리" {
@@ -38,7 +36,21 @@ struct AppInfoContent: View {
                         Spacer()
                         Image(systemName: "chevron.right")
                     }
-                } else {
+                } else if name == "로그아웃" {
+                    Text(name)
+                        .foregroundColor(Color(.systemGray))
+                        .font(.system(size: 14))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                } else if name == "탈퇴하기" {
+                    Text(name)
+                        .foregroundColor(Color(.systemGray))
+                        .font(.system(size: 14))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+                
+                else {
                     Text(name)
                         .foregroundColor(.black)
                         .font(.system(size: 14))
@@ -59,7 +71,12 @@ struct AppInfoContent: View {
                     EmptyView()
                 }
             } //: HSTACK
+                
+            Spacer()
+            
+            Divider()
         } //: VSTACK
+        .frame(height: 68)
     }
 }
 
@@ -84,5 +101,8 @@ struct AppInfoLabel: View {
 #Preview {
     Group {
         AppInfoContent(name: "Sample2")
+        AppInfoContent(name: "Sample2")
+        AppInfoContent(name: "로그아웃")
+        AppInfoContent(name: "탈퇴하기")
     }
 }

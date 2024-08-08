@@ -11,6 +11,7 @@ struct TermsView: View {
     @State private var isAllAgreed = false // 전체동의 토글 상태
     @State private var isTermsAgreed = false // 이용약관 동의 토글 상태
     @State private var isPrivacyPolicyAgreed = false // 개인정보 처리 방침 동의 토글 상태
+    @State private var isAgeAgreed = false // 만 14세 이상입니다 동의
     @State private var isMarketingAgreed = false // 광고성 정보 수신 및 마케팅 활용 동의 토글 상태
     @State private var isConfirmButtonEnabled = false // 확인 버튼 활성화 상태
     
@@ -29,7 +30,7 @@ struct TermsView: View {
                     .padding(.top, 50)
                 
                 Text("서비스 시작 및 가입을 위해 먼저\n가입 및 정보 제공에 동의해 주세요.")
-                    .font(.subheadline)
+                    .font(.callout)
                     .foregroundColor(Color(.systemGray))
                     
             }
@@ -43,10 +44,11 @@ struct TermsView: View {
                     isAllAgreed = newValue
                     isTermsAgreed = newValue
                     isPrivacyPolicyAgreed = newValue
+                    isAgeAgreed = newValue
                     isMarketingAgreed = newValue
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
                 } label: {
-                    HStack(spacing: 20) {
+                    HStack(spacing: 15) {
                         Image(isAllAgreed ? "Terms2" : "Terms")
                             .resizable()
                             .scaledToFill()
@@ -71,7 +73,7 @@ struct TermsView: View {
                     isAgreed: $isTermsAgreed,
                     title: "이용약관 동의",
                     isRequired: true,
-                    url: URL(string: "https://mixolydian-beef-6a0.notion.site/3b731e9f5880466e9df899bf30a66cfb?pvs=4")!
+                    url: URL(string: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")!
                 ) {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
@@ -81,7 +83,17 @@ struct TermsView: View {
                     isAgreed: $isPrivacyPolicyAgreed,
                     title: "개인정보 처리 방침 동의",
                     isRequired: true,
-                    url: URL(string: "https://example.com/privacy")!
+                    url: URL(string: "https://mixolydian-beef-6a0.notion.site/497ab7ab659743c8b797e2c62e4c7bc9?pvs=4")!
+                ) {
+                    updateAllAgreed() // 전체 동의 상태 업데이트
+                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                }
+                
+                TermsToggleButton(
+                    isAgreed: $isAgeAgreed,
+                    title: "만 14세 이상입니다 동의",
+                    isRequired: true,
+                    url: URL(string: "https://mixolydian-beef-6a0.notion.site/14-c96d3cf1df7c449690452b07c55459c9?pvs=4")!
                 ) {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
@@ -91,7 +103,7 @@ struct TermsView: View {
                     isAgreed: $isMarketingAgreed,
                     title: "광고성 정보 수신 및 마케팅 활용 동의",
                     isRequired: false,
-                    url: URL(string: "https://example.com/marketing")!
+                    url: URL(string: "https://mixolydian-beef-6a0.notion.site/9bdc6cfbb2474b58ad4f99421feab6cf?pvs=4")!
                 ) {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
@@ -99,7 +111,7 @@ struct TermsView: View {
                 
                 
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 16)
             
             Spacer()
             
@@ -114,7 +126,7 @@ struct TermsView: View {
                         Spacer()
                         
                         Text("다음")
-                            .font(.subheadline)
+                            .font(.callout)
                             .bold()
                             .foregroundColor(isConfirmButtonEnabled ? .white : Color(.systemGray))
                         
@@ -165,37 +177,28 @@ struct TermsToggleButton: View {
             isAgreed.toggle()
             action()
         } label: {
-            HStack(spacing: 20) {
+            HStack(spacing: 15) {  // HStack의 spacing을 줄여서 더 많은 공간을 확보합니다
                 Image(isAgreed ? "Terms3" : "Terms")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 20, height: 30)
                     .padding(.leading, 5)
                 
-                if isRequired {
-                    Text("[필수] \(title)")
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundColor(isAgreed ? .black : Color(.systemGray2))
-                } else {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("[선택] 광고성 정보 수신 및")
-                        Text("마케팅 활용 동의")
-                    }
-                    .font(.subheadline)
+                Text(isRequired ? "[필수] \(title)" : "[선택] 광고성 정보 수신 및 마케팅 활용 동의")
+                    .font(.footnote)
                     .bold()
                     .foregroundColor(isAgreed ? .black : Color(.systemGray2))
-                }
+                    
                 
-                Spacer()
+                Spacer(minLength: 5)  // 최소 Spacer 길이를 설정하여 텍스트와 버튼 사이의 간격을 확보합니다
                 
                 Button {
                     isShowingSheet.toggle()
                 } label: {
-                    Text("더보기")
-                        .font(.subheadline)
-                        .foregroundColor(isAgreed ? .black : Color(.systemGray2))
-                        .underline()
+                    Image("NotionButton")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
                 }
                 .padding(.trailing, 5)
             }
@@ -209,6 +212,7 @@ struct TermsToggleButton: View {
         }
     }
 }
+
 
 #Preview {
     TermsView(viewModel: LoginViewModel())

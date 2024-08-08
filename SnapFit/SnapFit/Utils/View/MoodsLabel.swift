@@ -9,18 +9,28 @@ import SwiftUI
 
 struct MoodsLabel: View {
     var text: String
+    var bigCardViewType: Bool = false
     
     var body: some View {
         Text(text)
             .font(.caption)
             .bold()
-            .foregroundColor(Color("labelFontColor")) // 폰트 색상
-            .padding(.vertical, 5) // 세로 패딩을 줄임
-            .padding(.horizontal, 15) // 가로 패딩을 줄임
-            .background(Color("labelBackColor").opacity(0.3)) // 배경색
+            .foregroundColor(Color("labelFontColor"))
+            .padding(.vertical, 5)
+            .padding(.horizontal, 15)
+            .background(bigCardViewType ? Color("labelBackColor").opacity(0.3) : Color("InOutLableBackColor"))
             .cornerRadius(5)
     }
 }
+
+#Preview {
+    VStack {
+        MoodsLabel(text: "시크", bigCardViewType: true)
+        MoodsLabel(text: "시크")
+    }
+    .previewLayout(.sizeThatFits)
+}
+
 
 
 struct InOutLabel: View {
@@ -33,7 +43,7 @@ struct InOutLabel: View {
             .foregroundColor(Color("InOutLableFontColor")) // 폰트 색상
             .padding(.vertical, 5) // 세로 패딩을 줄임
             .padding(.horizontal, 10) // 가로 패딩을 줄임
-            .background(Color("InOutLableBackColor").opacity(0.3)) // 배경색
+            .background(Color("InOutLableBackColor")) // 배경색
             .cornerRadius(5)
     }
 }
@@ -63,12 +73,6 @@ struct StarImageLabel: View {
     }
 }
 
-struct MoodsLabel_Previews: PreviewProvider {
-    static var previews: some View {
-        MoodsLabel(text: "시크")
-            .previewLayout(.sizeThatFits) // 프리뷰에서 크기 맞춤
-    }
-}
 
 struct InOutLabel_Previews: PreviewProvider {
     static var previews: some View {

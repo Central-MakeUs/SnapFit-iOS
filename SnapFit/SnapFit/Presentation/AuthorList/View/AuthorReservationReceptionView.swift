@@ -48,9 +48,7 @@ struct AuthorReservationReceptionView: View {
                     .frame(width: .infinity, height: 196)
                     .padding(.bottom, 16)
                     
-                    Button {
-                        // Action for "예약하기"
-                    } label: {
+                    NavigationLink(destination: ReservationView().navigationBarBackButtonHidden(true)) {
                         HStack(spacing: 20) {
                             Spacer()
                             Text("예약내역 보러가기")

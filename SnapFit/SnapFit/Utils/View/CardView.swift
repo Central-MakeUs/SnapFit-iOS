@@ -75,7 +75,7 @@ struct MiddleCardView: View {
                             .frame(width: 16, height: 16)
                             .foregroundColor(.white)
                     }
-                    .offset(x: 65, y: -70)
+                    .offset(x: 62, y: -62)
                 }
                 .padding(.bottom, 5)
 
@@ -138,8 +138,8 @@ struct BigCardView: View {
         
 
                 HStack(spacing: 9) {
-                    MoodsLabel(text: "시크")
-                    MoodsLabel(text: "러블리")
+                    MoodsLabel(text: "시크", bigCardViewType: true)
+                    MoodsLabel(text: "러블리", bigCardViewType: true)
                 }
                
             }
@@ -148,6 +148,64 @@ struct BigCardView: View {
         .background(Color.white)
 //        .cornerRadius(10)
 //        .shadow(radius: 4)
+    }
+}
+
+struct MainPromotionRandomCardView: View {
+    @State private var isLiked = false
+
+    var body: some View {
+        ZStack{
+            Image("demo5")
+                .resizable()
+                .scaledToFill()
+                .frame(width: .infinity, height: 202)
+                .clipped()
+                .padding(16)
+            
+            HStack(spacing: 230) {
+                Text("New")
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .hidden()
+                
+                Button(action: {
+                    isLiked.toggle()
+                }) {
+                    Image(systemName: isLiked ? "heart.fill" : "heart")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                        .foregroundColor(.white)
+                }
+            }
+            .offset(CGSize(width: 30, height: -70.0))
+            
+            Group{
+                Rectangle()
+                    .frame(width: .infinity, height: 96)
+                    .foregroundColor(Color.black.opacity(0.7))
+                    .padding(.horizontal)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("대체불가! 성수 컨셉스냅 전문 인기 포토그래퍼, 데이트 스냅...")
+                        .font(.subheadline)
+                        .lineLimit(1)
+                        .foregroundColor(.white)
+                    Text("32,400원")
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                    
+                    HStack(spacing: 8){
+                        MoodsLabel(text: "시크")
+                        InOutLabel(text: "야외스냅")
+                    }
+                }
+                .padding(.horizontal, 30)
+            
+            }
+            .offset(CGSize(width: 0, height: 53.0))
+        }  //:ZSTACK
     }
 }
 
@@ -165,4 +223,9 @@ struct BigCardView: View {
 #Preview {
     BigCardView()
         .frame(width: 175, height: 258)
+}
+
+#Preview {
+    MainPromotionRandomCardView()
+        .frame(width: .infinity, height: 202)
 }
