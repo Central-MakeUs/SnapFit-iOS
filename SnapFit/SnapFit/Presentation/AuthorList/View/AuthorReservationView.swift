@@ -9,7 +9,6 @@ import SwiftUI
 
 struct AuthorReservationView: View {
     @State private var selectedTab: Int = 0
-    @Environment(\.presentationMode) var presentationMode
     
     @State var locationText: String = ""
     @State var dateText: String = ""
@@ -17,6 +16,8 @@ struct AuthorReservationView: View {
     @State var phoneText: String = ""
     
     @State private var counter: Int = 0
+    
+    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -37,7 +38,10 @@ struct AuthorReservationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                Button(action: {
+                    // 뒤로 가기 버튼을 사용하여 네비게이션 경로를 관리
+                    navigationModel.navigationPath.removeLast()
+                }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
@@ -192,8 +196,14 @@ struct PhoneSection: View {
 }
 
 struct SubmitButton: View {
+    
+    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
+    
     var body: some View {
-        NavigationLink(destination: AuthorReservationReceptionView().navigationBarBackButtonHidden(true)) {
+        
+        Button(action: {
+            navigationModel.navigationPath.append("AuthorReservationReceptionView")
+        }) {
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -206,11 +216,11 @@ struct SubmitButton: View {
             .frame(height: 48)
             .background(Color.black)
             .cornerRadius(5)
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
+            .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
         }
+
     }
 }
-
 
 struct EmailSection: View {
     @Binding var emailText: String

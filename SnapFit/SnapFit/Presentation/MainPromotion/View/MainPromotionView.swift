@@ -6,19 +6,12 @@
 //
 import SwiftUI
 
+
 struct MainPromotionView: View {
-    
-    @State private var isLiked = false // 좋아요 상태를 관리하는 변수
-    
-    let layout: [GridItem] = [ GridItem(.flexible()) ]
-    
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10)
-    ]
-    
+    @StateObject var navigationModel = NavigationModel() // NavigationModel을 환경 객체로 사용
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationModel.navigationPath) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     // 상단 로고 및 인사말
@@ -27,7 +20,7 @@ struct MainPromotionView: View {
                     
                     // 섹션 1: 추천 사진
                     SectionHeaderView(title: "이런 사진은 어때요?")
-                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                    NavigationLink(value: "AuthorDetail") {
                         MainPromotionRandomCardView()
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -41,9 +34,27 @@ struct MainPromotionView: View {
                     SectionBigCardsView()
                         .padding(.bottom, 40)
                 }
-                
             }
+            .navigationBarHidden(true) // 네비게이션 바 숨기기
+            .navigationDestination(for: String.self) { value in
+                switch value {
+                case "AuthorDetail":
+                    AuthorDetailView()
+                        .navigationBarBackButtonHidden(true) // 뒤로가기 버튼 숨기기
+                case "AuthorReservation":
+                    AuthorReservationView()
+                        .navigationBarBackButtonHidden(true) // 뒤로가기 버튼 숨기기
+                case "AuthorReservationReceptionView" :
+                    AuthorReservationReceptionView()
+                        .navigationBarBackButtonHidden(true)
+                default:
+                    EmptyView()
+                }
+            }
+
         }
+        .environmentObject(navigationModel) // NavigationModel을 환경 객체로 주입
+   
     }
 }
 
@@ -80,14 +91,18 @@ struct HeaderView: View {
     }
 }
 
+
 struct SectionMiniCardsView: View {
-    let layout: [GridItem] = [ GridItem(.flexible()) ]
+    @EnvironmentObject var navigationModel: NavigationModel // NavigationModel을 환경 객체로 사용
+    let layout: [GridItem] = [GridItem(.fixed(130))] // 고정된 크기 설정
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
                 ForEach(0..<10, id: \.self) { item in
-                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                    Button(action: {
+                        navigationModel.navigationPath.append("AuthorDetail")
+                    }) {
                         MiniCardView()
                             .frame(width: 130, height: 202)
                     }
@@ -99,17 +114,21 @@ struct SectionMiniCardsView: View {
     }
 }
 
+
 struct SectionBigCardsView: View {
+    @EnvironmentObject var navigationModel: NavigationModel // NavigationModel을 환경 객체로 사용
     let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10)
+        GridItem(.fixed(175), spacing: 10), // 고정된 크기 설정
+        GridItem(.fixed(175), spacing: 10)
     ]
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(0..<10, id: \.self) { item in
-                    NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true)) {
+                    Button(action: {
+                        navigationModel.navigationPath.append("AuthorDetail")
+                    }) {
                         BigCardView()
                             .frame(width: 175, height: 288)
                     }

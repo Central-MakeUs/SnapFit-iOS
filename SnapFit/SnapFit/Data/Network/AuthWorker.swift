@@ -18,25 +18,20 @@ import MultipartForm
 protocol AuthWorkingLogic {
     func loginWithKakao(completion: @escaping (Result<String, Error>) -> Void)
     func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
-    func loginUserWithKakao(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func loginUserWithKakao(kakaoAccessToken: String) -> AnyPublisher<Tokens, ApiError>
     func logoutFromKakao(completion: @escaping (Result<Void, Error>) -> Void)
     func initiateAppleLogin(request: ASAuthorizationAppleIDRequest)
-    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void)
+    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<String, Error>) -> Void)
     func logoutFromApple(completion: @escaping (Result<Void, Error>) -> Void)
-    func verifyUserMembership(completion: @escaping (Result<Bool, Error>) -> Void)
+    
+    func fetchVibes() -> AnyPublisher<Vibes, ApiError>
 }
 
 final class AuthWorker: AuthWorkingLogic{
     
     
+    
     static let baseURL = "http://34.47.94.218/snapfit" // 서버 주소
-    
-    
-    
-    // MARK: - 사용자 회원 여부를 확인하는 메서드
-    func verifyUserMembership(completion: @escaping (Result<Bool, any Error>) -> Void) {
-        completion(.success(false))
-    }
     
     
     
@@ -71,7 +66,7 @@ final class AuthWorker: AuthWorkingLogic{
     // MARK: - 스냅핏 서버에 사용자 등록 요청
     func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher< Tokens, ApiError> {
         
-        let urlString = AuthWorker.baseURL + "/signUp"
+        let urlString = AuthWorker.baseURL + "/user"
 
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -80,20 +75,16 @@ final class AuthWorker: AuthWorkingLogic{
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        urlRequest.addValue("Bearer \(request.oauthToken)", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("Bearer \(request.kakaoAccessToken)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
     
         // JSON 요청 본문 생성
-        print("request.social\(request.social)")
-        print("oauthToken \(request.oauthToken)")
-        print("request.nickName\(request.nickName)")
-        print("request.isMarketing\(request.isMarketing)")
                 
         let requestBody: [String: Any] = [
             "social": request.social,
             "vibes": request.moods,
             "deviceType": "apple",
-            "deviceToken": request.oauthToken,
+            "deviceToken": request.kakaoAccessToken,
             "nickName": request.nickName,
             "marketing": request.isMarketing
         ]
@@ -127,7 +118,7 @@ final class AuthWorker: AuthWorkingLogic{
                     let message = errorResponse?.message ?? "Bad Request"
                     let errorCode = errorResponse?.errorCode ?? 0
                     throw ApiError.badRequest(message: message, errorCode: errorCode)
-                    // 젠장 error badRequest(message: "유저가 존재합니다.", errorCode: 4) => 로그인넘기기
+                
                 case 204:
                     throw ApiError.noContent
                     
@@ -157,9 +148,9 @@ final class AuthWorker: AuthWorkingLogic{
     
     
     // MARK: - 카카오 계정으로 스냅핏 서버에 사용자 로그인
-    func loginUserWithKakao(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
+    func loginUserWithKakao(kakaoAccessToken: String) -> AnyPublisher<Tokens, ApiError> {
         
-        let urlString = AuthWorker.baseURL + "/login?SocialType=kakao"
+        let urlString = AuthWorker.baseURL + "/login"
 
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -168,7 +159,7 @@ final class AuthWorker: AuthWorkingLogic{
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        urlRequest.addValue("Bearer \(request.oauthToken)", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("Bearer \(kakaoAccessToken)", forHTTPHeaderField: "Authorization")
        
 
         // 2. urlSession 으로 API를 호출한다
@@ -185,7 +176,7 @@ final class AuthWorker: AuthWorkingLogic{
                 }
                 
                 switch httpResponse.statusCode {
-                case (400...410):
+                case (400...404): // 사용자가 이미 있는경우
                     let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
                     let message = errorResponse?.message ?? "Bad Request"
                     let errorCode = errorResponse?.errorCode ?? 0
@@ -196,9 +187,6 @@ final class AuthWorker: AuthWorkingLogic{
                 default: print("default")
                 }
                 
-                if !(200...299).contains(httpResponse.statusCode){
-                    throw ApiError.badStatus(code: httpResponse.statusCode)
-                }
                 
                 return data
             })
@@ -230,18 +218,23 @@ final class AuthWorker: AuthWorkingLogic{
     }
 
     
-    // MARK: - 카카오 로그아웃 처리
+    
     func initiateAppleLogin(request: ASAuthorizationAppleIDRequest) {
         request.requestedScopes = [.fullName, .email]
     }
 
     
     // MARK: - 애플 로그인 요청 초기화
-    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<ASAuthorizationAppleIDCredential, Error>) -> Void) {
+    func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<String, Error>) -> Void) {
         switch result {
         case .success(let authResults):
             if let appleIDCredential = authResults.credential as? ASAuthorizationAppleIDCredential {
-                completion(.success(appleIDCredential))
+                if let identityToken = appleIDCredential.identityToken,
+                   let tokenString = String(data: identityToken, encoding: .utf8) {
+                    completion(.success(tokenString)) // 서버로 보내서 검증하거나 사용
+                } else {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Apple ID Credential"])))
+                }
             } else {
                 completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Apple ID Credential"])))
             }
@@ -249,9 +242,10 @@ final class AuthWorker: AuthWorkingLogic{
             completion(.failure(error))
         }
     }
+
     
     
-    // MARK: - 애플 로그인 완료 처리
+    // MARK: - 애플 로그아웃 완료 처리
     func logoutFromApple(completion: @escaping (Result<Void, Error>) -> Void) {
         // 예시로, 클라이언트 측에서는 로그아웃 시 로컬 데이터를 초기화하는 것을 보여줍니다.
         // 실제로는 Apple ID 자격 증명과 관련된 데이터를 서버에서도 삭제해야 할 수 있습니다.
@@ -264,4 +258,59 @@ final class AuthWorker: AuthWorkingLogic{
     
     
     
+    // MARK: - 분위기 가져오기
+    func fetchVibes() -> AnyPublisher<Vibes, ApiError> {
+        
+        let urlString = AuthWorker.baseURL + "/vibes"
+
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+  
+        
+        // 2. urlSession 으로 API를 호출한다
+        // 3. API 호출에 대한 응답을 받는다
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap({ (data: Data, urlResponse: URLResponse) -> Data in
+                
+                // 디버그용 프린트
+                print("urlResponse: \(urlResponse)")
+                     
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    print("bad status code")
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case (400...404):
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+    
+                default: print("default")
+                }
+                
+                
+                return data
+            })
+            .decode(type: Vibes.self, decoder: JSONDecoder()) // Vibes 배열로 디코딩
+            .mapError({ err -> ApiError in
+                if let error = err as? ApiError { // ApiError 라면
+                    return error
+                }
+                
+                if let _ = err as? DecodingError { // 디코딩 에러라면
+                    return ApiError.decodingError
+                }
+                
+                return ApiError.unknown(nil)
+            }).eraseToAnyPublisher()
+    }
+    
+   
+
 }

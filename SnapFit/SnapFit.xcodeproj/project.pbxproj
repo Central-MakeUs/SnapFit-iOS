@@ -23,6 +23,8 @@
 		642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642D9E9D2C4D458500B31B51 /* Tokens.swift */; };
 		642D9EA12C4D46AF00B31B51 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 642D9EA02C4D46AF00B31B51 /* CombineExt */; };
 		642D9EA42C4D46BA00B31B51 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 642D9EA32C4D46BA00B31B51 /* MultipartForm */; };
+		643F64892C68BCAE0017ACCD /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F64882C68BCAE0017ACCD /* NavigationModel.swift */; };
+		643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F648A2C68F1C40017ACCD /* Vibes.swift */; };
 		64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */; };
 		644EDABE2C4552FF00745DDD /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABD2C4552FF00745DDD /* WebView.swift */; };
 		644EDAC02C4636DE00745DDD /* NicknameSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */; };
@@ -90,6 +92,8 @@
 		6428A5122C3FA32B00C47990 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		6428A5142C3FB2FB00C47990 /* SnapFit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapFit.entitlements; sourceTree = "<group>"; };
 		642D9E9D2C4D458500B31B51 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		643F64882C68BCAE0017ACCD /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
+		643F648A2C68F1C40017ACCD /* Vibes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vibes.swift; sourceTree = "<group>"; };
 		64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorReservationReceptionView.swift; sourceTree = "<group>"; };
 		644EDABD2C4552FF00745DDD /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NicknameSettingsView.swift; sourceTree = "<group>"; };
@@ -216,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				642D9E9D2C4D458500B31B51 /* Tokens.swift */,
+				643F648A2C68F1C40017ACCD /* Vibes.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -319,6 +324,7 @@
 		64795A4D2C5A10880018BE0D /* View */ = {
 			isa = PBXGroup;
 			children = (
+				643F64882C68BCAE0017ACCD /* NavigationModel.swift */,
 				64795A4E2C5A109B0018BE0D /* MainPromotionView.swift */,
 			);
 			path = View;
@@ -564,6 +570,7 @@
 				64600F0A2C5D0B7400C34929 /* ImageSliderView.swift in Sources */,
 				6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */,
 				64795A4B2C5908FD0018BE0D /* SnapFitTabView.swift in Sources */,
+				643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */,
 				6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */,
 				6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */,
 				64795A4F2C5A109B0018BE0D /* MainPromotionView.swift in Sources */,
@@ -571,6 +578,7 @@
 				64600F062C5D072700C34929 /* CustomTopTabbar.swift in Sources */,
 				6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */,
 				6428A5132C3FA32B00C47990 /* LoginViewModel.swift in Sources */,
+				643F64892C68BCAE0017ACCD /* NavigationModel.swift in Sources */,
 				6428A48F2C3D20C600C47990 /* ContentView.swift in Sources */,
 				6428A48D2C3D20C600C47990 /* SnapFitApp.swift in Sources */,
 				64ACDAEE2C46627000A4C169 /* Path.swift in Sources */,
@@ -654,7 +662,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -712,7 +720,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

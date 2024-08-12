@@ -8,23 +8,33 @@ import SwiftUI
 
 struct AuthorDetailView: View {
     @State private var selectedTab: Int = 0
-    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
 
     var body: some View {
-        VStack(alignment: .leading) {
+        ZStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     MainContentView()
                     DividerAndRegulationView()
-                    NextButton()
+                    Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
                 }
+                .padding(.bottom)
             }
-            .padding(.bottom)
+
+            // 고정된 NextButton
+            VStack {
+                Spacer()
+                NextButton()
+            }
+            .edgesIgnoringSafeArea(.bottom) // NextButton이 항상 화면 하단에 고정되도록 설정
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                Button(action: {
+                    // 뒤로 가기 버튼을 사용하여 네비게이션 경로를 관리
+                    navigationModel.navigationPath.removeLast()
+                }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
@@ -56,11 +66,10 @@ struct AuthorDetailView: View {
                         Image(systemName: "ellipsis")
                             .foregroundColor(.black)
                     }
-                    
                 }
             }
-           
         }
+      
     }
 }
 
@@ -141,11 +150,11 @@ struct DividerAndRegulationView: View {
                 
                 Text("추카랜드")
             }
-            .padding(.horizontal)
+            .padding(16)
             
             CustomDividerView()
             
-            SectionHeaderView(title: "최소 규정")
+            SectionHeaderView(title: "취소 규정")
                 .padding(.bottom, 16)
             
             Text("""
@@ -164,9 +173,12 @@ struct DividerAndRegulationView: View {
 
 // 다음 버튼 뷰
 struct NextButton: View {
-   
+    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
+    
     var body: some View {
-        NavigationLink(destination: AuthorReservationView().navigationBarBackButtonHidden(true)) {
+        Button(action: {
+            navigationModel.navigationPath.append("AuthorReservation")
+        }) {
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -179,7 +191,7 @@ struct NextButton: View {
             .frame(height: 48)
             .background(Color.black)
             .cornerRadius(5)
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
+            .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
         }
     }
 }

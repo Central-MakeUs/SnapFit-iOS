@@ -15,33 +15,34 @@ protocol LoginPresentationLogic {
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String)
     func presentKakaoLogoutSuccess()
     func presentLoginFailure(_ error: Error)
+    func presentAlreadyregisteredusers(_ kakaoAccessToken: String  ,_ error: any Error)
     
-//    func presentAppleLoginSuccess(_ credential: ASAuthorizationAppleIDCredential)
-//    func presentAppleLoginFailure(_ error: Error)
-//    func presentAppleLogoutSuccess()
-//    func presentAppleLogoutFailure(_ error: Error)
-    
-
+    func presentVibes(_ vibes: [Vibe])
+    func presentVibesFetchFailure(_ error: Error)
 }
 
 class LoginPresenter: LoginPresentationLogic {
    
     func presentLoginFailure(_ error: any Error) {
         print("presentLoginFailure \(error)")
+     
     }
     
-   
+    func presentAlreadyregisteredusers(_ kakaoAccessToken: String  ,_ error: any Error) {
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: nil, kakaoAccessToken: kakaoAccessToken, membershipRequired: true)
+        view?.display(viewModel: viewModel)
+    }
     
     
     var view: LoginDisplayLogic?
     
     func presentKakaoLoginSuccess(_ loginState: Bool) { // 참 값이 전달
-        let viewModel = Login.LoadLogin.ViewModel(socialLoginType: "kakao", oauthToken: nil, userVerification: loginState)
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: nil, kakaoAccessToken: nil, membershipRequired:false)
         view?.display(viewModel: viewModel)
     }
  
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String) {
-        let viewModel = Login.LoadLogin.ViewModel(socialLoginType: "kakao", oauthToken: accessToken, userVerification: loginState)
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: accessToken, kakaoAccessToken: nil, membershipRequired: false)
         view?.display(viewModel: viewModel)
     }
     
@@ -73,4 +74,13 @@ class LoginPresenter: LoginPresentationLogic {
     }
     */
     
+    func presentVibes(_ vibes: [Vibe]) {
+        let viewModel = Login.LoadLogin.VibesPresentationViewModel(vibes: vibes)
+        view?.displayVibes(viewModel: viewModel)
+    }
+    
+    func presentVibesFetchFailure(_ error: Error) {
+        // 오류 처리 로직을 추가할 수 있습니다.
+        print("Error fetching vibes: \(error)")
+    }
 }

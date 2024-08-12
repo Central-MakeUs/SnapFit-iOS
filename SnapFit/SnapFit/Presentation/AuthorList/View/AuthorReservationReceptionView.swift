@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AuthorReservationReceptionView: View {
+    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
     @State private var selectedTab: Int = 0
-    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -29,7 +29,6 @@ struct AuthorReservationReceptionView: View {
                     }
                     .padding(.horizontal)
                     
-                  
                     CustomDividerView()
                     
                     ProductSection()
@@ -46,12 +45,33 @@ struct AuthorReservationReceptionView: View {
                         .padding(.horizontal)
                     }
                     .frame(width: .infinity, height: 196)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 50)
                     
                     NavigationLink(destination: ReservationView().navigationBarBackButtonHidden(true)) {
                         HStack(spacing: 20) {
                             Spacer()
                             Text("예약내역 보러가기")
+                                .font(.headline)
+                                .bold()
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                        .padding()
+                        .frame(height: 48)
+                        .background(Color.black)
+                        .cornerRadius(5)
+                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 10, trailing: 20))
+                    }
+                    
+                    Button(action: {
+                        // 네비게이션 스택을 초기화하여 홈으로 돌아가기
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            navigationModel.resetNavigation()
+                        }
+                    }) {
+                        HStack(spacing: 20) {
+                            Spacer()
+                            Text("홈으로 돌아가기")
                                 .font(.headline)
                                 .bold()
                                 .foregroundColor(.white)
@@ -68,17 +88,10 @@ struct AuthorReservationReceptionView: View {
             .padding(.bottom)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                }
-            }
-        }
     }
 }
 
 #Preview {
     AuthorReservationReceptionView()
+        .environmentObject(NavigationModel()) // Preview에서 환경 객체를 설정
 }

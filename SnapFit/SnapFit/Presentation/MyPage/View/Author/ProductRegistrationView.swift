@@ -193,11 +193,7 @@ struct ProductRegistrationView: View {
                 // 서버랑 액션이 들어갈듯
             } label: {
                 HStack(spacing: 20) {
-                    NavigationLink(destination: GridSelectionView(columnsCount: 3, moods: [
-                        "전체", "강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구",
-                        "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구",
-                        "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"
-                    ], viewModel: LoginViewModel()).navigationBarBackButtonHidden(true)) {
+                    NavigationLink(destination: GridSelectionView(columnsCount: 3).navigationBarBackButtonHidden(true)) {
                         Image("addButtonImage")
                             .resizable()
                             .scaledToFit()

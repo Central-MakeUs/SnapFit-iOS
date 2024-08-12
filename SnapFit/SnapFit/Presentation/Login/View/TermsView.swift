@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUI
 
 struct TermsView: View {
     @State private var isAllAgreed = false // 전체동의 토글 상태
@@ -16,12 +17,11 @@ struct TermsView: View {
     @State private var isConfirmButtonEnabled = false // 확인 버튼 활성화 상태
     
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
-    @ObservedObject var viewModel: LoginViewModel
+    @EnvironmentObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
     var interactor: LoginBusinessLogic?
     
     var body: some View {
         VStack(alignment: .leading) {
-            
             VStack {
                 Text("스냅핏 서비스 이용약관에\n동의해주세요.")
                     .font(.title2)
@@ -35,9 +35,7 @@ struct TermsView: View {
                     
             }
             .padding(EdgeInsets(top: 0, leading: 20, bottom: 88, trailing: 20))
-          
     
-            
             Group {
                 Button {
                     let newValue = !isAllAgreed
@@ -67,7 +65,6 @@ struct TermsView: View {
                     .background(isAllAgreed ? .black : Color(.systemGray4))
                     .cornerRadius(5)
                 }
-                
                 
                 TermsToggleButton(
                     isAgreed: $isTermsAgreed,
@@ -108,15 +105,14 @@ struct TermsView: View {
                     updateAllAgreed() // 전체 동의 상태 업데이트
                     updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
                 }
-                
-                
             }
             .padding(.horizontal, 16)
             
             Spacer()
             
             // 기존의 Button 대신 NavigationLink를 직접 사용
-            NavigationLink(destination: NicknameSettingsView(viewModel: viewModel, interactor: interactor).navigationBarBackButtonHidden(true)) {
+            NavigationLink(destination: NicknameSettingsView(interactor: interactor).environmentObject(viewModel).navigationBarBackButtonHidden(true)) {
+            // 환경 객체 설정{
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
                         .fill(isConfirmButtonEnabled ? Color.black : Color(.systemGray4))
@@ -136,8 +132,6 @@ struct TermsView: View {
             }
             .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
             .disabled(!isConfirmButtonEnabled)
-            
-         
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -154,12 +148,12 @@ struct TermsView: View {
     
     private func updateAllAgreed() {
         // 전체 동의 상태는 개별 동의 상태에 따라 업데이트
-        isAllAgreed = isTermsAgreed && isPrivacyPolicyAgreed && isMarketingAgreed
+        isAllAgreed = isTermsAgreed && isPrivacyPolicyAgreed && isAgeAgreed
     }
     
     private func updateConfirmButtonState() {
         // 확인 버튼 활성화 상태는 개별 동의 상태에 따라 결정
-        isConfirmButtonEnabled = isTermsAgreed && isPrivacyPolicyAgreed
+        isConfirmButtonEnabled = isTermsAgreed && isPrivacyPolicyAgreed && isAgeAgreed
     }
 }
 
@@ -177,20 +171,19 @@ struct TermsToggleButton: View {
             isAgreed.toggle()
             action()
         } label: {
-            HStack(spacing: 15) {  // HStack의 spacing을 줄여서 더 많은 공간을 확보합니다
+            HStack(spacing: 15) {
                 Image(isAgreed ? "Terms3" : "Terms")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 20, height: 30)
                     .padding(.leading, 5)
                 
-                Text(isRequired ? "[필수] \(title)" : "[선택] 광고성 정보 수신 및 마케팅 활용 동의")
+                Text(isRequired ? "[필수] \(title)" : "[선택] \(title)")
                     .font(.footnote)
                     .bold()
                     .foregroundColor(isAgreed ? .black : Color(.systemGray2))
                     
-                
-                Spacer(minLength: 5)  // 최소 Spacer 길이를 설정하여 텍스트와 버튼 사이의 간격을 확보합니다
+                Spacer(minLength: 5)
                 
                 Button {
                     isShowingSheet.toggle()
@@ -213,7 +206,9 @@ struct TermsToggleButton: View {
     }
 }
 
-
-#Preview {
-    TermsView(viewModel: LoginViewModel())
+struct TermsView_Previews: PreviewProvider {
+    static var previews: some View {
+        TermsView()
+            .environmentObject(LoginViewModel())
+    }
 }

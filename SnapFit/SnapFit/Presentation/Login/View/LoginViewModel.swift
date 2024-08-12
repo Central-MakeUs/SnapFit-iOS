@@ -25,6 +25,9 @@ class LoginViewModel: NSObject, ObservableObject {
     @Published var oauthToken: String = ""
     @Published var moods: [String] = []
     @Published var destination: Destination = .termsView
+    @Published var kakaoAccessToken: String = ""
+    // Add this property
+    @Published var vibes: [Vibe] = []
     
     enum Destination {
             case termsView

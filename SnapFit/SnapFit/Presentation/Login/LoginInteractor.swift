@@ -8,9 +8,6 @@
 import Foundation
 import AuthenticationServices
 import Combine
-import Foundation
-import AuthenticationServices
-import Combine
 
 protocol LoginBusinessLogic {
     func loginWithKakao()
@@ -19,7 +16,8 @@ protocol LoginBusinessLogic {
     func handleAppleLogin(request: ASAuthorizationAppleIDRequest)
     func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>)
     //func handleAppleLogout()
-
+    
+    func fetchVibes()
 }
 
 final class LoginInteractor: LoginBusinessLogic {
@@ -44,53 +42,30 @@ final class LoginInteractor: LoginBusinessLogic {
         authWorker.loginWithKakao { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success(let accessToken):
-                self.verifyUserMembership(accessToken: accessToken)
+            case .success(let kakaoAccessToken):
+                self.loginKakaoSnapFitUser(kakaoAccessToken: kakaoAccessToken)
             case .failure(let error):
                 self.presenter?.presentLoginFailure(error)
             }
         }
     }
+    
+    
     
     // MARK: - Step 2
-    /// 카카오, 애플 로그인 버튼을 눌렀을때 이미 실 서버에 가입이 되어있는지 확인하는 메서드 입니다
-    func verifyUserMembership(accessToken: String) {
-        authWorker.verifyUserMembership { [weak self] verification in
-            guard let self = self else { return }
-            switch verification { // 회원 가입한 사용자인지 확인 참/거짓을 반환
-            case .success(let isVerified):
-                if isVerified {
-                    let request = Login.LoadLogin.Request(
-                        social: "",
-                        nickName: "",
-                        isMarketing: true,
-                        oauthToken: accessToken,
-                        moods: [""]
-                    )
-                    self.loginKakaoSnapFitUser(request: request) // 이미 회원가입한 사람이라면 로그인로직 처리
-                }
-                else {
-                    self.presenter?.presentKakaoLoginFailure(false, accessToken: accessToken)
-                }
-            case .failure(let error):
-                print("userMemberVerification \(error)")
-                self.presenter?.presentLoginFailure(error)
-            }
-        }
-    }
-    
-    // MARK: - Step 3
     // 스냅핏 서버에 카카오로그인을 요청
-    func loginKakaoSnapFitUser(request: Login.LoadLogin.Request) {
-        authWorker.loginUserWithKakao(request: request)
+    // 이미 사용자가 있으면 presenter를 통해 accessToken을 전달 (회원 가입 처리를 위해)
+    // 성공해서 서버에서 tokens을 받았다면 로컬에 저장 후 presenter에게 알림
+    func loginKakaoSnapFitUser(kakaoAccessToken: String) {
+        authWorker.loginUserWithKakao(kakaoAccessToken: kakaoAccessToken)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
                     // Handle completion
                     break
                 case .failure(let error):
-                    self.presenter?.presentLoginFailure(error)
-                    print("젠장 error \(error)")
+                    self.presenter?.presentAlreadyregisteredusers(kakaoAccessToken, error)
+                    print("젠장 error \(error)") // 사용자가 존재하면
                 }
             }, receiveValue: { tokens in
                 self.saveTokens(tokens)
@@ -130,8 +105,8 @@ final class LoginInteractor: LoginBusinessLogic {
         }
     }
     
-    // MARK: - Step 4 (회원이 아닐때)
-    // 스냅핏 서버에 회원가입 요청
+    // MARK: - Step 3 (회원이 아닐때)
+    // 스냅핏 서버에 회원가입 요청 (뷰를 통해 다시 들어옴)
     func registerSnapFitUser(request: Login.LoadLogin.Request) {
         authWorker.registerUser(request: request)
             .sink(receiveCompletion: { completion in
@@ -157,14 +132,15 @@ final class LoginInteractor: LoginBusinessLogic {
     }
     
     func handleAppleLoginCompletion(result: Result<ASAuthorization, Error>) {
+      
         authWorker.completeAppleLogin(result: result) { [weak self] completionResult in
             switch completionResult {
-            case .success(let appleIDCredential):
+            case .success(let identityToken):
                 //self?.presenter?.presentAppleLoginSuccess(appleIDCredential)
-                print("")
+                print("identityToken \(identityToken)")
             case .failure(let error):
                 //self?.presenter?.presentAppleLoginFailure(error)
-                print("")
+                print("실패임ㅋ")
             }
         }
     }
@@ -179,5 +155,25 @@ final class LoginInteractor: LoginBusinessLogic {
 //            }
 //        }
 //    }
+    
+    func fetchVibes() {
+        print("fetchVibes 호출 완료")
+         authWorker.fetchVibes()
+             .sink(receiveCompletion: { completion in
+                 switch completion {
+                 case .finished:
+                     // Completion 시 추가적인 처리가 필요하다면 여기서 처리
+                     break
+                 case .failure(let error):
+                     self.presenter?.presentVibesFetchFailure(error)
+                     print("젠장 error \(error)")
+                 }
+             }, receiveValue: { vibes in
+                 print("Fetched Vibes: \(vibes)")
+                 self.presenter?.presentVibes(vibes)
+             })
+             .store(in: &cancellables)
+     }
+    
 }
 
