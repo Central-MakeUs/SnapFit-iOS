@@ -4,83 +4,86 @@
 //
 //  Created by 정정욱 on 7/14/24.
 //  
+// LoginPresenter.swift
+// SnapFit
+// Created by 정정욱 on 7/14/24.
+
 import Foundation
 import KakaoSDKAuth
 import KakaoSDKUser
 import AuthenticationServices
 
-// 뷰에게 전달할 Presenter 기능들을 정의
+// Presenter가 View에 전달해야 할 정보를 정의하는 프로토콜
 protocol LoginPresentationLogic {
-    func presentKakaoLoginSuccess(_ loginState: Bool)
+    func presentSocialLoginSuccess(socialLoginType: String, accessToken: String, oauthToken: String?)
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String)
-    func presentKakaoLogoutSuccess()
-    func presentLoginFailure(_ error: Error)
-    func presentAlreadyregisteredusers(_ kakaoAccessToken: String  ,_ error: any Error)
-    
+    func presentLoginFailure(_ error: Error, accessToken: String)
+    func presentAlreadyregisteredusers(socialLoginType: String, oauthToken: String?, error: Error?)
     func presentVibes(_ vibes: [Vibe])
     func presentVibesFetchFailure(_ error: Error)
 }
 
+// Presenter는 Interactor로부터 받은 정보를 View에 전달하는 역할을 합니다.
 class LoginPresenter: LoginPresentationLogic {
-   
-    func presentLoginFailure(_ error: any Error) {
-        print("presentLoginFailure \(error)")
-     
-    }
     
-    func presentAlreadyregisteredusers(_ kakaoAccessToken: String  ,_ error: any Error) {
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: nil, kakaoAccessToken: kakaoAccessToken, membershipRequired: true)
+    var view: LoginDisplayLogic?  // View와의 통신을 위한 참조
+    
+    // 로그인 실패를 View에 전달
+    func presentLoginFailure(_ error: Error, accessToken: String) {
+        
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: "kakao",
+            oauthToken: "",
+            kakaoAccessToken: accessToken,
+            membershipRequired: false
+        )
         view?.display(viewModel: viewModel)
     }
     
-    
-    var view: LoginDisplayLogic?
-    
-    func presentKakaoLoginSuccess(_ loginState: Bool) { // 참 값이 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: nil, kakaoAccessToken: nil, membershipRequired:false)
+    // 이미 등록된 사용자를 View에 전달
+    func presentAlreadyregisteredusers(socialLoginType: String, oauthToken: String?, error: Error?) {
+        // ViewModel을 생성하여 View에 전달
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: socialLoginType,
+            oauthToken: oauthToken,
+            kakaoAccessToken: nil,
+            membershipRequired: false
+        )
         view?.display(viewModel: viewModel)
     }
- 
+    
+    // 소셜 로그인 성공을 View에 전달
+    func presentSocialLoginSuccess(socialLoginType: String, accessToken: String, oauthToken: String?) {
+        // ViewModel을 생성하여 View에 전달
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: socialLoginType,
+            oauthToken: oauthToken,
+            kakaoAccessToken: accessToken,
+            membershipRequired: true
+        )
+        view?.display(viewModel: viewModel)
+    }
+    
+    // 카카오 로그인 실패를 View에 전달
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String) {
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(socialLoginType: "kakao", oauthToken: accessToken, kakaoAccessToken: nil, membershipRequired: false)
+        // ViewModel을 생성하여 View에 전달
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: "kakao",
+            oauthToken: accessToken,
+            kakaoAccessToken: nil,
+            membershipRequired: false
+        )
         view?.display(viewModel: viewModel)
     }
     
-    func presentKakaoLogoutSuccess() {
-//        let viewModel = Login.LoadLogin.ViewModel(success: true, message: "Kakao logout successful", oauthToken: "")
-//        view?.display(viewModel: viewModel)
-    }
-    
-
-  /*
-    func presentAppleLoginSuccess(_ credential: ASAuthorizationAppleIDCredential) {
-        let viewModel = Login.LoadLogin.ViewModel(success: true, message: "Apple login successful", oauthToken: "")
-        view?.display(viewModel: viewModel)
-    }
-    
-    func presentAppleLoginFailure(_ error: Error) {
-        let viewModel = Login.LoadLogin.ViewModel(success: false, message: "Apple login failed: \(error.localizedDescription)", oauthToken: "")
-        view?.display(viewModel: viewModel)
-    }
-    
-    func presentAppleLogoutSuccess() {
-        let viewModel = Login.LoadLogin.ViewModel(success: true, message: "Apple logout successful", oauthToken: "")
-        view?.display(viewModel: viewModel)
-    }
-    
-    func presentAppleLogoutFailure(_ error: Error) {
-        let viewModel = Login.LoadLogin.ViewModel(success: false, message: "Apple logout failed: \(error.localizedDescription)", oauthToken: "")
-        view?.display(viewModel: viewModel)
-    }
-    */
-    
+    // 분위기 정보를 View에 전달
     func presentVibes(_ vibes: [Vibe]) {
         let viewModel = Login.LoadLogin.VibesPresentationViewModel(vibes: vibes)
         view?.displayVibes(viewModel: viewModel)
     }
     
+    // 분위기 정보를 가져오는 데 실패했을 때 View에 에러를 전달
     func presentVibesFetchFailure(_ error: Error) {
-        // 오류 처리 로직을 추가할 수 있습니다.
-        print("Error fetching vibes: \(error)")
+        print("Error fetching vibes: \(error)")  // 실제 앱에서는 UI에 에러를 표시해야 함
     }
 }

@@ -9,5 +9,5 @@ import Foundation
 
 // MARK: - Tokens
 struct Tokens: Codable {
-    let accessToken, refreshToken: String?
+    let accessToken, refreshToken : String?
 }

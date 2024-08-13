@@ -12,9 +12,10 @@ struct NicknameSettingsView: View {
     @State private var isConfirmButtonEnabled = false
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
-    @EnvironmentObject var viewModel: LoginViewModel
+    @EnvironmentObject var navigationPath: LoginNavigationModel
+    @EnvironmentObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
+    
     var interactor: LoginBusinessLogic?
-    @State private var shouldNavigate = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -54,7 +55,7 @@ struct NicknameSettingsView: View {
             Button {
                 // Action for "확인"
                 viewModel.nickName = inputText
-                shouldNavigate.toggle()
+                navigationPath.append("GridSelectionView")
             } label: {
                 HStack(spacing: 20) {
                     Spacer()
@@ -71,10 +72,6 @@ struct NicknameSettingsView: View {
                 .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
             }
             .disabled(!isConfirmButtonEnabled)
-        }
-        .navigationDestination(isPresented: $shouldNavigate) {
-            GridSelectionView(columnsCount: 2, interactor: interactor)
-                .navigationBarBackButtonHidden(true)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -93,4 +90,5 @@ struct NicknameSettingsView: View {
 #Preview {
     NicknameSettingsView()
         .environmentObject(LoginViewModel())
+        .environmentObject(LoginNavigationModel()) // 환경 모델 추가
 }

@@ -1,70 +1,78 @@
 import SwiftUI
 import _AuthenticationServices_SwiftUI
 
-// Presenter에서 전달 받을 기능들을 정의 UI 업데이트 관련
+// View가 Presenter로부터 받는 정보를 정의하는 프로토콜
 protocol LoginDisplayLogic {
     func display(viewModel: Login.LoadLogin.LoginPresentationViewModel)
     func displayVibes(viewModel: Login.LoadLogin.VibesPresentationViewModel)
 }
 
+// 로그인 화면을 정의하는 View
 struct LoginView: View, LoginDisplayLogic {
     
-    @ObservedObject var loginviewModel : LoginViewModel // 뷰모델 생성
-    var interactor: LoginBusinessLogic?
-    @State private var stack = NavigationPath() // 초기 설정
+    @ObservedObject var loginviewModel: LoginViewModel  // 로그인 관련 상태를 관리하는 ViewModel
+    @ObservedObject var navigationModel: LoginNavigationModel  // 네비게이션 상태를 관리하는 모델
     
-    // 실제 프리젠터에서 값을 받아 뷰를 업데이트하는 로직
+    var interactor: LoginBusinessLogic?  // Interactor와의 통신을 위한 참조
+    
+    // Presenter가 제공한 로그인 ViewModel을 기반으로 UI 업데이트
     func display(viewModel: Login.LoadLogin.LoginPresentationViewModel) {
-
-        switch viewModel.socialLoginType {
-        case "kakao":
-            if viewModel.membershipRequired == false {
-                self.loginviewModel.social = "kakao"
-                self.loginviewModel.isKakaoLogin = true
-                self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
-                self.loginviewModel.kakaoAccessToken = viewModel.kakaoAccessToken ?? ""
-                print("Kakao login failed verification\(viewModel.oauthToken ?? "")")
+        // 상태 업데이트가 메인 스레드에서 이루어지도록 보장
+        DispatchQueue.main.async {
+            // 로그인 후 화면 이동을 위한 목적지 결정
+            let destination = viewModel.membershipRequired ? "termsView" : "splashAndTabView"
+            
+            // 소셜 로그인 타입에 따라 로그인 상태 업데이트
+            switch viewModel.socialLoginType {
+            case "kakao":
+                if viewModel.membershipRequired {
+                    // 카카오 로그인 상태 업데이트
+                    self.loginviewModel.social = viewModel.socialLoginType
+                    self.loginviewModel.isKakaoLogin = true
+                    self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
+                    self.loginviewModel.kakaoAccessToken = viewModel.kakaoAccessToken ?? ""
+                    print("Kakao login failed verification kakaoAccessToken \(viewModel.kakaoAccessToken ?? "")")
+                } else {
+                    print("Kakao login successful")
+                }
                 
-            } else {
-                print("Kakao login successful ")
+            case "apple":
+                if viewModel.membershipRequired {
+                    // 애플 로그인 상태 업데이트
+                    self.loginviewModel.social = viewModel.socialLoginType
+                    self.loginviewModel.isAppleLoggedIn = true
+                    self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
+                    self.loginviewModel.kakaoAccessToken = viewModel.kakaoAccessToken ?? ""
+                    print("Apple login failed verification \(viewModel.oauthToken ?? "")")
+                } else {
+                    print("Apple login successful")
+                }
+                
+            default:
+                print("Unsupported social login type")  // 지원하지 않는 로그인 타입 처리
             }
             
-        case "apple":
-            if viewModel.membershipRequired {
-                self.loginviewModel.social = "apple"
-                self.loginviewModel.isAppleLoggedIn = true
-                self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
-                print("Apple login successful with token: \(viewModel.oauthToken ?? "")")
-            } else {
-                print("Apple login failed verification")
-            }
-            
-        default:
-            print("Unsupported social login type")
+            // 네비게이션 목적지로 이동
+            navigationModel.navigationPath.append(destination)
         }
-        
-        // Navigate to the appropriate view based on membership requirement
-        self.loginviewModel.destination = viewModel.membershipRequired ? .splashAndTabView : .termsView
-        self.loginviewModel.shouldNavigate.toggle()
-        
     }
     
+    // Presenter가 제공한 분위기 ViewModel을 기반으로 UI 업데이트
     func displayVibes(viewModel: Login.LoadLogin.VibesPresentationViewModel) {
-        // 이 메서드를 통해 하위뷰에 데이터를 전달할 수 있습니다.
-        // 예를 들어, 하위뷰를 업데이트하거나, 하위뷰를 보여줄 수 있습니다.
-        // `viewModel.vibes`를 사용하여 하위뷰를 초기화합니다.
-        // 예시: `VibesView`로 데이터 전달
-        self.loginviewModel.vibes = viewModel.vibes
+        DispatchQueue.main.async {
+            // 분위기 상태 업데이트
+            self.loginviewModel.vibes = viewModel.vibes
+        }
     }
     
     var body: some View {
-        NavigationStack(path: $stack) {
+        NavigationStack(path: $navigationModel.navigationPath) {
             GeometryReader { geometry in
                 VStack(alignment: .leading) {
                     Spacer().frame(height: 148)
                     
                     Group {
-                        Image("appLogo")
+                        Image("appLogo")  // 앱 로고
                             .resizable()
                             .scaledToFill()
                             .frame(width: 155, height: 63)
@@ -75,9 +83,10 @@ struct LoginView: View, LoginDisplayLogic {
                             .foregroundColor(Color("LoginFontColor"))
                     }
                     .font(.title3)
-                  
+                    
                     Spacer()
                     
+                    // 로그인 버튼 그룹
                     LoginViewGroup(interactor: interactor)
                     
                     Spacer().frame(height: 32)
@@ -86,8 +95,8 @@ struct LoginView: View, LoginDisplayLogic {
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .background(
                     ZStack {
-                        Color.black.ignoresSafeArea()
-                        Image("LoginImages")
+                        Color.black.ignoresSafeArea()  // 배경 색상
+                        Image("LoginImages")  // 배경 이미지
                             .resizable()
                             .scaledToFit()
                             .frame(width: 211, height: 426)
@@ -95,58 +104,77 @@ struct LoginView: View, LoginDisplayLogic {
                     }
                 )
             }
-            .navigationDestination(isPresented: $loginviewModel.shouldNavigate) {
-                switch loginviewModel.destination {
-                case .termsView:
+            .navigationDestination(for: String.self) { destination in
+                // 네비게이션 목적지에 따라 View를 설정
+                switch destination {
+                case "termsView":
                     TermsView(interactor: interactor)
+                        .environmentObject(loginviewModel)
+                        .environmentObject(navigationModel)
                         .navigationBarBackButtonHidden(true)
-                case .splashAndTabView:
+                case "NicknameSettingsView":
+                    NicknameSettingsView(interactor: interactor)
+                        .environmentObject(loginviewModel)
+                        .environmentObject(navigationModel)
+                        .navigationBarBackButtonHidden(true)
+                case "GridSelectionView":
+                    GridSelectionView(columnsCount: 2, interactor: interactor)
+                        .environmentObject(loginviewModel)
+                        .environmentObject(navigationModel)
+                        .navigationBarBackButtonHidden(true)
+                case "splashAndTabView":
                     SplashAndTabView()
                         .navigationBarBackButtonHidden(true)
+          
+                default:
+                    EmptyView()  // 기본적으로 아무것도 표시하지 않음
                 }
             }
             .navigationBarBackButtonHidden(true)
             .ignoresSafeArea()
         }
-        .environmentObject(loginviewModel)
+        .environmentObject(loginviewModel)  // ViewModel 제공
+        .environmentObject(navigationModel)  // 네비게이션 모델 제공
     }
 }
 
+// 로그인 버튼 및 로그인 관련 UI를 정의하는 구조체
 private struct LoginViewGroup: View {
     var interactor: LoginBusinessLogic?
-    @EnvironmentObject var viewModel: LoginViewModel // environmentObject 사용
+    @EnvironmentObject var viewModel: LoginViewModel
     
     var body: some View {
         VStack(spacing: 20) {
-            Image("LoginDscription")
+            Image("LoginDscription")  // 로그인 설명 이미지
                 .resizable()
                 .scaledToFill()
                 .frame(width: 178, height: 22)
                 .overlay {
                     HStack {
-                        Image("LoginDscriptionLogo")
+                        Image("LoginDscriptionLogo")  // 설명 로고
                             .resizable()
                             .scaledToFill()
                             .frame(width: 10, height: 10)
                         
-                        Text("3초만에 빠른 로그인")
+                        Text("3초만에 빠른 로그인")  // 설명 텍스트
                             .font(.caption)
                             .foregroundColor(.black)
                     }
                     .offset(y: -7)
                 }
             
+            // 카카오 로그인 버튼
             Button {
-                interactor?.loginWithKakao() // Kakao 로그인 처리
+                interactor?.loginWithKakao()  // 카카오 로그인 처리
             } label: {
                 HStack(spacing: 70) {
-                    Image("kakaoButton")
+                    Image("kakaoButton")  // 카카오 버튼 이미지
                         .resizable()
                         .scaledToFill()
                         .frame(width: 20, height: 20)
                         .padding(.leading)
                     
-                    Text("카카오로 계속하기")
+                    Text("카카오로 계속하기")  // 버튼 텍스트
                         .font(.system(size: 15))
                         .bold()
                         .foregroundColor(.black)
@@ -154,32 +182,25 @@ private struct LoginViewGroup: View {
                     Spacer()
                 }
                 .padding()
-                .background(Color.yellow)
+                .background(Color.yellow)  // 버튼 배경 색상
             }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             
-            if viewModel.isKakaoLogin {
-                Button {
-                    interactor?.logoutFromKakao() // Kakao 로그아웃 처리
-                } label: {
-                    Text("카카오 로그아웃")
-                }
-            }
-            
+            // 애플 로그인 버튼
             SignInWithAppleButton(
-                onRequest: { request in interactor?.handleAppleLogin(request: request) },
-                onCompletion: { result in interactor?.handleAppleLoginCompletion(result: result) }
+                onRequest: { request in interactor?.loginWithApple(request: request) },
+                onCompletion: { result in interactor?.completeAppleLogin(result: result) }
             )
             .overlay {
                 HStack(spacing: 70) {
-                    Image("AppleButton")
+                    Image("AppleButton")  // 애플 버튼 이미지
                         .resizable()
                         .scaledToFill()
                         .frame(width: 24, height: 24)
                         .padding(.leading)
                     
-                    Text("Apple로 계속하기")
+                    Text("Apple로 계속하기")  // 버튼 텍스트
                         .font(.system(size: 15))
                         .bold()
                         .foregroundColor(.black)
@@ -187,27 +208,19 @@ private struct LoginViewGroup: View {
                     Spacer()
                 }
                 .padding()
-                .background(Color.white)
-                .allowsHitTesting(false)
+                .background(Color.white)  // 버튼 배경 색상
+                .allowsHitTesting(false)  // 버튼 클릭 무시 설정
             }
             .frame(width: UIScreen.main.bounds.width * 0.9, height: 50)
             .cornerRadius(10)
             .padding(.bottom, 40)
-            
-            if viewModel.isAppleLoggedIn {
-                Button {
-                    // interactor?.handleAppleLogout() // Apple 로그아웃 처리
-                } label: {
-                    Text("애플 로그아웃")
-                }
-            }
         }
     }
 }
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(loginviewModel: LoginViewModel())
-            .environmentObject(LoginViewModel())
+        LoginView(loginviewModel: LoginViewModel(), navigationModel: LoginNavigationModel())
+            .environmentObject(LoginNavigationModel())  // Preview를 위한 네비게이션 모델 제공
     }
 }

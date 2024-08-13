@@ -1,11 +1,3 @@
-//
-//  TermsView.swift
-//  SnapFit
-//
-//  Created by 정정욱 on 7/14/24.
-//
-
-import SwiftUI
 import SwiftUI
 
 struct TermsView: View {
@@ -17,6 +9,8 @@ struct TermsView: View {
     @State private var isConfirmButtonEnabled = false // 확인 버튼 활성화 상태
     
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+   
+    @EnvironmentObject var navigationPath: LoginNavigationModel
     @EnvironmentObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
     var interactor: LoginBusinessLogic?
     
@@ -38,13 +32,15 @@ struct TermsView: View {
     
             Group {
                 Button {
-                    let newValue = !isAllAgreed
-                    isAllAgreed = newValue
-                    isTermsAgreed = newValue
-                    isPrivacyPolicyAgreed = newValue
-                    isAgeAgreed = newValue
-                    isMarketingAgreed = newValue
-                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    DispatchQueue.main.async {
+                        let newValue = !isAllAgreed
+                        isAllAgreed = newValue
+                        isTermsAgreed = newValue
+                        isPrivacyPolicyAgreed = newValue
+                        isAgeAgreed = newValue
+                        isMarketingAgreed = newValue
+                        updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    }
                 } label: {
                     HStack(spacing: 15) {
                         Image(isAllAgreed ? "Terms2" : "Terms")
@@ -72,8 +68,10 @@ struct TermsView: View {
                     isRequired: true,
                     url: URL(string: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")!
                 ) {
-                    updateAllAgreed() // 전체 동의 상태 업데이트
-                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    DispatchQueue.main.async {
+                        updateAllAgreed() // 전체 동의 상태 업데이트
+                        updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    }
                 }
                 
                 TermsToggleButton(
@@ -82,8 +80,10 @@ struct TermsView: View {
                     isRequired: true,
                     url: URL(string: "https://mixolydian-beef-6a0.notion.site/497ab7ab659743c8b797e2c62e4c7bc9?pvs=4")!
                 ) {
-                    updateAllAgreed() // 전체 동의 상태 업데이트
-                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    DispatchQueue.main.async {
+                        updateAllAgreed() // 전체 동의 상태 업데이트
+                        updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    }
                 }
                 
                 TermsToggleButton(
@@ -92,8 +92,10 @@ struct TermsView: View {
                     isRequired: true,
                     url: URL(string: "https://mixolydian-beef-6a0.notion.site/14-c96d3cf1df7c449690452b07c55459c9?pvs=4")!
                 ) {
-                    updateAllAgreed() // 전체 동의 상태 업데이트
-                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    DispatchQueue.main.async {
+                        updateAllAgreed() // 전체 동의 상태 업데이트
+                        updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    }
                 }
                 
                 TermsToggleButton(
@@ -102,17 +104,22 @@ struct TermsView: View {
                     isRequired: false,
                     url: URL(string: "https://mixolydian-beef-6a0.notion.site/9bdc6cfbb2474b58ad4f99421feab6cf?pvs=4")!
                 ) {
-                    updateAllAgreed() // 전체 동의 상태 업데이트
-                    updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    DispatchQueue.main.async {
+                        updateAllAgreed() // 전체 동의 상태 업데이트
+                        updateConfirmButtonState() // 확인 버튼 활성화 상태 업데이트
+                    }
                 }
             }
             .padding(.horizontal, 16)
             
             Spacer()
             
-            // 기존의 Button 대신 NavigationLink를 직접 사용
-            NavigationLink(destination: NicknameSettingsView(interactor: interactor).environmentObject(viewModel).navigationBarBackButtonHidden(true)) {
-            // 환경 객체 설정{
+            Button(action: {
+                if isConfirmButtonEnabled {
+                    // 예를 들어, navigationPath에 "NicknameSettingsView"를 추가하여 탐색
+                    navigationPath.append("NicknameSettingsView")
+                }
+            }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
                         .fill(isConfirmButtonEnabled ? Color.black : Color(.systemGray4))
@@ -168,8 +175,10 @@ struct TermsToggleButton: View {
     
     var body: some View {
         Button {
-            isAgreed.toggle()
-            action()
+            DispatchQueue.main.async {
+                isAgreed.toggle()
+                action()
+            }
         } label: {
             HStack(spacing: 15) {
                 Image(isAgreed ? "Terms3" : "Terms")
