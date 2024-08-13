@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct MiniCardView: View {
     @State private var isLiked = false
 
@@ -36,7 +37,6 @@ struct MiniCardView: View {
                     .font(.footnote)
                     .bold()
                     .lineLimit(1)
-                    .frame(width: .infinity)
 
                 Text("서울 중구")
                     .font(.caption)
@@ -52,8 +52,10 @@ struct MiniCardView: View {
         .background(Color.white)
 //        .cornerRadius(10)
 //        .shadow(radius: 4)
+        .frame(width: 130, height: 244) // Explicitly set frame size
     }
 }
+
 
 struct MiddleCardView: View {
     @State private var isLiked = false
@@ -93,19 +95,20 @@ struct MiddleCardView: View {
                     .bold()
                     .foregroundColor(.black)
 
-                HStack{
+                HStack {
                     MoodsLabel(text: "시크")
                     InOutLabel(text: "야외스냅")
                 }
-                
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
         }
         .background(Color.white)
 //        .cornerRadius(10)
 //        .shadow(radius: 2)
+        .frame(width: 175, height: 270) // Explicitly set frame size
     }
 }
+
 
 struct BigCardView: View {
     @State private var isLiked = false
@@ -131,83 +134,85 @@ struct BigCardView: View {
                 }
                 .padding(.bottom, 5)
 
-            VStack(alignment:.leading){
+            VStack(alignment:.leading) {
                 Text("추카랜드")
                     .font(.callout)
                     .lineLimit(2)
-        
 
                 HStack(spacing: 9) {
                     MoodsLabel(text: "시크", bigCardViewType: true)
                     MoodsLabel(text: "러블리", bigCardViewType: true)
                 }
-               
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10))
         }
         .background(Color.white)
-//        .cornerRadius(10)
-//        .shadow(radius: 4)
+        //.cornerRadius(10)
+        //.shadow(radius: 4)
+        .frame(width: 175, height: 258) // Explicitly set frame size
     }
 }
+
 
 struct MainPromotionRandomCardView: View {
     @State private var isLiked = false
 
     var body: some View {
-        ZStack{
+        ZStack(alignment: .bottom) {
+            // Background Image
             Image("demo5")
                 .resizable()
                 .scaledToFill()
-                .frame(width: .infinity, height: 202)
+                .frame(width: 358, height: 202)
                 .clipped()
-                .padding(16)
-            
-            HStack(spacing: 230) {
-                Text("New")
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .hidden()
-                
-                Button(action: {
-                    isLiked.toggle()
-                }) {
-                    Image(systemName: isLiked ? "heart.fill" : "heart")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                        .foregroundColor(.white)
-                }
-            }
-            .offset(CGSize(width: 30, height: -70.0))
-            
-            Group{
-                Rectangle()
-                    .frame(width: .infinity, height: 96)
-                    .foregroundColor(Color.black.opacity(0.7))
-                    .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("대체불가! 성수 컨셉스냅 전문 인기 포토그래퍼, 데이트 스냅...")
-                        .font(.subheadline)
-                        .lineLimit(1)
-                        .foregroundColor(.white)
-                    Text("32,400원")
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                    
-                    HStack(spacing: 8){
-                        MoodsLabel(text: "시크")
-                        InOutLabel(text: "야외스냅")
+                //.cornerRadius(10)
+
+            // Overlay for "New" and like button
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isLiked.toggle()
+                    }) {
+                        Image(systemName: isLiked ? "heart.fill" : "heart")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.white)
                     }
+                    .padding()
                 }
-                .padding(.horizontal, 30)
-            
+                Spacer()
             }
-            .offset(CGSize(width: 0, height: 53.0))
-        }  //:ZSTACK
+
+            // Bottom Overlay with Text and Labels
+            Rectangle()
+                .fill(Color.black.opacity(0.7))
+                .frame(height: 96)
+                .overlay(
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("대체불가! 성수 컨셉스냅 전문 인기 포토그래퍼, 데이트 스냅...")
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .foregroundColor(.white)
+                        
+                        Text("32,400원")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                        
+                        HStack(spacing: 8) {
+                            MoodsLabel(text: "시크")
+                            InOutLabel(text: "야외스냅")
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                )
+                //.cornerRadius(10)
+        }
+        .frame(width: 358, height: 202) // Explicitly set frame size
     }
 }
+
 
 // Previews
 #Preview {
@@ -227,5 +232,5 @@ struct MainPromotionRandomCardView: View {
 
 #Preview {
     MainPromotionRandomCardView()
-        .frame(width: .infinity, height: 202)
+        .frame(width: 358, height: 202)
 }

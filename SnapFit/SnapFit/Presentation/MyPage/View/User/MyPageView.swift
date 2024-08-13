@@ -2,8 +2,20 @@ import SwiftUI
 import PhotosUI
 
 // 메인 MyPageView
+
+protocol MyPageDisplayLogic {
+    func display(viewModel: MyPage.LoadMyPage.ViewModel)
+}
+
+extension MyPageView: MyPageDisplayLogic {
+    func display(viewModel: MyPage.LoadMyPage.ViewModel) {}
+    func fetch() {}
+}
+
 struct MyPageView: View {
     @StateObject var viewModel = ProfileViewModel()
+    var myPageInteractor: MyPageBusinessLogic?
+    
     @State var stack = NavigationPath() // 초기 설정
     
     var body: some View {
@@ -17,7 +29,7 @@ struct MyPageView: View {
                     
                     NavigationButtonsView()
                         .padding(.bottom, 32)
-                    GroupBoxViews()
+                    GroupBoxViews(myPageInteractor : myPageInteractor)
                    
                     Spacer()
                         .frame(height: 40)
@@ -27,6 +39,9 @@ struct MyPageView: View {
             }
             .ignoresSafeArea(.container, edges: .top)
         }
+//        .task {
+//            fetch()
+//        }
         .accentColor(.black) // 내비게이션 링크 색상을 검정색으로 변경
     }
 }
@@ -137,16 +152,19 @@ struct NavigationButton<Destination: View>: View {
 
 // 그룹 박스 뷰
 struct GroupBoxViews: View {
+    var myPageInteractor: MyPageBusinessLogic?
+    
     var body: some View {
+        
         
         SectionHeaderView(title: "메이커 관리")
             .padding(.bottom, 16)
         Group {
-            AppInfoContent(name: "사진작가로 전환")
+            AppInfoContent(name: "사진작가로 전환", linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA")
          
-            AppInfoContent(name: "상품관리")
-        
-            AppInfoContent(name: "예약관리")
+            AppInfoContent(name: "상품관리", canNavigate: false)  // Modify as needed
+            AppInfoContent(name: "예약관리", canNavigate: false)   // Modify as needed
+                       
                 .padding(.bottom, 24)
                 
         }
@@ -155,15 +173,16 @@ struct GroupBoxViews: View {
        
         SectionHeaderView(title: "SnapFit 설정")
         Group{
-            AppInfoContent(name: "고객센터")
-            AppInfoContent(name: "이용약관")
-            AppInfoContent(name: "로그아웃")
-            AppInfoContent(name: "탈퇴하기")
+            AppInfoContent(name: "고객센터", linkDestination: "https://forms.gle/tMHQQ37FQDW3jrDU8")
+            AppInfoContent(name: "이용약관", linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")
+            AppInfoContent(name: "로그아웃", interactor: myPageInteractor)
+            AppInfoContent(name: "탈퇴하기", interactor: myPageInteractor)
         }
         .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
         .padding(.horizontal, 16)
     }
 }
+
 
 // 뷰 모델
 class ProfileViewModel: ObservableObject {

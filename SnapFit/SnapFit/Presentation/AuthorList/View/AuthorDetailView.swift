@@ -7,69 +7,68 @@
 import SwiftUI
 
 struct AuthorDetailView: View {
-    @State private var selectedTab: Int = 0
     @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
 
     var body: some View {
-        ZStack {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading) {
-                    MainContentView()
-                    DividerAndRegulationView()
-                    Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+        GeometryReader { geometry in
+            ZStack {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        MainContentView()
+                        DividerAndRegulationView()
+                        Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+                    }
+                    .padding(.bottom)
                 }
-                .padding(.bottom)
-            }
 
-            // 고정된 NextButton
-            VStack {
-                Spacer()
-                NextButton()
-            }
-            .edgesIgnoringSafeArea(.bottom) // NextButton이 항상 화면 하단에 고정되도록 설정
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    // 뒤로 가기 버튼을 사용하여 네비게이션 경로를 관리
-                    navigationModel.navigationPath.removeLast()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                // 고정된 NextButton
+                VStack {
+                    Spacer()
+                    NextButton()
                 }
             }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        // Action for heart button
+                        // 네비게이션 경로에서 마지막 항목을 제거
+                        navigationModel.pop()
                     }) {
-                        Image(systemName: "heart")
+                        Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
-                    Menu {
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
                         Button(action: {
-                            // 공유하기 액션
-                            print("공유하기")
+                            // Action for heart button
                         }) {
-                            Label("공유하기", systemImage: "square.and.arrow.up")
+                            Image(systemName: "heart")
+                                .foregroundColor(.black)
                         }
-                        
-                        Button(action: {
-                            // 신고하기 액션
-                            print("신고하기")
-                        }) {
-                            Label("신고하기", systemImage: "exclamationmark.bubble")
+                        Menu {
+                            Button(action: {
+                                // 공유하기 액션
+                                print("공유하기")
+                            }) {
+                                Label("공유하기", systemImage: "square.and.arrow.up")
+                            }
+                            
+                            Button(action: {
+                                // 신고하기 액션
+                                print("신고하기")
+                            }) {
+                                Label("신고하기", systemImage: "exclamationmark.bubble")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundColor(.black)
                         }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .foregroundColor(.black)
                     }
                 }
             }
         }
-      
     }
 }
 
@@ -80,7 +79,8 @@ struct MainContentView: View {
     var body: some View {
         Group {
             ImageSliderView(images: ["demo1", "demo2", "demo3"])
-                .frame(width: .infinity)
+                .frame(maxWidth: .infinity) // 너비를 최대화하여 사용
+                .aspectRatio(contentMode: .fit) // 비율 유지
                 .padding(.bottom)
             
             Text("나의 첫 스냅사진 감성을 담은 스냅사진")
@@ -126,7 +126,7 @@ struct MainContentView: View {
                 LazyHGrid(rows: layout, spacing: 8) {
                     ForEach(0..<10, id: \.self) { item in
                         MiddleCardView()
-                            .frame(width: 175, height: 270)
+                            .frame(width: 175, height: 270) // 적절한 크기 설정
                     }
                 }
             }
@@ -177,7 +177,7 @@ struct NextButton: View {
     
     var body: some View {
         Button(action: {
-            navigationModel.navigationPath.append("AuthorReservation")
+            navigationModel.append(.authorReservation)
         }) {
             HStack(spacing: 20) {
                 Spacer()
@@ -216,4 +216,5 @@ struct PriceView: View {
 
 #Preview {
     AuthorDetailView()
+        .environmentObject(NavigationModel()) // NavigationModel을 환경 객체로 주입
 }

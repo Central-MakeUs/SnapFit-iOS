@@ -7,53 +7,41 @@
 import SwiftUI
 
 struct SnapFitTabView: View {
-    @State private var selectedTab = 0 // 선택된 탭을 저장할 상태 변수
-
+    @State private var selectedTab = 0
+    @StateObject var navigationModel = NavigationModel()
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             MainPromotionView()
-            .tabItem {
-                VStack {
-                    // 선택된 탭에 따라 이미지 변경
-                    if selectedTab == 0 {
-                        Image("iconHome")
-                    } else {
-                        Image("iconHomeNoTab")
+                .environmentObject(navigationModel)
+                .tabItem {
+                    VStack {
+                        Image(selectedTab == 0 ? "iconHome" : "iconHomeNoTab")
+                        Text("홈")
                     }
-                    Text("홈")
                 }
-            }
-            .tag(0)
+                .tag(0)
 
             AuthorListView()
-            .tabItem {
-                VStack {
-                    // 선택된 탭에 따라 이미지 변경
-                    if selectedTab == 1 {
-                        Image("iconList")
-                    } else {
-                        Image("iconListNoTab")
+                .tabItem {
+                    VStack {
+                        Image(selectedTab == 1 ? "iconList" : "iconListNoTab")
+                        Text("사진리스트")
                     }
-                    Text("사진리스트")
                 }
-            }
-            .tag(1)
+                .tag(1)
 
             MyPageView()
-            .tabItem {
-                VStack {
-                    // 선택된 탭에 따라 이미지 변경
-                    if selectedTab == 2 {
-                        Image("iconMypage")
-                    } else {
-                        Image("iconMypageNoTab")
+                .configureView()
+                .tabItem {
+                    VStack {
+                        Image(selectedTab == 2 ? "iconMypage" : "iconMypageNoTab")
+                        Text("마이페이지")
                     }
-                    Text("마이페이지")
                 }
-            }
-            .tag(2)
+                .tag(2)
         }
-        .accentColor(.black) // 선택된 탭 아이콘 색상
+        .accentColor(.black)
     }
 }
 

@@ -40,7 +40,7 @@ struct AuthorReservationView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     // 뒤로 가기 버튼을 사용하여 네비게이션 경로를 관리
-                    navigationModel.navigationPath.removeLast()
+                    navigationModel.pop()
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
@@ -79,7 +79,6 @@ struct OptionSection: View {
         }
     }
 }
-
 
 struct LocationSection: View {
     @Binding var locationText: String
@@ -120,7 +119,6 @@ struct DateTimeSection: View {
         }
     }
 }
-
 
 struct PeopleSection: View {
     @Binding var counter: Int
@@ -196,13 +194,11 @@ struct PhoneSection: View {
 }
 
 struct SubmitButton: View {
-    
     @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
     
     var body: some View {
-        
         Button(action: {
-            navigationModel.navigationPath.append("AuthorReservationReceptionView")
+            navigationModel.append(.authorReservationReceptionView) // 열거형 사용
         }) {
             HStack(spacing: 20) {
                 Spacer()
@@ -218,7 +214,6 @@ struct SubmitButton: View {
             .cornerRadius(5)
             .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
         }
-
     }
 }
 
@@ -244,4 +239,5 @@ struct EmailSection: View {
 
 #Preview {
     AuthorReservationView()
+        .environmentObject(NavigationModel()) // Preview에서 환경 객체 주입
 }

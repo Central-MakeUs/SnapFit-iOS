@@ -5,7 +5,6 @@ struct GridSelectionView: View {
     @State private var isConfirmButtonEnabled = false
     @State private var selectedItems: Set<Int> = []
     @State private var showAlert = false
-    @State private var navigateToSnapFitTabView = false
     
     let columnsCount: Int
     var columns: [GridItem] {
@@ -15,6 +14,7 @@ struct GridSelectionView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var viewModel: LoginViewModel
     var interactor: LoginBusinessLogic?
+    @EnvironmentObject var navigationPath: LoginNavigationModel
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -47,20 +47,26 @@ struct GridSelectionView: View {
                                     // Deselect the item
                                     selectedItems.remove(index)
                                     if let name = viewModel.vibes[index].name {
-                                        viewModel.moods.removeAll { $0 == name }
+                                        DispatchQueue.main.async {
+                                            viewModel.moods.removeAll { $0 == name }
+                                        }
                                     }
                                 } else if selectedItems.count < 2 {
                                     // Select the item
                                     selectedItems.insert(index)
                                     if let name = viewModel.vibes[index].name {
-                                        viewModel.moods.append(name)
+                                        DispatchQueue.main.async {
+                                            viewModel.moods.append(name)
+                                        }
                                     }
                                 } else {
                                     // Show alert when more than 2 items are selected
                                     showAlert = true
                                 }
                                 // Enable or disable confirm button based on selection count
-                                isConfirmButtonEnabled = selectedItems.count > 0
+                                DispatchQueue.main.async {
+                                    isConfirmButtonEnabled = selectedItems.count > 0
+                                }
                             } label: {
                                 Text(viewModel.vibes[index].name ?? "")
                                     .foregroundColor(selectedItems.contains(index) ? Color.white : Color.black)
@@ -74,28 +80,25 @@ struct GridSelectionView: View {
                                     )
                             }
                         }
-
                     }
                     .padding(.horizontal)
             }
             Spacer()
             
-            NavigationLink(destination: SplashAndTabView().navigationBarBackButtonHidden(), isActive: $navigateToSnapFitTabView) {
-                EmptyView()
-            }
-            
             Button {
                 // Action for "시작하기"
-                interactor?.registerSnapFitUser(request: Login.LoadLogin.Request(
-                    social: viewModel.social,
-                    nickName: viewModel.nickName,
-                    isMarketing: viewModel.isMarketing,
-                    oauthToken: viewModel.oauthToken,
-                    kakaoAccessToken: viewModel.kakaoAccessToken,
-                    moods: viewModel.moods
-                ))
-                
-                navigateToSnapFitTabView = true
+                DispatchQueue.main.async {
+                    interactor?.registerUser(request: Login.LoadLogin.Request(
+                        social: viewModel.social,
+                        nickName: viewModel.nickName,
+                        isMarketing: viewModel.isMarketing,
+                        oauthToken: viewModel.oauthToken,
+                        kakaoAccessToken: viewModel.kakaoAccessToken,
+                        moods: viewModel.moods
+                    ))
+                    
+                    navigationPath.append("SplashAndTabView")
+                }
             } label: {
                 HStack(spacing: 20) {
                     Spacer()
@@ -139,51 +142,18 @@ struct GridSelectionView: View {
             }
         )
         .onAppear {
-            print("GridSelectionView appeared")
-            interactor?.fetchVibes() // Fetch vibes when view appears
-        }
-
-    }
-}
-
-struct CustomAlertView: View {
-    @Binding var isPresented: Bool
-    let message: String
-    let action: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("알림")
-                .font(.headline)
-            Text(message)
-                .font(.subheadline)
-                .foregroundColor(Color(.systemGray))
-                .multilineTextAlignment(.center)
-            Button(action: {
-                action()
-            }) {
-                Text("확인")
-                    .bold()
-                    .font(.subheadline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .cornerRadius(10)
+            DispatchQueue.main.async {
+                print("GridSelectionView appeared")
+                interactor?.fetchVibes() // Fetch vibes when view appears
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 10)
     }
 }
-
-
 
 struct GridSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         GridSelectionView(columnsCount: 2, interactor: nil)
             .environmentObject(LoginViewModel())
+            .environmentObject(LoginNavigationModel()) // 환경 모델 추가
     }
 }
