@@ -11,7 +11,7 @@ import Combine
 protocol MainPromotionBusinessLogic {
     //func load(request: MainPromotion.LoadMainPromotion.Request)
     func fetchProductAll(request : MainPromotion.LoadMainPromotion.Request)
-   
+    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
 }
 
 final class MainPromotionInteractor {
@@ -60,5 +60,24 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
-    
+        
+    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request) {
+        productWorker.fetchPostDetailById(postId: request.id)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("상품 디테일 조회 실패")
+                    self?.presenter?.presentFetchPostDetailByIdFailure(error: error)
+                }
+            } receiveValue: { [weak self] productDetail in
+                print("상품 조회 성공")
+                // Response 객체 생성
+                let response = MainPromotion.LoadDetailProduct.Response(productDetail: productDetail)
+                // Presenter에 전달
+                self?.presenter?.presentFetchPostDetailByIdSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
 }

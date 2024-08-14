@@ -9,6 +9,10 @@ import SwiftUI
 struct AuthorDetailView: View {
 
     @Environment(\.presentationMode) var presentationMode
+    
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    var mainPromotionInteractor: MainPromotionBusinessLogic?
+    
     @Binding var stack : NavigationPath
     
     var body: some View {
@@ -16,7 +20,12 @@ struct AuthorDetailView: View {
             ZStack {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading) {
-                        MainContentView()
+                        if let detail = mainPromotionViewModel.productDetail {
+                            MainContentView(productDetail: detail)
+                        } else {
+                            ProgressView()
+                                .padding()
+                        }
                         DividerAndRegulationView()
                         Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
                     }
@@ -28,6 +37,15 @@ struct AuthorDetailView: View {
                     Spacer()
                     NextButton(stack: $stack)
                 }
+            }
+            .onAppear {
+                
+                if let productId = mainPromotionViewModel.selectedProductId {
+                    mainPromotionInteractor?.fetchPostDetailById(
+                        request: MainPromotion.LoadDetailProduct.Request(id: productId))
+                }
+                
+                
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -82,37 +100,64 @@ struct AuthorDetailView: View {
 
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
+    let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
 
     var body: some View {
         Group {
-            ImageSliderView(images: ["demo1", "demo2", "demo3"])
-                .frame(maxWidth: .infinity) // 너비를 최대화하여 사용
-                .aspectRatio(contentMode: .fit) // 비율 유지
-                .padding(.bottom)
+            // 이미지 슬라이더
+            if let imageUrls = productDetail.images, !imageUrls.isEmpty {
+                ImageSliderView(images: imageUrls)
+                    .frame(maxWidth: .infinity) // 너비를 최대화하여 사용
+                    .aspectRatio(contentMode: .fit) // 비율 유지
+                    .padding(.bottom)
+            } else {
+                Text("이미지가 없습니다.")
+                    .padding(.bottom)
+            }
             
-            Text("나의 첫 스냅사진 감성을 담은 스냅사진")
+            // 제목
+            Text(productDetail.title ?? "제목 없음")
                 .font(.title3)
                 .bold()
                 .padding(.horizontal)
             
+            // 무드와 위치
             HStack {
-                MoodsLabel(text: "시크")
-                InOutLabel(text: "야외스냅")
+                if let vibes = productDetail.vibes {
+                    ForEach(vibes, id: \.self) { vibe in
+                        MoodsLabel(text: vibe)
+                    }
+                }
+                
+                if let locations = productDetail.locations {
+                    ForEach(locations, id: \.self) { location in
+                        InOutLabel(text: location)
+                    }
+                }
             }
             .padding(.horizontal)
             
-            PriceView(price: "32,400원")
+            // 가격
+            if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
+                PriceView(price: "\(minPrice) - \(price)")
+            } else {
+                PriceView(price: "가격 정보 없음")
+            }
             
             SectionHeaderView(title: "위치")
             
             HStack(spacing: 8) {
-                StarImageLabel(text: "서울 용산구")
-                StarImageLabel(text: "서울 중구")
+                if let locations = productDetail.locations {
+                    ForEach(locations, id: \.self) { location in
+                        StarImageLabel(text: location)
+                    }
+                }
             }
             .padding(.horizontal)
             .padding(.bottom, 40)
             
+            // 작가의 설명
             HStack(spacing: 8) {
                 Image("AuthorDec")
                     .resizable()
@@ -122,12 +167,13 @@ struct MainContentView: View {
             }
             .padding(.horizontal)
             
-            Text("사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다. 사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다.")
+            Text(productDetail.desc ?? "설명이 없습니다.")
                 .font(.caption)
                 .foregroundColor(Color(.systemGray))
                 .padding(.horizontal)
                 .padding(.bottom, 40)
             
+            // 등록된 상품
             SectionHeaderView(title: "등록된 상품")
             
             ScrollView(.horizontal, showsIndicators: false) {

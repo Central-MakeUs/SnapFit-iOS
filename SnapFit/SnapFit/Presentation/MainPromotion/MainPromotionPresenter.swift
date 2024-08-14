@@ -11,6 +11,10 @@ protocol MainPromotionPresentationLogic {
 
     func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response)
     func presentFetchProductAllFailure(error: ApiError)
+    
+    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
+    func presentFetchPostDetailByIdFailure(error: ApiError)
+    
 }
 
 final class MainPromotionPresenter {
@@ -20,6 +24,8 @@ final class MainPromotionPresenter {
 }
 
 extension MainPromotionPresenter: MainPromotionPresentationLogic {
+  
+    
     
     func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
         // Response를 ViewModel로 변환
@@ -33,6 +39,16 @@ extension MainPromotionPresenter: MainPromotionPresentationLogic {
     }
     
     
-    // 전달 로직 
+    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response) {
+        let viewModel = MainPromotion.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
+        // View에 전달
+        view?.displayDetail(viewModel: viewModel)
+    }
+    
+    func presentFetchPostDetailByIdFailure(error: ApiError) {
+        print("Error occurred: \(error)")
+    }
+
+    // 전달 로직
 }
 

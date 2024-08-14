@@ -22,5 +22,20 @@ enum MainPromotion {
             var products : Product
         }
     }
+    
+    
+    enum LoadDetailProduct {
+        struct Request {
+            var id: Int
+        }
+        
+        struct Response {
+            var productDetail : PostDetailResponse
+        }
+        
+        struct ViewModel {
+            var productDetail : PostDetailResponse
+        }
+    }
 }
 

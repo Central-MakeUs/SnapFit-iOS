@@ -8,16 +8,28 @@ import SwiftUI
 
 protocol MainPromotionDisplayLogic {
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
+    
+    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
     
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
-        mainPromotionViewModel.products = viewModel.products.data
-        //print("viewModel.products.data \(viewModel.products.data)")
-        print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
+        DispatchQueue.main.async {
+            mainPromotionViewModel.products = viewModel.products.data
+            //print("viewModel.products.data \(viewModel.products.data)")
+            print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
+        }
+    }
+    
+    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
+        DispatchQueue.main.async {
+            mainPromotionViewModel.productDetail = viewModel.productDetail
+            print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
+        }
     }
 }
+
 
 struct MainPromotionView: View {
     @State var stack = NavigationPath()
@@ -57,8 +69,9 @@ struct MainPromotionView: View {
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
-                    AuthorDetailView(stack: $stack)
+                    AuthorDetailView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(mainPromotionViewModel)
                 case "AuthorReservationView":
                     AuthorReservationView(stack: $stack)
                         .navigationBarBackButtonHidden(true)
@@ -127,7 +140,10 @@ struct SectionMiniCardsView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
                 ForEach(mainPromotionViewModel.products) { product in
-                    NavigationLink(value: "AuthorDetailView") {
+                    Button(action: {
+                        mainPromotionViewModel.selectedProductId = product.id
+                        stack.append("AuthorDetailView")
+                    }) {
                         MiniCardView(product: product)
                             .frame(width: 130, height: 202)
                     }
