@@ -97,7 +97,9 @@ struct GridSelectionView: View {
                         moods: viewModel.moods
                     ))
                     
-                    navigationPath.append("SplashAndTabView")
+//                    navigationPath.append("SplashAndTabView")
+                    // 로그인 성공 시 모달 닫기
+                    viewModel.showLoginModal = false
                 }
             } label: {
                 HStack(spacing: 20) {

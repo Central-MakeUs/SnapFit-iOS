@@ -18,13 +18,25 @@ struct ContentView: View {
             if isLoggedIn {
                 SplashAndTabView() // 토큰이 있으면 SplashAndTabView로 이동
             } else {
-                LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
-                    .configureView() // VIP 패턴에 맞게 뷰를 구성
+                Text("로그인 상태가 아닙니다.") // 실제로는 모달로 로그인 뷰를 표시할 부분입니다.
+                    .hidden()
             }
         }
         .onAppear {
             //clearTokens()
             checkForSavedTokens() // 토큰 확인 로직 호출
+        }
+        .fullScreenCover(isPresented: $loginVM.showLoginModal) {
+            LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
+                .configureView() // VIP 패턴에 맞게 뷰를 구성
+                .onDisappear {
+                    checkForSavedTokens() // 모달이 닫힐 때 다시 토큰을 확인
+                }
+        }
+        .onChange(of: isLoggedIn) { newValue in
+            if !newValue {
+                loginVM.showLoginModal = true // 로그인 상태가 아닐 때 모달 표시
+            }
         }
     }
 
@@ -35,6 +47,7 @@ struct ContentView: View {
             isLoggedIn = true // 토큰이 있으면 자동 로그인으로 이동
         } else {
             isLoggedIn = false // 토큰이 없으면 로그인 화면으로 이동
+            loginVM.showLoginModal = true // 로그인 모달 표시
         }
     }
     

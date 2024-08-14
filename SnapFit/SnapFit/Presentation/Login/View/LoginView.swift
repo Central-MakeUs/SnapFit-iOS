@@ -12,6 +12,8 @@ struct LoginView: View, LoginDisplayLogic {
     
     @ObservedObject var loginviewModel: LoginViewModel  // 로그인 관련 상태를 관리하는 ViewModel
     @ObservedObject var navigationModel: LoginNavigationModel  // 네비게이션 상태를 관리하는 모델
+   
+    //@Binding private var showLoginModal: Bool
     
     var interactor: LoginBusinessLogic?  // Interactor와의 통신을 위한 참조
     
@@ -19,8 +21,18 @@ struct LoginView: View, LoginDisplayLogic {
     func display(viewModel: Login.LoadLogin.LoginPresentationViewModel) {
         // 상태 업데이트가 메인 스레드에서 이루어지도록 보장
         DispatchQueue.main.async {
+            
+            var destination = ""
+            
             // 로그인 후 화면 이동을 위한 목적지 결정
-            let destination = viewModel.membershipRequired ? "termsView" : "splashAndTabView"
+            if viewModel.membershipRequired == true {
+                destination = "termsView"
+                // 네비게이션 목적지로 이동
+                navigationModel.navigationPath.append(destination)
+            } else {
+                // 로그인 성공 시 모달 닫기
+                loginviewModel.showLoginModal = false
+            }
             
             // 소셜 로그인 타입에 따라 로그인 상태 업데이트
             switch viewModel.socialLoginType {
@@ -34,6 +46,8 @@ struct LoginView: View, LoginDisplayLogic {
                     print("Kakao login failed verification kakaoAccessToken \(viewModel.socialAccessToken ?? "")")
                 } else {
                     print("Kakao login successful")
+                    // 로그인 성공 시 모달 닫기
+                    loginviewModel.showLoginModal = false
                 }
                 
             case "apple":
@@ -46,14 +60,15 @@ struct LoginView: View, LoginDisplayLogic {
                     print("Apple login failed verification \(viewModel.oauthToken ?? "")")
                 } else {
                     print("Apple login successful")
+                    // 로그인 성공 시 모달 닫기
+                    loginviewModel.showLoginModal = false
                 }
                 
             default:
                 print("Unsupported social login type")  // 지원하지 않는 로그인 타입 처리
             }
             
-            // 네비게이션 목적지로 이동
-            navigationModel.navigationPath.append(destination)
+          
         }
     }
     
@@ -122,9 +137,9 @@ struct LoginView: View, LoginDisplayLogic {
                         .environmentObject(loginviewModel)
                         .environmentObject(navigationModel)
                         .navigationBarBackButtonHidden(true)
-                case "splashAndTabView":
-                    SplashAndTabView()
-                        .navigationBarBackButtonHidden(true)
+//                case "splashAndTabView":
+//                    SplashAndTabView()
+//                        .navigationBarBackButtonHidden(true)
           
                 default:
                     EmptyView()  // 기본적으로 아무것도 표시하지 않음

@@ -29,4 +29,6 @@ class LoginViewModel: NSObject, ObservableObject {
     @Published var vibes: [Vibe] = []
     
   
+    
+    @Published var showLoginModal: Bool = true
 }
