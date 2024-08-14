@@ -15,11 +15,11 @@ enum MainPromotion {
         }
         
         struct Response {
-            var products : Products
+            var products : Product
         }
         
         struct ViewModel {
-            var products : Products
+            var products : Product
         }
     }
 }

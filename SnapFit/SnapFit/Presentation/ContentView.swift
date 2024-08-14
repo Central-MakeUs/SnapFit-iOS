@@ -23,6 +23,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            //clearTokens()
             checkForSavedTokens() // 토큰 확인 로직 호출
         }
     }

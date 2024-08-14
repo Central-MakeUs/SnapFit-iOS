@@ -9,24 +9,25 @@ import Foundation
 
 // MARK: - Welcome
 struct Product: Codable {
-    let offset, limit: Int?
-    let data: [ProductInfo]?
+    let offset: Int
+    let limit: Int
+    let data: [ProductInfo]
 }
 
-// MARK: - Datum
 struct ProductInfo: Codable {
-    let id: Int?
+    let id: Int
     let maker: Maker?
-    let title, thumbNail: String?
-    let vibes, locations: [String]?
+    let title: String?
+    let thumbNail: String?
+    let vibes: [String]?
+    let locations: [String]?
     let price: Int?
     let studio: Bool?
 }
 
-// MARK: - Maker
 struct Maker: Codable {
-    let id: Int?
+    let id: Int
     let nickName: String?
 }
 
-typealias Products = [Product]
+//typealias Product = [Product]
