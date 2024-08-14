@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6416BCDC2C6CC88200E55367 /* PostDetailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */; };
+		6416BCDE2C6CCA8100E55367 /* MainPromotionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */; };
 		6428A48D2C3D20C600C47990 /* SnapFitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6428A48C2C3D20C600C47990 /* SnapFitApp.swift */; };
 		6428A48F2C3D20C600C47990 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6428A48E2C3D20C600C47990 /* ContentView.swift */; };
 		6428A4912C3D20C900C47990 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6428A4902C3D20C900C47990 /* Assets.xcassets */; };
@@ -91,6 +92,7 @@
 
 /* Begin PBXFileReference section */
 		6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailResponse.swift; sourceTree = "<group>"; };
+		6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionViewModel.swift; sourceTree = "<group>"; };
 		6428A4892C3D20C600C47990 /* SnapFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6428A48C2C3D20C600C47990 /* SnapFitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapFitApp.swift; sourceTree = "<group>"; };
 		6428A48E2C3D20C600C47990 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -358,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				64795A4E2C5A109B0018BE0D /* MainPromotionView.swift */,
+				6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -624,6 +627,7 @@
 				643E57142C6C96A50026226D /* MainPromotionConfigurator.swift in Sources */,
 				64600F062C5D072700C34929 /* CustomTopTabbar.swift in Sources */,
 				6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */,
+				6416BCDE2C6CCA8100E55367 /* MainPromotionViewModel.swift in Sources */,
 				6428A5132C3FA32B00C47990 /* LoginViewModel.swift in Sources */,
 				6428A48F2C3D20C600C47990 /* ContentView.swift in Sources */,
 				6416BCDC2C6CC88200E55367 /* PostDetailResponse.swift in Sources */,

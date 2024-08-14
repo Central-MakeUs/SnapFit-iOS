@@ -14,7 +14,7 @@ struct Product: Codable {
     let data: [ProductInfo]
 }
 
-struct ProductInfo: Codable {
+struct ProductInfo: Codable, Identifiable {
     let id: Int
     let maker: Maker?
     let title: String?

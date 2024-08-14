@@ -9,10 +9,13 @@ import SwiftUI
 struct SnapFitTabView: View {
     @State private var selectedTab = 0
     
+    @StateObject var mainPromotionViewModel = MainPromotionViewModel()
+    
     var body: some View {
         TabView(selection: $selectedTab) {
-            MainPromotionView()
+            MainPromotionView(mainPromotionViewModel: mainPromotionViewModel)
                 .configureView()
+                .environmentObject(mainPromotionViewModel)
                 .tabItem {
                     VStack {
                         Image(selectedTab == 0 ? "iconHome" : "iconHomeNoTab")

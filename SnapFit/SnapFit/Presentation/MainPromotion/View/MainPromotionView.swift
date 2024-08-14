@@ -13,13 +13,17 @@ protocol MainPromotionDisplayLogic {
 extension MainPromotionView: MainPromotionDisplayLogic {
     
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
-        print("MainPromotionView viewModel \(viewModel.products)")
+        mainPromotionViewModel.products = viewModel.products.data
+        //print("viewModel.products.data \(viewModel.products.data)")
+        print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
     }
 }
 
 struct MainPromotionView: View {
     @State var stack = NavigationPath()
     var mainPromotionInteractor: MainPromotionBusinessLogic?
+    
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     
     var body: some View {
         NavigationStack(path: $stack) {
@@ -47,7 +51,7 @@ struct MainPromotionView: View {
                     SectionBigCardsView(stack: $stack)
                         .padding(.bottom, 40)
                 }
-               
+                .environmentObject(mainPromotionViewModel)
             }
             .navigationBarBackButtonHidden(true)
             .navigationDestination(for: String.self) { viewName in
@@ -62,7 +66,7 @@ struct MainPromotionView: View {
                     AuthorReservationReceptionView(stack: $stack)
                         .navigationBarBackButtonHidden(true)
                 default:
-                    MainPromotionView()
+                    SnapFitTabView()
                 }
             }
             .onAppear {
@@ -114,17 +118,17 @@ struct HeaderView: View {
 }
 
 struct SectionMiniCardsView: View {
-    //@EnvironmentObject var navigationModel: NavigationModel // NavigationModel을 환경 객체로 사용
-    @Binding var stack : NavigationPath
-    
-    let layout: [GridItem] = [GridItem(.fixed(130))] // 고정된 크기 설정
-    
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @Binding var stack: NavigationPath
+
+    let layout: [GridItem] = [GridItem(.fixed(130))] // Fixed size layout
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
-                ForEach(0..<10, id: \.self) { item in
-                    NavigationLink(value: "AuthorDetailView"){
-                        MiniCardView()
+                ForEach(mainPromotionViewModel.products) { product in
+                    NavigationLink(value: "AuthorDetailView") {
+                        MiniCardView(product: product)
                             .frame(width: 130, height: 202)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -134,6 +138,7 @@ struct SectionMiniCardsView: View {
         }
     }
 }
+
 
 struct SectionBigCardsView: View {
     //@EnvironmentObject var navigationModel: NavigationModel // NavigationModel을 환경 객체로 사용
@@ -165,5 +170,5 @@ struct SectionBigCardsView: View {
     // Preview를 위한 NavigationPath 초기화
     let path = NavigationPath()
     
-    return MainPromotionView()
+    return MainPromotionView(mainPromotionViewModel: MainPromotionViewModel())
 }
