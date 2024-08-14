@@ -7,11 +7,14 @@
 import SwiftUI
 
 protocol MainPromotionDisplayLogic {
-    func display(viewModel: MyPage.LoadMyPage.ViewModel)
+    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
 }
 
-extension MainPromotionView: MyPageDisplayLogic {
-    func display(viewModel: MyPage.LoadMyPage.ViewModel) {}
+extension MainPromotionView: MainPromotionDisplayLogic {
+    
+    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
+        print("MainPromotionView viewModel \(viewModel.products)")
+    }
 }
 
 struct MainPromotionView: View {
@@ -63,8 +66,13 @@ struct MainPromotionView: View {
                 }
             }
             .onAppear {
+                
+                mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+                
                 print(stack.count)
                 stack = NavigationPath()
+            
+                
             }
         }// 스택 블럭 안에 .navigationDestination 가 있어야함
         

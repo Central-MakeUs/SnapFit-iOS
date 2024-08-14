@@ -9,10 +9,18 @@ import Foundation
 
 enum MainPromotion {
     enum LoadMainPromotion {
-        struct Request {}
+        struct Request {
+            var limit: Int
+            var offset: Int
+        }
         
-        struct Response {}
+        struct Response {
+            var products : Products
+        }
         
-        struct ViewModel {}
+        struct ViewModel {
+            var products : Products
+        }
     }
 }
+

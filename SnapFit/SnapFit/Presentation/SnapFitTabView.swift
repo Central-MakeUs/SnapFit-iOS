@@ -12,6 +12,7 @@ struct SnapFitTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             MainPromotionView()
+                .configureView()
                 .tabItem {
                     VStack {
                         Image(selectedTab == 0 ? "iconHome" : "iconHomeNoTab")

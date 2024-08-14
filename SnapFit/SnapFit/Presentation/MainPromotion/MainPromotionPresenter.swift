@@ -8,7 +8,9 @@
 import Foundation
 
 protocol MainPromotionPresentationLogic {
-    func present(response: MainPromotion.LoadMainPromotion.Response)
+
+    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response)
+    func presentFetchProductAllFailure(error: ApiError)
 }
 
 final class MainPromotionPresenter {
@@ -18,7 +20,19 @@ final class MainPromotionPresenter {
 }
 
 extension MainPromotionPresenter: MainPromotionPresentationLogic {
-    func present(response: Response) {
-    //    view?.display(viewModel: viewModel)
+    
+    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
+        // Response를 ViewModel로 변환
+                let viewModel = MainPromotion.LoadMainPromotion.ViewModel(products: response.products)
+                // View에 전달
+                view?.display(viewModel: viewModel)
     }
+    
+    func presentFetchProductAllFailure(error: ApiError) {
+        print("Error occurred: \(error)")
+    }
+    
+    
+    // 전달 로직 
 }
+

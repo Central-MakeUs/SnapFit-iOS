@@ -27,6 +27,8 @@
 		643E57112C6C96A50026226D /* MainPromotionInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E570B2C6C96A50026226D /* MainPromotionInteractor.swift */; };
 		643E57132C6C96A50026226D /* MainPromotionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E570D2C6C96A50026226D /* MainPromotionModel.swift */; };
 		643E57142C6C96A50026226D /* MainPromotionConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E570E2C6C96A50026226D /* MainPromotionConfigurator.swift */; };
+		643E57162C6C97C30026226D /* ProductWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E57152C6C97C30026226D /* ProductWorker.swift */; };
+		643E57182C6C99DD0026226D /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E57172C6C99DD0026226D /* Product.swift */; };
 		643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F648A2C68F1C40017ACCD /* Vibes.swift */; };
 		64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */; };
 		644EDABE2C4552FF00745DDD /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABD2C4552FF00745DDD /* WebView.swift */; };
@@ -105,6 +107,8 @@
 		643E570B2C6C96A50026226D /* MainPromotionInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionInteractor.swift; sourceTree = "<group>"; };
 		643E570D2C6C96A50026226D /* MainPromotionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionModel.swift; sourceTree = "<group>"; };
 		643E570E2C6C96A50026226D /* MainPromotionConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionConfigurator.swift; sourceTree = "<group>"; };
+		643E57152C6C97C30026226D /* ProductWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWorker.swift; sourceTree = "<group>"; };
+		643E57172C6C99DD0026226D /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		643F648A2C68F1C40017ACCD /* Vibes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vibes.swift; sourceTree = "<group>"; };
 		64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorReservationReceptionView.swift; sourceTree = "<group>"; };
 		644EDABD2C4552FF00745DDD /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
@@ -239,6 +243,7 @@
 			children = (
 				642D9E9D2C4D458500B31B51 /* Tokens.swift */,
 				643F648A2C68F1C40017ACCD /* Vibes.swift */,
+				643E57172C6C99DD0026226D /* Product.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -330,6 +335,7 @@
 			children = (
 				64FDCCE82C5006030033447D /* ApiError.swift */,
 				6496CB482C43B81B00381F0F /* AuthWorker.swift */,
+				643E57152C6C97C30026226D /* ProductWorker.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -594,6 +600,7 @@
 				64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */,
 				64ACDAEC2C4642A200A4C169 /* GridSelectionView.swift in Sources */,
 				6496CB442C42CECA00381F0F /* LoginView.swift in Sources */,
+				643E57182C6C99DD0026226D /* Product.swift in Sources */,
 				644EDABE2C4552FF00745DDD /* WebView.swift in Sources */,
 				64795A732C5A2C100018BE0D /* AccordionView.swift in Sources */,
 				64795A712C5A2BFA0018BE0D /* SelectPhotosView.swift in Sources */,
@@ -621,6 +628,7 @@
 				64795A512C5A10CF0018BE0D /* CardView.swift in Sources */,
 				6457580D2C5E785A00258730 /* AuthorReservationView.swift in Sources */,
 				64795A542C5A23BD0018BE0D /* MoodsLabel.swift in Sources */,
+				643E57162C6C97C30026226D /* ProductWorker.swift in Sources */,
 				64600F082C5D087600C34929 /* AuthorDetailView.swift in Sources */,
 				6428A4C42C3D64D200C47990 /* SplashView.swift in Sources */,
 			);
