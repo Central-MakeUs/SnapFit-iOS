@@ -24,7 +24,7 @@ class LoginViewModel: NSObject, ObservableObject {
     @Published var isMarketing: Bool = false
     @Published var oauthToken: String = ""
     @Published var moods: [String] = []
-    @Published var kakaoAccessToken: String = ""
+    @Published var socialAccessToken: String = ""
     // Add this property
     @Published var vibes: [Vibe] = []
     

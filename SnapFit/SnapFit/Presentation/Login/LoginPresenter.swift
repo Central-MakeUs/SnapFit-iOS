@@ -17,28 +17,24 @@ import AuthenticationServices
 protocol LoginPresentationLogic {
     func presentSocialLoginSuccess(socialLoginType: String, accessToken: String, oauthToken: String?)
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String)
-    func presentLoginFailure(_ error: Error, accessToken: String)
+    func presentSocialLoginFailure(_ error: Error, socialLoginType: String, accessToken: String)
     func presentAlreadyregisteredusers(socialLoginType: String, oauthToken: String?, error: Error?)
+    
+    func presentSocialregisterSuccess(socialLoginType: String, accessToken: String, oauthToken: String?)
+    func presentSocialregisterFailure(_ error: Error, socialLoginType: String, accessToken: String, oauthToken: String?)
+    
     func presentVibes(_ vibes: [Vibe])
     func presentVibesFetchFailure(_ error: Error)
 }
 
 // Presenter는 Interactor로부터 받은 정보를 View에 전달하는 역할을 합니다.
 class LoginPresenter: LoginPresentationLogic {
+  
+    
     
     var view: LoginDisplayLogic?  // View와의 통신을 위한 참조
     
-    // 로그인 실패를 View에 전달
-    func presentLoginFailure(_ error: Error, accessToken: String) {
-        
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
-            socialLoginType: "kakao",
-            oauthToken: "",
-            kakaoAccessToken: accessToken,
-            membershipRequired: false
-        )
-        view?.display(viewModel: viewModel)
-    }
+  
     
     // 이미 등록된 사용자를 View에 전달
     func presentAlreadyregisteredusers(socialLoginType: String, oauthToken: String?, error: Error?) {
@@ -46,19 +42,57 @@ class LoginPresenter: LoginPresentationLogic {
         let viewModel = Login.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
-            kakaoAccessToken: nil,
+            socialAccessToken: nil,
             membershipRequired: false
         )
         view?.display(viewModel: viewModel)
     }
     
-    // 소셜 로그인 성공을 View에 전달
+    
+    // 소셜 로그인 성공
     func presentSocialLoginSuccess(socialLoginType: String, accessToken: String, oauthToken: String?) {
         // ViewModel을 생성하여 View에 전달
         let viewModel = Login.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
-            kakaoAccessToken: accessToken,
+            socialAccessToken: accessToken,
+            membershipRequired: false
+        )
+        view?.display(viewModel: viewModel)
+    }
+    
+    // 로그인 실패를 View에 전달
+    func presentSocialLoginFailure(_ error: Error, socialLoginType: String, accessToken: String) {
+        
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: socialLoginType,
+            oauthToken: "",
+            socialAccessToken: accessToken,
+            membershipRequired: true
+        )
+        view?.display(viewModel: viewModel)
+    }
+    
+    // 소셜 회원가입 성공을 View에 전달
+    func presentSocialregisterSuccess(socialLoginType: String, accessToken: String, oauthToken: String?) {
+        // ViewModel을 생성하여 View에 전달
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: socialLoginType,
+            oauthToken: oauthToken,
+            socialAccessToken: accessToken,
+            membershipRequired: false
+        )
+        view?.display(viewModel: viewModel)
+    }
+    
+    // 소셜 회원가입 실패을 View에 전달
+    func presentSocialregisterFailure(_ error: Error, socialLoginType: String, accessToken: String, oauthToken: String?) {
+        print("회원가입 실패 \(error)")
+        // ViewModel을 생성하여 View에 전달
+        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+            socialLoginType: socialLoginType,
+            oauthToken: oauthToken,
+            socialAccessToken: accessToken,
             membershipRequired: true
         )
         view?.display(viewModel: viewModel)
@@ -70,7 +104,7 @@ class LoginPresenter: LoginPresentationLogic {
         let viewModel = Login.LoadLogin.LoginPresentationViewModel(
             socialLoginType: "kakao",
             oauthToken: accessToken,
-            kakaoAccessToken: nil,
+            socialAccessToken: nil,
             membershipRequired: false
         )
         view?.display(viewModel: viewModel)

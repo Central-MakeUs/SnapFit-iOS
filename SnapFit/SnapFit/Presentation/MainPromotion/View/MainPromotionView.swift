@@ -6,8 +6,17 @@
 //
 import SwiftUI
 
+protocol MainPromotionDisplayLogic {
+    func display(viewModel: MyPage.LoadMyPage.ViewModel)
+}
+
+extension MainPromotionView: MyPageDisplayLogic {
+    func display(viewModel: MyPage.LoadMyPage.ViewModel) {}
+}
+
 struct MainPromotionView: View {
     @State var stack = NavigationPath()
+    var mainPromotionInteractor: MainPromotionBusinessLogic?
     
     var body: some View {
         NavigationStack(path: $stack) {

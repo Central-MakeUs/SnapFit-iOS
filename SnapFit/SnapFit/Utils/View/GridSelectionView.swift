@@ -93,7 +93,7 @@ struct GridSelectionView: View {
                         nickName: viewModel.nickName,
                         isMarketing: viewModel.isMarketing,
                         oauthToken: viewModel.oauthToken,
-                        kakaoAccessToken: viewModel.kakaoAccessToken,
+                        socialAccessToken: viewModel.socialAccessToken,
                         moods: viewModel.moods
                     ))
                     

@@ -30,8 +30,8 @@ struct LoginView: View, LoginDisplayLogic {
                     self.loginviewModel.social = viewModel.socialLoginType
                     self.loginviewModel.isKakaoLogin = true
                     self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
-                    self.loginviewModel.kakaoAccessToken = viewModel.kakaoAccessToken ?? ""
-                    print("Kakao login failed verification kakaoAccessToken \(viewModel.kakaoAccessToken ?? "")")
+                    self.loginviewModel.socialAccessToken = viewModel.socialAccessToken ?? ""
+                    print("Kakao login failed verification kakaoAccessToken \(viewModel.socialAccessToken ?? "")")
                 } else {
                     print("Kakao login successful")
                 }
@@ -42,7 +42,7 @@ struct LoginView: View, LoginDisplayLogic {
                     self.loginviewModel.social = viewModel.socialLoginType
                     self.loginviewModel.isAppleLoggedIn = true
                     self.loginviewModel.oauthToken = viewModel.oauthToken ?? ""
-                    self.loginviewModel.kakaoAccessToken = viewModel.kakaoAccessToken ?? ""
+                    self.loginviewModel.socialAccessToken = viewModel.socialAccessToken ?? ""
                     print("Apple login failed verification \(viewModel.oauthToken ?? "")")
                 } else {
                     print("Apple login successful")

@@ -15,7 +15,7 @@ enum Login {
             let nickName: String
             let isMarketing: Bool
             let oauthToken: String
-            let kakaoAccessToken: String
+            let socialAccessToken: String
             let moods: [String]
         }
         struct Response {
@@ -27,7 +27,7 @@ enum Login {
         struct LoginPresentationViewModel { //엔터티
             let socialLoginType: String
             let oauthToken: String?
-            let kakaoAccessToken: String?
+            let socialAccessToken: String?
             let membershipRequired : Bool
         }
         struct VibesPresentationViewModel { //엔터티

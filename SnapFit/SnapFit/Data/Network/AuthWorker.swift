@@ -85,7 +85,7 @@ class AuthWorker: AuthWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        urlRequest.addValue("Bearer \(request.kakaoAccessToken)", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("Bearer \(request.socialAccessToken)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
         
         // JSON 요청 본문 생성

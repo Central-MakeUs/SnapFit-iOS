@@ -35,7 +35,7 @@ class LoginInteractor: LoginBusinessLogic {
                     .sink(receiveCompletion: { completion in
                         switch completion {
                         case .failure(let error):
-                            self?.presenter?.presentLoginFailure(error, accessToken: accessToken) // 존재하지 않으면 기존 애플, 카카오 엑세스 토큰 전달 뷰 모델로 -> 회원가입 로직
+                            self?.presenter?.presentSocialLoginFailure(error, socialLoginType: "kakao", accessToken: accessToken) // 존재하지 않으면 기존 애플, 카카오 엑세스 토큰 전달 뷰 모델로 -> 회원가입 로직
                         case .finished:
                             break
                         }
@@ -65,20 +65,20 @@ class LoginInteractor: LoginBusinessLogic {
                 self?.authWorker.socialLoginSnapfitServer(accessToken: accessToken, socialType : "apple")
                     .sink(receiveCompletion: { completion in
                         switch completion {
-                        case .failure(let error):
-                            self?.presenter?.presentLoginFailure(error, accessToken: accessToken)
+                        case .failure(let error): // 실패시 애플에서 받은 엑세스 토큰을 저장
+                            self?.presenter?.presentSocialLoginFailure(error, socialLoginType: "apple", accessToken: accessToken)
                         case .finished:
                             break
                         }
                     }, receiveValue: { tokens in
-                        // 1. 토큰을 저장
+                        // 1. 애플 로그인 성공시 스냅핏 토큰을 저장
                         self?.saveTokens(tokens)
                         self?.presenter?.presentSocialLoginSuccess(socialLoginType: "apple", accessToken: accessToken, oauthToken: nil)
                     })
                     .store(in: &self!.cancellables)
                 
             case .failure(let error):
-                self?.presenter?.presentLoginFailure(error, accessToken: "애플로그인 실패")
+                self?.presenter?.presentSocialLoginFailure(error, socialLoginType: "apple", accessToken: "애플로그인 실패")
             }
         }
     }
@@ -89,7 +89,7 @@ class LoginInteractor: LoginBusinessLogic {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
-                    self.presenter?.presentLoginFailure(error, accessToken: request.kakaoAccessToken)
+                    self.presenter?.presentSocialregisterFailure(error, socialLoginType: request.social, accessToken: request.socialAccessToken, oauthToken: nil)
                 case .finished:
                     break
                 }
@@ -97,7 +97,7 @@ class LoginInteractor: LoginBusinessLogic {
                 self.saveTokens(tokens)
                 // 옵셔널 값 처리: `accessToken`이 옵셔널이므로 `??`를 사용해 기본값을 제공
                 let accessToken = tokens.accessToken ?? ""
-                self.presenter?.presentSocialLoginSuccess(socialLoginType: request.social, accessToken: accessToken, oauthToken: nil)
+                self.presenter?.presentSocialregisterSuccess(socialLoginType: request.social, accessToken: accessToken, oauthToken: nil)
             })
             .store(in: &cancellables)
     }
