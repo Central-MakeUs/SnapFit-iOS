@@ -65,14 +65,14 @@ struct AuthorReservationReceptionView: View {
                         }
                         
                         
-//                        Button(action: {
-//                            // 모든 항목을 제거하고 스택을 새로 초기화하여 홈으로 돌아가기
-//                            print("stack.count \(stack.count)")
-//                            stack.append("SnapFitTabView")
-//                            stack = NavigationPath()
-//                           
-//                        }) {
-                        NavigationLink(value: "SnapFitTabView"){
+                        Button(action: {
+                            // 모든 항목을 제거하고 스택을 새로 초기화하여 홈으로 돌아가기
+                            print("stack.count \(stack.count)")
+                            //stack.append("SnapFitTabView")
+                            stack = NavigationPath()
+                           
+                        }) {
+                      
                             HStack(spacing: 20) {
                                 Spacer()
                                 Text("홈으로 돌아가기")

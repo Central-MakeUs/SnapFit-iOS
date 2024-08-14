@@ -16,7 +16,7 @@ struct ReservationView: View {
         GridItem(.flexible(), spacing: 6, alignment: nil),
     ]
     
-    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
     
     var body: some View {
         ScrollView {
@@ -25,7 +25,8 @@ struct ReservationView: View {
                 alignment: .center,
                 spacing: 6){
                     ForEach(0..<20) { index in
-                        NavigationLink(destination: ReservationInfoView().navigationBarBackButtonHidden(true)) {
+                        
+                        NavigationLink(value: "ReservationInfoView"){
                             ReservationCardView()
                                 .frame(width: 390, height: 163)
                             
@@ -36,7 +37,7 @@ struct ReservationView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)

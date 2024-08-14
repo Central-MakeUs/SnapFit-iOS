@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ReservationInfoView: View {
     
-    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
@@ -121,7 +121,7 @@ struct ReservationInfoView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)

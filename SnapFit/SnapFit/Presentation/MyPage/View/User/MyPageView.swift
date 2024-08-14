@@ -15,35 +15,55 @@ extension MyPageView: MyPageDisplayLogic {
 struct MyPageView: View {
     @StateObject var viewModel = ProfileViewModel()
     var myPageInteractor: MyPageBusinessLogic?
-    
-    @State var stack = NavigationPath() // 초기 설정
-    
+    @State var stack = NavigationPath()
     var body: some View {
         NavigationStack(path: $stack) {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ProfileHeaderView(viewModel: viewModel)
                     
                     UserInfoView()
                         .padding(.horizontal)
                     
-                    NavigationButtonsView()
-                        .padding(.bottom, 32)
-                    GroupBoxViews(myPageInteractor : myPageInteractor)
-                   
+                    
+                    NavigationButtonsView(stack: $stack) // stack을 전달
+                                            .padding(.bottom, 32)
+                    
+                    GroupBoxViews(myPageInteractor: myPageInteractor)
+                    
                     Spacer()
                         .frame(height: 40)
                     
                     Spacer()
                 }
+             
             }
+            .navigationDestination(for: String.self) { viewName in
+                switch viewName {
+                case "MyProfileEdit":
+                    MyProfileEdit(viewModel: viewModel)
+                        .navigationBarBackButtonHidden(true)
+                case "ReservationView":
+                    ReservationView()
+                        .navigationBarBackButtonHidden(true)
+                case "ReservationInfoView" :
+                    ReservationInfoView().navigationBarBackButtonHidden(true)
+                case "DibsView":
+                    DibsView()
+                        .navigationBarBackButtonHidden(true)
+                case "SnapFitTabView":
+                    SnapFitTabView()
+                        .navigationBarBackButtonHidden(true)
+                default:
+                    SnapFitTabView()
+                }
+            }
+            .navigationBarHidden(true)
             .ignoresSafeArea(.container, edges: .top)
+            .accentColor(.black)
         }
-//        .task {
-//            fetch()
-//        }
-        .accentColor(.black) // 내비게이션 링크 색상을 검정색으로 변경
     }
+
 }
 
 // 프로필 헤더 뷰
@@ -54,7 +74,7 @@ struct ProfileHeaderView: View {
         ZStack {
             Rectangle()
                 .foregroundColor(.black)
-                .frame(width: .infinity, height: 168)
+                .frame(height: 168)  // 높이를 명확히 설정
                 .overlay {
                     Image("starBigLogo")
                         .resizable()
@@ -69,17 +89,16 @@ struct ProfileHeaderView: View {
                 .frame(width: 117.78, height: 44.17)
                 .offset(x: 0, y: 20)
             
-            Button(action: {
-                // 예약 내역 버튼 액션
-            }) {
-                NavigationLink(destination: MyProfileEdit(viewModel: viewModel).navigationBarBackButtonHidden(true)) {
-                    Image("editicon")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(.white)
-                }
+            
+            
+            NavigationLink(value: "MyProfileEdit"){
+                Image("editicon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
             }
+            
             .offset(x: 160, y: -30)
         }
     }
@@ -101,16 +120,21 @@ struct UserInfoView: View {
 
 // 네비게이션 버튼 뷰
 struct NavigationButtonsView: View {
+    @Binding var stack: NavigationPath // 바인딩을 통해 전달받음
+    
     var body: some View {
         HStack(spacing: 0) {
-            NavigationButton(destination: ReservationView()
-                             , title: "예약 내역", count: "0")
+            NavigationLink(value: "ReservationView") {
+                NavigationButtonLabel(title: "예약 내역", count: "0")
+            }
             
             Divider()
                 .frame(width: 1)
                 .background(Color.gray.opacity(0.3))
             
-            NavigationButton(destination: DibsView(), title: "찜한 내역", count: "0")
+            NavigationLink(value: "DibsView") {
+                NavigationButtonLabel(title: "찜한 내역", count: "0")
+            }
         }
         .frame(height: 108)
         .background(Color.white)
@@ -122,31 +146,24 @@ struct NavigationButtonsView: View {
     }
 }
 
-// 네비게이션 버튼 커스텀 뷰
-struct NavigationButton<Destination: View>: View {
-    let destination: Destination
+struct NavigationButtonLabel: View {
     let title: String
     let count: String
     
     var body: some View {
-        Button(action: {}) {
-            NavigationLink(destination: destination.navigationBarBackButtonHidden(true)) {
-                VStack(alignment: .leading) {
-                    Spacer()
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 5)
-                    
-                    Text(count)
-                        .foregroundColor(.black)
-                    Spacer()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: 108)
-            .background(Color.white)
-          
+        VStack(alignment: .leading) {
+            Spacer()
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.black)
+                .padding(.bottom, 5)
+            
+            Text(count)
+                .foregroundColor(.black)
+            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: 108)
+        .background(Color.white)
     }
 }
 
@@ -161,16 +178,16 @@ struct GroupBoxViews: View {
             .padding(.bottom, 16)
         Group {
             AppInfoContent(name: "사진작가로 전환", linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA")
-         
+            
             AppInfoContent(name: "상품관리", canNavigate: false)  // Modify as needed
             AppInfoContent(name: "예약관리", canNavigate: false)   // Modify as needed
-                       
+            
                 .padding(.bottom, 24)
-                
+            
         }
         .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
         .padding(.horizontal, 16)
-       
+        
         SectionHeaderView(title: "SnapFit 설정")
         Group{
             AppInfoContent(name: "고객센터", linkDestination: "https://forms.gle/tMHQQ37FQDW3jrDU8")

@@ -20,7 +20,7 @@ struct DibsView: View {
         GridItem(.flexible(), spacing: 6, alignment: nil),
     ]
     
-    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
     
     var body: some View {
         VStack{
@@ -45,7 +45,7 @@ struct DibsView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()  // 뒤로가기 버튼 클릭 시 dismiss 호출
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)

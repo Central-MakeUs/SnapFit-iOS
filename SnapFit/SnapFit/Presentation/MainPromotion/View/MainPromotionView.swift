@@ -37,7 +37,7 @@ struct MainPromotionView: View {
                 }
                
             }
-            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
@@ -48,9 +48,6 @@ struct MainPromotionView: View {
                         .navigationBarBackButtonHidden(true)
                 case "AuthorReservationReceptionView" :
                     AuthorReservationReceptionView(stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                case "SnapFitTabView" :
-                    SnapFitTabView()
                         .navigationBarBackButtonHidden(true)
                 default:
                     MainPromotionView()
