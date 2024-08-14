@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AuthorListView: View {
     @State private var selectedTab: Int = 0
-    
+    @State var stack = NavigationPath()
     
     // columns 의 갯수를 2개로 설정
     let columns: [GridItem] = [
@@ -20,7 +20,7 @@ struct AuthorListView: View {
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
     var body: some View {
-        NavigationView {
+        NavigationView { //. stack 전환 필요할듯
             VStack{
                 HStack {
                     Image("mainSnapFitLogo")
@@ -36,7 +36,7 @@ struct AuthorListView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(0..<10, id: \.self) { item in
-                            NavigationLink(destination: AuthorDetailView().navigationBarBackButtonHidden(true) ) {
+                            NavigationLink(destination: AuthorDetailView(stack: $stack).navigationBarBackButtonHidden(true) ) {
                                 MiddleCardView()
                                     .frame(width: 175, height: 270)
                                     .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))

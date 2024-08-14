@@ -16,8 +16,9 @@ struct AuthorReservationView: View {
     @State var phoneText: String = ""
     
     @State private var counter: Int = 0
+    @Binding var stack : NavigationPath
     
-    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,18 +31,24 @@ struct AuthorReservationView: View {
                     PeopleSection(counter: $counter)
                     EmailSection(emailText: $emailText)
                     PhoneSection(phoneText: $phoneText)
-                    SubmitButton()
+                    SubmitButton(stack: $stack)
                 }
             }
             .padding(.bottom)
         }
+//        .navigationDestination(for: String.self) { viewName in
+//            switch viewName {
+//            case "AuthorReservationReceptionView" :
+//                AuthorReservationReceptionView(stack: $stack)
+//                    .navigationBarBackButtonHidden(true)
+//            default:
+//                MainPromotionView()
+//            }
+//        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    // 뒤로 가기 버튼을 사용하여 네비게이션 경로를 관리
-                    navigationModel.pop()
-                }) {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
@@ -194,12 +201,10 @@ struct PhoneSection: View {
 }
 
 struct SubmitButton: View {
-    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
+    @Binding var stack : NavigationPath
     
     var body: some View {
-        Button(action: {
-            navigationModel.append(.authorReservationReceptionView) // 열거형 사용
-        }) {
+        NavigationLink(value: "AuthorReservationReceptionView"){
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -238,6 +243,8 @@ struct EmailSection: View {
 }
 
 #Preview {
-    AuthorReservationView()
-        .environmentObject(NavigationModel()) // Preview에서 환경 객체 주입
+    // Preview를 위한 NavigationPath 초기화
+    let path = NavigationPath()
+    
+    return AuthorReservationView(stack: .constant(path))
 }

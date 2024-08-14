@@ -7,8 +7,10 @@
 import SwiftUI
 
 struct AuthorDetailView: View {
-    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
 
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var stack : NavigationPath
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -24,16 +26,13 @@ struct AuthorDetailView: View {
                 // 고정된 NextButton
                 VStack {
                     Spacer()
-                    NextButton()
+                    NextButton(stack: $stack)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        // 네비게이션 경로에서 마지막 항목을 제거
-                        navigationModel.pop()
-                    }) {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
@@ -69,6 +68,15 @@ struct AuthorDetailView: View {
                 }
             }
         }
+//        .navigationDestination(for: String.self) { viewName in
+//            switch viewName {
+//            case "AuthorReservationView":
+//                AuthorReservationView(stack: $stack)
+//                    .navigationBarBackButtonHidden(true)
+//            default:
+//                MainPromotionView()
+//            }
+//        }
     }
 }
 
@@ -173,12 +181,9 @@ struct DividerAndRegulationView: View {
 
 // 다음 버튼 뷰
 struct NextButton: View {
-    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
-    
+    @Binding var stack : NavigationPath
     var body: some View {
-        Button(action: {
-            navigationModel.append(.authorReservation)
-        }) {
+        NavigationLink(value: "AuthorReservationView"){
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -191,7 +196,7 @@ struct NextButton: View {
             .frame(height: 48)
             .background(Color.black)
             .cornerRadius(5)
-            .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
         }
     }
 }
@@ -214,7 +219,10 @@ struct PriceView: View {
     }
 }
 
+
 #Preview {
-    AuthorDetailView()
-        .environmentObject(NavigationModel()) // NavigationModel을 환경 객체로 주입
+    // Preview를 위한 NavigationPath 초기화
+    let path = NavigationPath()
+    
+    return AuthorDetailView(stack: .constant(path))
 }

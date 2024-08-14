@@ -259,8 +259,11 @@ struct ProductRegistrationView: View {
     }
     
     private struct ReserveButton: View {
+        let path = NavigationPath()
+        
+
         var body: some View {
-            NavigationLink(destination: AuthorReservationView().navigationBarBackButtonHidden(true)) {
+            NavigationLink(destination: AuthorReservationView(stack:.constant(path)).navigationBarBackButtonHidden(true)) {
                 HStack(spacing: 20) {
                     Spacer()
                     Text("예약하기")

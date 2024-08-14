@@ -9,7 +9,8 @@ import SwiftUI
 import SwiftUI
 
 struct AuthorReservationReceptionView: View {
-    @EnvironmentObject var navigationModel: NavigationModel // EnvironmentObject로 NavigationModel을 사용
+    
+    @Binding var stack : NavigationPath
     @State private var selectedTab: Int = 0
 
     var body: some View {
@@ -60,15 +61,18 @@ struct AuthorReservationReceptionView: View {
                             .frame(height: 48)
                             .background(Color.black)
                             .cornerRadius(5)
-                            .padding(EdgeInsets(top: 0, leading: 20, bottom: 10, trailing: 20))
+                            .padding(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
                         }
                         
-                        Button(action: {
-                            // 네비게이션 스택을 초기화하여 홈으로 돌아가기
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                navigationModel.resetNavigation()
-                            }
-                        }) {
+                        
+//                        Button(action: {
+//                            // 모든 항목을 제거하고 스택을 새로 초기화하여 홈으로 돌아가기
+//                            print("stack.count \(stack.count)")
+//                            stack.append("SnapFitTabView")
+//                            stack = NavigationPath()
+//                           
+//                        }) {
+                        NavigationLink(value: "SnapFitTabView"){
                             HStack(spacing: 20) {
                                 Spacer()
                                 Text("홈으로 돌아가기")
@@ -81,7 +85,7 @@ struct AuthorReservationReceptionView: View {
                             .frame(height: 48)
                             .background(Color.black)
                             .cornerRadius(5)
-                            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                            .padding(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
                         }
                     }
                     .padding(.bottom, geometry.safeAreaInsets.bottom) // 안전 영역을 고려하여 여백 추가
@@ -92,7 +96,10 @@ struct AuthorReservationReceptionView: View {
     }
 }
 
+
 #Preview {
-    AuthorReservationReceptionView()
-        .environmentObject(NavigationModel()) // Preview에서 환경 객체를 설정
+    // Preview를 위한 NavigationPath 초기화
+    let path = NavigationPath()
+    
+    return AuthorReservationReceptionView(stack: .constant(path))
 }
