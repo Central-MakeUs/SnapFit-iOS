@@ -167,6 +167,7 @@ struct InfoRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
+                .foregroundStyle(Color("LoginFontColor"))
             Spacer()
             Text(value)
                 .foregroundColor(.black)

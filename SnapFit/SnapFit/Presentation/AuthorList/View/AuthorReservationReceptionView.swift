@@ -32,6 +32,7 @@ struct AuthorReservationReceptionView: View {
                         .padding(.horizontal)
                         
                         CustomDividerView()
+                            .padding(.bottom, 32)
                         
                         ProductSection()
                             .padding(.bottom, 40)

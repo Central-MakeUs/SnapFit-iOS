@@ -63,24 +63,31 @@ struct ReservationCardView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(width: 130, height: 130)
-                    .clipShape(RoundedRectangle(cornerRadius: 10)) // Apply corner radius
+                    .clipShape(RoundedRectangle(cornerRadius: 5)) // Apply corner radius
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("고급퀄리티 | 15년 경력, 홍대")
-                        .font(.footnote)
+                        .lineLimit(2)
+                        .font(.subheadline)
                         .foregroundColor(.black) // 텍스트 색상을 검정색으로 설정
                     
-                    Text("예약일시 24.02.22(목) 오후 5:00")
+                    Text("서울 용산구 | 중구")
                         .font(.caption)
-                        .foregroundColor(.black) // 텍스트 색상을 검정색으로 설정
+                        .foregroundColor(Color("LoginFontColor"))
+                    
+//                    Text("예약일시 24.02.22(목) 오후 5:00")
+//                        .font(.caption)
+//                        .foregroundColor(.black) // 텍스트 색상을 검정색으로 설정
                     
                     Text("32,400원")
                         .font(.callout) // Equivalent to font size 16
                         .bold()
                         .foregroundColor(.black) // 텍스트 색상을 검정색으로 설정
+                    
                     HStack(spacing: 8){
+                        DeteailInOutLabel(text: "야외스냅")
                         MoodsLabel(text: "시크")
-                        InOutLabel(text: "야외스냅")
+                        MoodsLabel(text: "러블리")
                     }
                 }
                 
