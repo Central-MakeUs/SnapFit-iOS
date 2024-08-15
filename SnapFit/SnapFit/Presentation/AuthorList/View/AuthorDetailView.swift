@@ -5,6 +5,7 @@
 //  Created by 정정욱 on 8/2/24.
 //
 import SwiftUI
+import MessageUI
 
 struct AuthorDetailView: View {
     
@@ -14,6 +15,8 @@ struct AuthorDetailView: View {
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack : NavigationPath
+    @State private var isShowingMailView = false
+    @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
     
     var body: some View {
         GeometryReader { geometry in
@@ -73,8 +76,7 @@ struct AuthorDetailView: View {
 //                            }
                             
                             Button(action: {
-                                // 신고하기 액션
-                                print("신고하기")
+                                isShowingMailView = true
                             }) {
                                 Label("신고하기", systemImage: "exclamationmark.bubble")
                             }
@@ -84,6 +86,13 @@ struct AuthorDetailView: View {
                         }
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $isShowingMailView) {
+            if MFMailComposeViewController.canSendMail() {
+                MailView(result: $mailResult)
+            } else {
+                Text("Mail services are not available")
             }
         }
         //        .navigationDestination(for: String.self) { viewName in

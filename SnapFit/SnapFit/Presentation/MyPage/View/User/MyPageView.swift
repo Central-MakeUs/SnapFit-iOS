@@ -190,7 +190,7 @@ struct GroupBoxViews: View {
         
         SectionHeaderView(title: "SnapFit 설정")
         Group{
-            AppInfoContent(name: "고객센터", linkDestination: "https://forms.gle/tMHQQ37FQDW3jrDU8")
+            AppInfoContent(name: "고객센터", linkDestination: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform")
             AppInfoContent(name: "이용약관", linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")
             AppInfoContent(name: "로그아웃", interactor: myPageInteractor)
             AppInfoContent(name: "탈퇴하기", interactor: myPageInteractor)
