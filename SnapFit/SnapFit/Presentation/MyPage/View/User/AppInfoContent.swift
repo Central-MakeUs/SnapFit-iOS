@@ -43,7 +43,7 @@ struct AppInfoContent: View {
                     }
                 } else if name == "로그아웃" {
                     Button {
-                        interactor?.logoutFromKakao() // Kakao 로그아웃 처리
+                        interactor?.serviceLogout() // Kakao 로그아웃 처리
                     } label: {
                         content
                     }

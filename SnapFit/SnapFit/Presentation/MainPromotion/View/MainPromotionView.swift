@@ -9,6 +9,7 @@ import SwiftUI
 protocol MainPromotionDisplayLogic {
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
 }
 
@@ -26,6 +27,13 @@ extension MainPromotionView: MainPromotionDisplayLogic {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetail = viewModel.productDetail
             print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
+        }
+    }
+    
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+        DispatchQueue.main.async {
+            mainPromotionViewModel.productDetailAuthorProducts = viewModel.products.data
+            print("mainPromotionViewModel.productDetailAuthorProducts \( mainPromotionViewModel.productDetailAuthorProducts)")
         }
     }
     

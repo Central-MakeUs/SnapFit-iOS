@@ -10,7 +10,7 @@ import Combine
 
 protocol MyPageBusinessLogic {
     func load(request: MyPage.LoadMyPage.Request)
-    func logoutFromKakao()
+    func serviceLogout()
     func cancelmembership()
 }
 
@@ -26,9 +26,9 @@ final class MyPageInteractor {
     init(authWorker: AuthWorkingLogic) {
         self.authWorker = authWorker
     }
+
     
-    
-    func logoutFromKakao() {
+    func serviceLogout() {
             print("MyPageInteractor logoutFromKakao")
             authWorker.logoutFromKakao { [weak self] result in
                 guard let self = self else { return } // self가 nil일 경우 종료
@@ -42,31 +42,29 @@ final class MyPageInteractor {
                             case .finished:
                                 print("SnapFit server logout completed")
                             case .failure(let apiError):
-                                print("SnapFit server logout failed: \(apiError)")
                                 // 서버 로그아웃 실패 시 프레젠터에 실패 전달
-                                //self?.presenter?.presentLogoutFailure(error: apiError)
+                                self.presenter?.presentLogoutFailure(error: apiError)
                             }
                         } receiveValue: { success in
                             // 서버 로그아웃 성공 시 프레젠터에 성공 전달
-                            //self?.presenter?.presentKakaoLogoutSuccess()
+                            self.presenter?.presentLogoutSuccess()
                         }
                         .store(in: &self.cancellables)
                     
                 case .failure(let error):
-                    // 카카오 로그아웃 실패 시에도 SnapFit 서버 로그아웃 처리
+                    // 카카오 로그아웃 실패 시에도 SnapFit 서버 로그아웃 처리 애플이 따로 로그아웃이 없기 때문임
                     self.authWorker.socialLogoutSnapfitServer()
                         .sink { completion in
                             switch completion {
                             case .finished:
                                 print("SnapFit server logout completed")
                             case .failure(let apiError):
-                                print("SnapFit server logout failed: \(apiError)")
                                 // 서버 로그아웃 실패 시 프레젠터에 실패 전달
-                                //self.presenter?.presentLogoutFailure(error: apiError)
+                                self.presenter?.presentLogoutFailure(error: apiError)
                             }
                         } receiveValue: { success in
                             // 서버 로그아웃 성공 시 프레젠터에 카카오 로그아웃 실패 전달
-                            //self.presenter?.presentKakaoLogoutFailure(error: error)
+                            self.presenter?.presentLogoutSuccess()
                         }
                         .store(in: &self.cancellables)
                 }

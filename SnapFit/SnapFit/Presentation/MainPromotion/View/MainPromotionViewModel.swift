@@ -14,7 +14,7 @@ class MainPromotionViewModel: NSObject, ObservableObject {
     @Published var products: [ProductInfo] = []
     @Published var selectedProductId: Int?
     @Published var productDetail: PostDetailResponse?
-    
+    @Published var productDetailAuthorProducts: [ProductInfo] = []
     init(productDetail: PostDetailResponse? = nil) {
         self.productDetail = productDetail
     }

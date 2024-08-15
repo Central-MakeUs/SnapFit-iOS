@@ -1,14 +1,24 @@
 import SwiftUI
 import PhotosUI
 
-// 메인 MyPageView
 
+// 프로토콜 정의
 protocol MyPageDisplayLogic {
     func display(viewModel: MyPage.LoadMyPage.ViewModel)
 }
 
 extension MyPageView: MyPageDisplayLogic {
-    func display(viewModel: MyPage.LoadMyPage.ViewModel) {}
+    func display(viewModel: MyPage.LoadMyPage.ViewModel) {
+        // 로그아웃 성공 여부 확인
+        if viewModel.logOut {
+            print("로그아웃 성공")
+            // 로그아웃 후 로그인 화면 표시
+            withAnimation {
+                loginVM.showLoginModal = true
+            }
+        }
+    }
+
     func fetch() {}
 }
 
@@ -16,6 +26,12 @@ struct MyPageView: View {
     @StateObject var viewModel = ProfileViewModel()
     var myPageInteractor: MyPageBusinessLogic?
     @State var stack = NavigationPath()
+    
+    // 로그아웃 이후 로그인 관리를 위한 뷰 모델
+    @StateObject var loginVM = LoginViewModel()
+    @StateObject var loginNaviModel = LoginNavigationModel()
+    @State private var isLoggedIn: Bool = false
+    
     var body: some View {
         NavigationStack(path: $stack) {
             ScrollView(showsIndicators: false) {
@@ -25,9 +41,8 @@ struct MyPageView: View {
                     UserInfoView()
                         .padding(.horizontal)
                     
-                    
-                    NavigationButtonsView(stack: $stack) // stack을 전달
-                                            .padding(.bottom, 32)
+                    NavigationButtonsView(stack: $stack)
+                        .padding(.bottom, 32)
                     
                     GroupBoxViews(myPageInteractor: myPageInteractor)
                     
@@ -36,7 +51,6 @@ struct MyPageView: View {
                     
                     Spacer()
                 }
-             
             }
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
@@ -62,8 +76,38 @@ struct MyPageView: View {
             .ignoresSafeArea(.container, edges: .top)
             .accentColor(.black)
         }
+        .fullScreenCover(isPresented: $loginVM.showLoginModal) {
+            LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
+                .configureView()
+                .onDisappear {
+                    // 로그인 화면이 닫힐 때 토큰을 다시 확인
+                    DispatchQueue.main.async {
+                        checkForSavedTokens()
+                    }
+                }
+        }
+        .onAppear {
+            // 화면이 보일 때 토큰을 확인하여 로그인 상태 업데이트
+            checkForSavedTokens()
+        }
+        .onChange(of: isLoggedIn) { newValue in
+            if !newValue {
+                loginVM.showLoginModal = true
+            }
+        }
     }
-
+    
+    private func checkForSavedTokens() {
+        if let accessToken = UserDefaults.standard.string(forKey: "accessToken"),
+           let refreshToken = UserDefaults.standard.string(forKey: "refreshToken"),
+           !accessToken.isEmpty, !refreshToken.isEmpty {
+            isLoggedIn = true
+            loginVM.showLoginModal = false
+        } else {
+            isLoggedIn = false
+            loginVM.showLoginModal = true
+        }
+    }
 }
 
 // 프로필 헤더 뷰

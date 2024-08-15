@@ -12,10 +12,12 @@ import SwiftUI
 protocol AuthorListDisplayLogic {
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel)
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
 }
 
 extension AuthorListView: AuthorListDisplayLogic {
+ 
     
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
@@ -31,6 +33,14 @@ extension AuthorListView: AuthorListDisplayLogic {
             print("authorListViewModel.productDetail \( authorListViewModel.productDetail)")
         }
     }
+    
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+        DispatchQueue.main.async {
+            authorListViewModel.productDetailAuthorProducts = viewModel.products.data
+            print("authorListViewModel.productDetailAuthorProducts \( authorListViewModel.productDetailAuthorProducts)")
+        }
+    }
+    
     
     // Presenter가 제공한 분위기 ViewModel을 기반으로 UI 업데이트
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {

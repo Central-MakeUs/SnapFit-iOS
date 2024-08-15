@@ -13,6 +13,8 @@ enum MyPage {
         
         struct Response {}
         
-        struct ViewModel {}
+        struct ViewModel {
+            var logOut : Bool = false
+        }
     }
 }

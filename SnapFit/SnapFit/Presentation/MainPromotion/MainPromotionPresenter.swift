@@ -15,6 +15,9 @@ protocol MainPromotionPresentationLogic {
     func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
     func presentFetchPostDetailByIdFailure(error: ApiError)
     
+    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse)
+    func presentFetchProductsForMakerFailure(error: ApiError)
+    
     func presentVibes(_ vibes: [Vibe])
     func presentVibesFetchFailure(_ error: Error)
 }
@@ -22,6 +25,7 @@ protocol MainPromotionPresentationLogic {
 
 
 class MainPromotionPresenter: MainPromotionPresentationLogic {
+    
   
  
     var view: MainPromotionDisplayLogic?
@@ -47,6 +51,18 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     func presentFetchPostDetailByIdFailure(error: ApiError) {
         print("Error occurred: \(error)")
     }
+    
+    
+    // MARK: - 작가 등록 상품 조회
+    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse) {
+        let viewModel = MainPromotion.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
+        view?.displayDetailProductsForMaker(viewModel: viewModel)
+    }
+    
+    func presentFetchProductsForMakerFailure(error: ApiError) {
+        print("작가 등록한 상품 Error occurred: \(error)")
+    }
+    
     
     // 분위기 정보를 View에 전달
     func presentVibes(_ vibes: [Vibe]) {

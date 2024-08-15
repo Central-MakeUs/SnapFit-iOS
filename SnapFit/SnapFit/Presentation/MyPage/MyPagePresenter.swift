@@ -9,7 +9,9 @@ import Foundation
 
 protocol MyPagePresentationLogic {
     func present(response: MyPage.LoadMyPage.Response)
-    func presentKakaoLogoutSuccess()
+    func presentLogoutFailure(error: ApiError)
+    func presentLogoutSuccess()
+    
 }
 
 final class MyPagePresenter {
@@ -19,14 +21,23 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+
+    func presentLogoutSuccess() {
+        
+        print("로그아웃 성공")
+        let viewModel = MyPage.LoadMyPage.ViewModel(logOut: true)
+        view?.display(viewModel: viewModel)
+    }
+    
+    func presentLogoutFailure(error: ApiError) {
+        print("로그아웃 실패 \(error)")
+    }
+    
     func present(response: Response) {
     //    view?.display(viewModel: viewModel)
     }
     
     
-    func presentKakaoLogoutSuccess() {
-//        let viewModel = Login.LoadLogin.ViewModel(success: true, message: "Kakao logout successful", oauthToken: "")
-//        view?.display(viewModel: viewModel)
-    }
+
     
 }

@@ -18,37 +18,46 @@ struct AuthorDetailView: View {
     @State private var isShowingMailView = false
     @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
     
+    @State private var isLoadingProducts = true // 로딩 상태 추가
+    
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
-                        if let detail = mainPromotionViewModel.productDetail {
-                            MainContentView(productDetail: detail)
-                        } else {
-                            ProgressView()
-                                .padding()
-                        }
-                       
-                        Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+                if isLoadingProducts {
+                    // 로딩 중일 때 ProgressView를 표시
+                    VStack {
+                        ProgressView("Loading...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.5) // 크기를 키울 수 있음
+                            .padding()
                     }
-                    .padding(.bottom)
-                }
-                
-                // 고정된 NextButton
-                VStack {
-                    Spacer()
-                    NextButton(stack: $stack)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    // 데이터 로딩이 완료되면 실제 콘텐츠를 표시
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(alignment: .leading) {
+                            if let detail = mainPromotionViewModel.productDetail {
+                                MainContentView(productDetail: detail, stack: $stack)
+                            } else {
+                                ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
+                                    .padding()
+                            }
+                            
+                            Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+                        }
+                        .padding(.bottom)
+                    }
+                    
+                    // 고정된 NextButton
+                    VStack {
+                        Spacer()
+                        NextButton(stack: $stack)
+                    }
                 }
             }
             .onAppear {
-                
-                if let productId = mainPromotionViewModel.selectedProductId {
-                    productInteractor?.fetchPostDetailById(
-                        request: MainPromotion.LoadDetailProduct.Request(id: productId))
-                }
-                
-                
+                loadProductDetails() // 데이터 로드 함수 호출
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -69,12 +78,12 @@ struct AuthorDetailView: View {
                         }
                         .hidden()
                         Menu {
-//                            Button(action: {
-//                                // 공유하기 액션
-//                                print("공유하기")
-//                            }) {
-//                                Label("공유하기", systemImage: "square.and.arrow.up")
-//                            }
+                            //                            Button(action: {
+                            //                                // 공유하기 액션
+                            //                                print("공유하기")
+                            //                            }) {
+                            //                                Label("공유하기", systemImage: "square.and.arrow.up")
+                            //                            }
                             
                             Button(action: {
                                 isShowingMailView = true
@@ -105,13 +114,59 @@ struct AuthorDetailView: View {
         //                MainPromotionView()
         //            }
         //        }
+        
+    }
+    
+    private func loadProductDetails() {
+        guard let productId = mainPromotionViewModel.selectedProductId else { return }
+        
+        Task {
+            isLoadingProducts = true
+            await fetchProductDetails(productId: productId)
+            isLoadingProducts = false
+        }
+    }
+    
+    @MainActor
+    private func fetchProductDetails(productId: Int) async {
+        // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
+        productInteractor?.fetchPostDetailById(
+            request: MainPromotion.LoadDetailProduct.Request(id: productId))
+        
+        
+        // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
+            let timeout: TimeInterval = 5
+            let startTime = Date()
+        
+        // 제품 상세 정보가 로드될 때까지 대기합니다.
+        while mainPromotionViewModel.productDetail == nil {
+            await Task.yield()
+            
+            if Date().timeIntervalSince(startTime) > timeout {
+                print("Timeout: Product detail loading took too long.")
+                break
+            }
+        }
+        
+        // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
+        if let makerId = mainPromotionViewModel.productDetail?.maker?.id {
+            productInteractor?.fetchProductsForMaker(
+                request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
+                    makerid: makerId,
+                    limit: 10,
+                    offset: 0
+                )
+            )
+        }
     }
 }
 
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
+    @Binding var stack : NavigationPath
     
     var body: some View {
         
@@ -167,7 +222,7 @@ struct MainContentView: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 24)
-
+        
         // 가격
         if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
             //PriceView(price: "\(minPrice) - \(price)")
@@ -184,14 +239,14 @@ struct MainContentView: View {
         Spacer().frame(height: 32)
         
         // 작가의 설명
-//        HStack(spacing: 8) {
-//            Image("AuthorDec")
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 24, height: 24)
-//            Text("작가의 설명")
-//        }
-//        .padding(.horizontal)
+        //        HStack(spacing: 8) {
+        //            Image("AuthorDec")
+        //                .resizable()
+        //                .scaledToFit()
+        //                .frame(width: 24, height: 24)
+        //            Text("작가의 설명")
+        //        }
+        //        .padding(.horizontal)
         
         VStack(alignment: .leading, spacing: 12){
             Text("작가의 설명")
@@ -205,9 +260,9 @@ struct MainContentView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 40)
         }
-       
+        
         CustomDividerView()
-        .padding(.bottom, 32)
+            .padding(.bottom, 32)
         
         // 등록된 상품
         // SectionHeaderView(title: "등록된 상품")
@@ -215,17 +270,38 @@ struct MainContentView: View {
             .font(.callout)
             .bold()
             .padding(.horizontal)
-           
         
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHGrid(rows: layout, spacing: 8) {
-                ForEach(0..<10, id: \.self) { item in
-                    MiddleCardView(product:  ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true)))
-                        .frame(width: 175, height: 324) // 적절한 크기 설정
+        
+        // 수정된 부분: productDetailAuthorProducts를 사용하여 MiddleCardView 연결
+        if mainPromotionViewModel.productDetailAuthorProducts.isEmpty {
+            
+            HStack() {
+                Spacer()
+                ProductEmptyView()
+                Spacer()
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 32)
+            
+            
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHGrid(rows: layout, spacing: 8) {
+                    ForEach(mainPromotionViewModel.productDetailAuthorProducts, id: \.id) { product in
+                        Button(action: {
+                            mainPromotionViewModel.selectedProductId = product.id
+                            stack.append("AuthorDetailView")
+                        }) {
+                            MiddleCardView(product: product)
+                                .frame(width: 175, height: 324) // 적절한 크기 설정
+                        }
+                    }
                 }
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
+        
+        
         
         CustomDividerView()
             .padding(.bottom, 32)
@@ -236,7 +312,7 @@ struct MainContentView: View {
                 .bold()
                 .padding(.horizontal)
                 .padding(.bottom, 12)
-         
+            
             
             Text("""
                             가. 기본 환불 규정
@@ -271,7 +347,7 @@ struct DividerAndRegulationView: View {
             .padding(16)
             
             CustomDividerView()
-
+            
         }
     }
 }

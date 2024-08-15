@@ -37,12 +37,26 @@ enum MainPromotion {
             var id: Int
         }
         
+        struct ProductsForMakerRequest {
+            var makerid: Int
+            var limit: Int
+            var offset: Int
+        }
+    
         struct Response {
             var productDetail : PostDetailResponse
         }
         
+        struct ProductsForMakerResponse {
+            var products : Product
+        }
+        
         struct ViewModel {
             var productDetail : PostDetailResponse
+        }
+        
+        struct ProductsForMakerViewModel {
+            var products : Product
         }
     }
 }

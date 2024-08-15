@@ -9,9 +9,9 @@ import Foundation
 import Combine
 
 protocol MainPromotionBusinessLogic: ProductBusinessLogic{
-    //func load(request: MainPromotion.LoadMainPromotion.Request)
     func fetchProductAll(request : MainPromotion.LoadMainPromotion.Request)
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
+    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
     func fetchVibes()
 }
 
@@ -78,6 +78,27 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
                 let response = MainPromotion.LoadDetailProduct.Response(productDetail: productDetail)
                 // Presenter에 전달
                 self?.presenter?.presentFetchPostDetailByIdSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
+    
+    // 작가가 등록한 상품 가져오기
+    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest) {
+        productWorker.fetchProductsForMaker(userId: request.makerid, limit: request.limit, offset: request.offset)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("작가 등록한 상품 조회 실패")
+                    self?.presenter?.presentFetchProductsForMakerFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("작가 등록한 상품 조회 성공")
+                // Response 객체 생성
+                let response = MainPromotion.LoadDetailProduct.ProductsForMakerResponse(products: products)
+                // Presenter에 전달
+                self?.presenter?.presentFetchProductsForMakerSuccess(response: response)
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }

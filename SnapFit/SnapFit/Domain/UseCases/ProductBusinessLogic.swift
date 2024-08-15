@@ -11,5 +11,7 @@ import Foundation
 protocol ProductBusinessLogic {
     func fetchProductAll(request: MainPromotion.LoadMainPromotion.Request)
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
+    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
     func fetchVibes()
+    
 }
