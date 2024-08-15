@@ -35,9 +35,9 @@ struct ProductManagementView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(0..<2, id: \.self) { item in
-                                MiddleCardView()
-                                    .frame(width: 174, height: 322)
-                                    .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+//                                MiddleCardView()
+//                                    .frame(width: 174, height: 322)
+//                                    .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
                             }
                         }
                     }

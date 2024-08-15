@@ -7,18 +7,39 @@
 
 import SwiftUI
 
+
 struct ImageSliderView: View {
-    let images: [String] // Array of image names
+    let images: [String] // Array of image URLs
     @State private var currentIndex: Int = 0
     
     var body: some View {
         VStack {
             TabView(selection: $currentIndex) {
                 ForEach(images.indices, id: \.self) { index in
-                    Image(images[index])
-                        .resizable()
-                        .scaledToFill()
+                    if let url = URL(string: images[index]) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .clipped()
+                            case .failure:
+                                Image(systemName: "xmark.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .foregroundColor(.gray)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
                         .tag(index)
+                    }
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
@@ -30,7 +51,7 @@ struct ImageSliderView: View {
                     Capsule()
                         .frame(width: currentIndex == index ? 20 : 8, height: 8)
                         .foregroundColor(currentIndex == index ? .black : .gray)
-                        .animation(.easeInOut, value: currentIndex) // currentIndex 값이 변경될 때마다 애니메이션이 적용되어 캡슐의 모양과 색상이 부드럽게 변경
+                        .animation(.easeInOut, value: currentIndex)
                 }
             }
             .padding(.top, 8)
@@ -45,7 +66,11 @@ struct ImageSliderView: View {
 
 struct testView: View {
     var body: some View {
-        ImageSliderView(images: ["demo1", "demo2", "demo3"]) // Replace with your image names
+        ImageSliderView(images: [
+            "https://cdn.pixabay.com/photo/2021/08/03/11/48/canal-6519196_640.jpg",
+            "https://cdn.pixabay.com/photo/2021/10/28/09/59/city-6749295_640.jpg",
+            "https://cdn.pixabay.com/photo/2018/07/18/20/25/channel-3547224_640.jpg"
+        ]) // Replace with your image URLs
     }
 }
 

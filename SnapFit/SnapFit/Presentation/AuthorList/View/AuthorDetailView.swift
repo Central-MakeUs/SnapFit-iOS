@@ -104,7 +104,7 @@ struct MainContentView: View {
     let layout: [GridItem] = [GridItem(.flexible())]
 
     var body: some View {
-        Group {
+
             // 이미지 슬라이더
             if let imageUrls = productDetail.images, !imageUrls.isEmpty {
                 ImageSliderView(images: imageUrls)
@@ -113,7 +113,7 @@ struct MainContentView: View {
                     .padding(.bottom)
             } else {
                 Text("이미지가 없습니다.")
-                    .padding(.bottom)
+                    .hidden()
             }
             
             // 제목
@@ -179,14 +179,14 @@ struct MainContentView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: layout, spacing: 8) {
                     ForEach(0..<10, id: \.self) { item in
-                        MiddleCardView()
+                        MiddleCardView(product:  ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true)))
                             .frame(width: 175, height: 270) // 적절한 크기 설정
                     }
                 }
             }
             .padding(.horizontal)
             .padding(.bottom, 40)
-        }
+        
     }
 }
 
