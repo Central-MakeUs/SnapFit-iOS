@@ -67,6 +67,7 @@ struct AuthorDetailView: View {
                             Image(systemName: "heart")
                                 .foregroundColor(.black)
                         }
+                        .hidden()
                         Menu {
 //                            Button(action: {
 //                                // 공유하기 액션

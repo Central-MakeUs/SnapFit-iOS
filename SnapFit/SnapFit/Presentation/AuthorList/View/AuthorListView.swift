@@ -69,7 +69,7 @@ struct AuthorListView: View {
                 }
                 .padding(.horizontal)
                 
-                CustomTopTabbar(selectedTab: $selectedTab, vibes: authorListViewModel.vibes)
+                CustomTopTabbar(selectedTab: $selectedTab, authorListInteractor: authorListInteractor, vibes: authorListViewModel.vibes)
                                 .padding(.bottom)
                 // 상품 탭의 내용
                 ScrollView(.vertical, showsIndicators: false) {
@@ -93,6 +93,8 @@ struct AuthorListView: View {
                 
             }
             .onAppear {
+                
+                // 💁 해당 전체 호출코드 필터값에서 전체 누를때만 분기 처리 필요 지금 서버에서 전체 값이 없음
                 authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
                 
                 print(stack.count)

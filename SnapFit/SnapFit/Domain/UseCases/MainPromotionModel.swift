@@ -14,6 +14,10 @@ enum MainPromotion {
             var offset: Int
         }
         
+        struct VibesRequest {
+            let vibes: String
+        }
+        
         struct Response {
             var products : Product
         }

@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-
 struct CustomTopTabbar: View {
     @Binding var selectedTab: Int
+    var authorListInteractor: AuthorListBusinessLogic?
     var vibes: [Vibe]
     
     var body: some View {
@@ -19,6 +19,8 @@ struct CustomTopTabbar: View {
                     Button(action: {
                         withAnimation {
                             selectedTab = index
+                            let selectedVibe = vibes[index].name ?? ""
+                            fetchProducts(for: selectedVibe)
                         }
                     }) {
                         VStack(spacing: 0) {
@@ -43,10 +45,15 @@ struct CustomTopTabbar: View {
         }
         .background(Color.white)
     }
+    
+    private func fetchProducts(for vibe: String) {
+        // Assuming the request requires the vibe to be a comma-separated string
+        authorListInteractor?.fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest(vibes: vibe))
+    }
 }
 
 #Preview {
-    CustomTopTabbar(selectedTab: .constant(0), vibes: [
+    CustomTopTabbar(selectedTab: .constant(0), authorListInteractor: nil, vibes: [
         SnapFit.Vibe(id: 1, name: "러블리"),
         SnapFit.Vibe(id: 2, name: "시크"),
         SnapFit.Vibe(id: 3, name: "차분함")

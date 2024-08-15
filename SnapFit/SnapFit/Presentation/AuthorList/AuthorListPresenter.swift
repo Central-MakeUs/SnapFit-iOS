@@ -10,8 +10,8 @@ import Foundation
 
 protocol AuthorListPresentationLogic {
 
-    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response)
-    func presentFetchProductAllFailure(error: ApiError)
+    func presentFetchProductSuccess(response : MainPromotion.LoadMainPromotion.Response)
+    func presentFetchProductFailure(error: ApiError)
     
     func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
     func presentFetchPostDetailByIdFailure(error: ApiError)
@@ -27,14 +27,16 @@ class AuthorListPresenter: AuthorListPresentationLogic {
  
     var view: AuthorListDisplayLogic?
     
-    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
+    
+    // 전체 조회, 필터조회던 로직이 같음
+    func presentFetchProductSuccess(response : MainPromotion.LoadMainPromotion.Response) {
         // Response를 ViewModel로 변환
                 let viewModel = MainPromotion.LoadMainPromotion.ViewModel(products: response.products)
                 // View에 전달
                 view?.display(viewModel: viewModel)
     }
     
-    func presentFetchProductAllFailure(error: ApiError) {
+    func presentFetchProductFailure(error: ApiError) {
         print("Error occurred: \(error)")
     }
     

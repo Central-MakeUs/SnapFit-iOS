@@ -12,7 +12,9 @@ protocol AuthorListBusinessLogic: ProductBusinessLogic {
     //func load(request: MainPromotion.LoadMainPromotion.Request)
     func fetchProductAll(request : MainPromotion.LoadMainPromotion.Request)
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
+    
     func fetchVibes()
+    func fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest)
 }
 
 final class AuthorListInteractor {
@@ -51,14 +53,14 @@ extension AuthorListInteractor: AuthorListBusinessLogic {
                     break // 성공적으로 완료됨
                 case .failure(let error):
                     print("상품 조회 실패")
-                    self?.presenter?.presentFetchProductAllFailure(error: error)
+                    self?.presenter?.presentFetchProductFailure(error: error)
                 }
             } receiveValue: { [weak self] products in
                 print("상품 조회 성공")
                 // Response 객체 생성
                 let response = MainPromotion.LoadMainPromotion.Response(products: products)
                 // Presenter에 전달
-                self?.presenter?.presentFetchProductAllSuccess(response: response)
+                self?.presenter?.presentFetchProductSuccess(response: response)
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
@@ -99,4 +101,23 @@ extension AuthorListInteractor: AuthorListBusinessLogic {
             .store(in: &cancellables)
     }
     
+    func fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest) {
+        productWorker.fetchProductsFromServerWithFilter(vibes: request.vibes, limit: 10, offset: 0)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("필터 조회 실패")
+                    self?.presenter?.presentFetchProductFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("필터 조회 성공")
+                // Response 객체 생성
+                let response = MainPromotion.LoadMainPromotion.Response(products: products)
+                // Presenter에 전달
+                self?.presenter?.presentFetchProductSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
 }
