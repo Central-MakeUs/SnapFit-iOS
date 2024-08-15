@@ -21,6 +21,10 @@ enum MainPromotion {
         struct ViewModel {
             var products : Product
         }
+        
+        struct VibesPresentationViewModel { //엔터티
+            let vibes: Vibes
+        }
     }
     
     

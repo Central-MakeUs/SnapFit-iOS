@@ -8,10 +8,11 @@
 import Foundation
 import Combine
 
-protocol MainPromotionBusinessLogic {
+protocol MainPromotionBusinessLogic: ProductBusinessLogic{
     //func load(request: MainPromotion.LoadMainPromotion.Request)
     func fetchProductAll(request : MainPromotion.LoadMainPromotion.Request)
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
+    func fetchVibes()
 }
 
 final class MainPromotionInteractor {
@@ -80,4 +81,21 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
+    
+    // 분위기 정보 가져오기
+    func fetchVibes() {
+        productWorker.fetchVibes()
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.presenter?.presentVibesFetchFailure(error)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { vibes in
+                self.presenter?.presentVibes(vibes)
+            })
+            .store(in: &cancellables)
+    }
+    
 }

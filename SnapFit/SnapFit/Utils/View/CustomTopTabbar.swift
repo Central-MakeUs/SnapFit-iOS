@@ -7,22 +7,22 @@
 
 import SwiftUI
 
+
 struct CustomTopTabbar: View {
-    @State private var selectedTab: Int = 0
-    private let tabs = ["전체", "로맨틱", "시크", "공주", "키치", "차분함", "몽환적", "밝은"]
-    
+    @Binding var selectedTab: Int
+    var vibes: [Vibe]
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 0) {
-                ForEach(tabs.indices, id: \.self) { index in
+                ForEach(vibes.indices, id: \.self) { index in
                     Button(action: {
                         withAnimation {
                             selectedTab = index
                         }
                     }) {
                         VStack(spacing: 0) {
-                            Text(tabs[index])
+                            Text(vibes[index].name ?? "")
                                 .padding()
                                 .font(.subheadline)
                                 .frame(minWidth: 50)
@@ -46,5 +46,9 @@ struct CustomTopTabbar: View {
 }
 
 #Preview {
-    CustomTopTabbar()
+    CustomTopTabbar(selectedTab: .constant(0), vibes: [
+        SnapFit.Vibe(id: 1, name: "러블리"),
+        SnapFit.Vibe(id: 2, name: "시크"),
+        SnapFit.Vibe(id: 3, name: "차분함")
+    ])
 }

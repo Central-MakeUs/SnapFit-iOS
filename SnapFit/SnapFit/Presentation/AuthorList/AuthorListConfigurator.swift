@@ -11,12 +11,15 @@ extension AuthorListView {
     func configureView() -> some View {
         var view = self
         let productWorker = ProductWorker() // AuthWorker를 초기화
-        let interactor = MainPromotionInteractor(productWorker: productWorker)
-        let presenter =  MainPromotionPresenter()
-        view.mainPromotionInteractor = interactor
+        let interactor = AuthorListInteractor(productWorker: productWorker)
+        let presenter =  AuthorListPresenter()
+        view.authorListInteractor = interactor
         interactor.presenter = presenter
         presenter.view = view
         return view
     }
 }
+
+
+
 

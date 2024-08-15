@@ -11,7 +11,7 @@ struct AuthorDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
-    var mainPromotionInteractor: MainPromotionBusinessLogic?
+    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack : NavigationPath
     
@@ -41,7 +41,7 @@ struct AuthorDetailView: View {
             .onAppear {
                 
                 if let productId = mainPromotionViewModel.selectedProductId {
-                    mainPromotionInteractor?.fetchPostDetailById(
+                    productInteractor?.fetchPostDetailById(
                         request: MainPromotion.LoadDetailProduct.Request(id: productId))
                 }
                 

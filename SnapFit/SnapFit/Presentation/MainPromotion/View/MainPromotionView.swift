@@ -8,8 +8,8 @@ import SwiftUI
 
 protocol MainPromotionDisplayLogic {
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
-    
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
+    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
@@ -28,6 +28,11 @@ extension MainPromotionView: MainPromotionDisplayLogic {
             print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
         }
     }
+    
+    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {
+        print()
+    }
+    
 }
 
 
@@ -69,7 +74,7 @@ struct MainPromotionView: View {
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
-                    AuthorDetailView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
+                    AuthorDetailView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                 case "AuthorReservationView":

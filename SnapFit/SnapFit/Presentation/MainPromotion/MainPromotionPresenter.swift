@@ -15,17 +15,16 @@ protocol MainPromotionPresentationLogic {
     func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
     func presentFetchPostDetailByIdFailure(error: ApiError)
     
+    func presentVibes(_ vibes: [Vibe])
+    func presentVibesFetchFailure(_ error: Error)
 }
 
-final class MainPromotionPresenter {
-    typealias Response = MainPromotion.LoadMainPromotion.Response
-    typealias ViewModel = MainPromotion.LoadMainPromotion.ViewModel
-    var view: MainPromotionDisplayLogic?
-}
 
-extension MainPromotionPresenter: MainPromotionPresentationLogic {
+
+class MainPromotionPresenter: MainPromotionPresentationLogic {
   
-    
+ 
+    var view: MainPromotionDisplayLogic?
     
     func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
         // Response를 ViewModel로 변환
@@ -47,6 +46,17 @@ extension MainPromotionPresenter: MainPromotionPresentationLogic {
     
     func presentFetchPostDetailByIdFailure(error: ApiError) {
         print("Error occurred: \(error)")
+    }
+    
+    // 분위기 정보를 View에 전달
+    func presentVibes(_ vibes: [Vibe]) {
+        let viewModel = MainPromotion.LoadMainPromotion.VibesPresentationViewModel(vibes: vibes)
+        view?.displayVibes(viewModel: viewModel)
+    }
+    
+    // 분위기 정보를 가져오는 데 실패했을 때 View에 에러를 전달
+    func presentVibesFetchFailure(_ error: Error) {
+        print("Error fetching vibes: \(error)")  // 실제 앱에서는 UI에 에러를 표시해야 함
     }
 
     // 전달 로직

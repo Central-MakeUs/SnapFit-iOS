@@ -7,7 +7,15 @@
 
 import SwiftUI
 
-extension AuthorListView: MainPromotionDisplayLogic {
+
+// View가 Presenter로부터 받는 정보를 정의하는 프로토콜
+protocol AuthorListDisplayLogic {
+    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel)
+    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
+    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
+}
+
+extension AuthorListView: AuthorListDisplayLogic {
     
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
@@ -21,6 +29,15 @@ extension AuthorListView: MainPromotionDisplayLogic {
         DispatchQueue.main.async {
             authorListViewModel.productDetail = viewModel.productDetail
             print("authorListViewModel.productDetail \( authorListViewModel.productDetail)")
+        }
+    }
+    
+    // Presenter가 제공한 분위기 ViewModel을 기반으로 UI 업데이트
+    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {
+        DispatchQueue.main.async {
+            // 분위기 상태 업데이트
+            self.authorListViewModel.vibes = viewModel.vibes
+            print("authorListViewModel.vibes \(authorListViewModel.vibes)")
         }
     }
 }
@@ -38,7 +55,7 @@ struct AuthorListView: View {
     
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
-    var mainPromotionInteractor: MainPromotionBusinessLogic?
+    var authorListInteractor: AuthorListBusinessLogic?
     @ObservedObject var authorListViewModel: MainPromotionViewModel
     
     var body: some View {
@@ -52,8 +69,8 @@ struct AuthorListView: View {
                 }
                 .padding(.horizontal)
                 
-                CustomTopTabbar()
-                    .padding(.bottom)
+                CustomTopTabbar(selectedTab: $selectedTab, vibes: authorListViewModel.vibes)
+                                .padding(.bottom)
                 // 상품 탭의 내용
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
@@ -76,16 +93,18 @@ struct AuthorListView: View {
                 
             }
             .onAppear {
-                mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+                authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
                 
                 print(stack.count)
                 stack = NavigationPath()
-   
+                
+                authorListInteractor?.fetchVibes()
+                
             }
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
-                    AuthorDetailView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
+                    AuthorDetailView(productInteractor: authorListInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(authorListViewModel)
                 case "AuthorReservationView":
