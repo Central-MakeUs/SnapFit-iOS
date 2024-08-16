@@ -37,6 +37,7 @@
 		643E57182C6C99DD0026226D /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E57172C6C99DD0026226D /* Product.swift */; };
 		643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F648A2C68F1C40017ACCD /* Vibes.swift */; };
 		64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */; };
+		644659D02C6F41930080BB03 /* SnapFitSplashImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 644659CF2C6F41930080BB03 /* SnapFitSplashImage.png */; };
 		644EDABE2C4552FF00745DDD /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABD2C4552FF00745DDD /* WebView.swift */; };
 		644EDAC02C4636DE00745DDD /* NicknameSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */; };
 		6457580D2C5E785A00258730 /* AuthorReservationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6457580C2C5E785A00258730 /* AuthorReservationView.swift */; };
@@ -127,6 +128,7 @@
 		643E57172C6C99DD0026226D /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		643F648A2C68F1C40017ACCD /* Vibes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vibes.swift; sourceTree = "<group>"; };
 		64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorReservationReceptionView.swift; sourceTree = "<group>"; };
+		644659CF2C6F41930080BB03 /* SnapFitSplashImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SnapFitSplashImage.png; sourceTree = "<group>"; };
 		644EDABD2C4552FF00745DDD /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		644EDABF2C4636DE00745DDD /* NicknameSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NicknameSettingsView.swift; sourceTree = "<group>"; };
 		6457580C2C5E785A00258730 /* AuthorReservationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorReservationView.swift; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 				6428A5142C3FB2FB00C47990 /* SnapFit.entitlements */,
 				6428A5012C3EAA9700C47990 /* Config.xcconfig */,
 				6428A4902C3D20C900C47990 /* Assets.xcassets */,
+				644659CF2C6F41930080BB03 /* SnapFitSplashImage.png */,
 				6428A4FD2C3E891E00C47990 /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
@@ -582,6 +585,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				644659D02C6F41930080BB03 /* SnapFitSplashImage.png in Resources */,
 				6428A4942C3D20C900C47990 /* Preview Assets.xcassets in Resources */,
 				6428A4912C3D20C900C47990 /* Assets.xcassets in Resources */,
 				6428A4FE2C3E891E00C47990 /* LaunchScreen.storyboard in Resources */,

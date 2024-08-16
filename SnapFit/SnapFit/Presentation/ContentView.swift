@@ -23,8 +23,8 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            //clearTokens()
-            checkForSavedTokens() // 토큰 확인 로직 호출
+            clearTokens()
+            //checkForSavedTokens() // 토큰 확인 로직 호출
         }
         .fullScreenCover(isPresented: $loginVM.showLoginModal) {
             LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
