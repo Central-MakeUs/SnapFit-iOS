@@ -9,7 +9,11 @@ import Foundation
 import Combine
 
 protocol MyPageBusinessLogic {
-    func load(request: MyPage.LoadMyPage.Request)
+    
+    // MARK: - 유저 정보 가져오기
+    func fetchUserDetails()
+    
+    // 로그아웃, 회원 탈퇴 관련
     func serviceLogout()
     func cancelmembership()
     
@@ -18,19 +22,43 @@ protocol MyPageBusinessLogic {
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
 }
 
-final class MyPageInteractor {
+
+
+
+final class MyPageInteractor: MyPageBusinessLogic {
+    
     typealias Request = MyPage.LoadMyPage.Request
     typealias Response = MyPage.LoadMyPage.Response
     var presenter: MyPagePresentationLogic?
-    
+
     private let myPageWorker: MyPageWorkingLogic
     private let authWorker: AuthWorkingLogic
-    // 추가: `cancellables` 프로퍼티 선언
     private var cancellables = Set<AnyCancellable>()
-    
-    init(myPageWorker: MyPageWorkingLogic ,authWorker: AuthWorkingLogic) {
+
+    init(myPageWorker: MyPageWorkingLogic, authWorker: AuthWorkingLogic) {
         self.myPageWorker = myPageWorker
         self.authWorker = authWorker
+    }
+
+    func fetchUserDetails() {
+        // 서버에서 사용자 정보를 가져옵니다.
+        myPageWorker.fetchUserDetails()
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("사용자 정보 조회 실패: \(error)")
+                    self?.presenter?.presentFetchUserDetailsFailure(error: error)
+                }
+            } receiveValue: { [weak self] userDetails in
+                print("사용자 정보 조회 성공")
+                // Response 객체 생성
+                let response = LoadUserDetails.Response(userDetails: userDetails)
+                // Presenter에 전달
+                self?.presenter?.presentFetchUserDetailsSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
 
     
@@ -143,8 +171,3 @@ final class MyPageInteractor {
     }
 }
 
-extension MyPageInteractor: MyPageBusinessLogic {
-    func load(request: Request) {
-        // presenter?.present(response:  Response)
-    }
-}

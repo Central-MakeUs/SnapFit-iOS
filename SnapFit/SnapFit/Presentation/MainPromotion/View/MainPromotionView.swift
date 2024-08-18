@@ -7,6 +7,13 @@
 import SwiftUI
 
 protocol MainPromotionDisplayLogic {
+    
+    
+    // MARK: - 사용자 조회관련
+    func displayUserDetails(viewModel: LoadUserDetails.ViewModel)
+    
+    
+    // MARK: - 상품 조회관련
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
@@ -20,6 +27,13 @@ protocol MainPromotionDisplayLogic {
 
 extension MainPromotionView: MainPromotionDisplayLogic {
     
+    func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
+        DispatchQueue.main.async {
+            mainPromotionViewModel.userDetails = viewModel.userDetails
+            print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
+        }
+    }
+
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.products = viewModel.products.data
@@ -97,7 +111,7 @@ struct MainPromotionView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     // 상단 로고 및 인사말
-                    HeaderView()
+                    HeaderView(mainPromotionViewModel: mainPromotionViewModel)
                         .padding(.bottom, 30)
                     
                     // 섹션 1: 추천 사진
@@ -151,6 +165,7 @@ struct MainPromotionView: View {
             .onAppear {
                 // fetchProductAll은 뷰가 나타난 후 비동기적으로 호출됩니다.
                 DispatchQueue.main.async {
+                    mainPromotionInteractor?.fetchUserDetails()
                     mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
                     
                     if stack.isEmpty {
@@ -165,6 +180,8 @@ struct MainPromotionView: View {
 }
 
 struct HeaderView: View {
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
+    
     var body: some View {
         VStack(spacing: 24) {
             HStack {
@@ -178,24 +195,54 @@ struct HeaderView: View {
             
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 7) {
-                    Text("안녕하세요, 한소희님")
-                        .font(.title2)
-                        .bold()
-                    Text("스냅핏에서는 원하는\n분위기의 사진을 찾을 수 있어요.")
-                        .font(.subheadline)
-                        .foregroundColor(Color(.systemGray))
-                        .padding(.bottom)
+                    if let nickName = mainPromotionViewModel.userDetails?.nickName {
+                        Text("안녕하세요, \(nickName)님")
+                            .font(.title2)
+                            .bold()
+                        Text("스냅핏에서는 원하는\n분위기의 사진을 찾아 보세요!")
+                            .font(.subheadline)
+                            .foregroundColor(Color(.systemGray))
+                            .padding(.bottom)
+                    } else {
+                        Text("안녕하세요!")
+                            .font(.title2)
+                            .bold()
+                        Text("스냅핏에서는 원하는\n분위기의 사진을 찾아 보세요!")
+                            .font(.subheadline)
+                            .foregroundColor(Color(.systemGray))
+                            .padding(.bottom)
+                    }
                 }
                 Spacer()
-                Image("SnapFitProfileLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
+                
+                if let profileUrl = mainPromotionViewModel.userDetails?.profile, !profileUrl.isEmpty {
+                    // 프로필 이미지가 있을 때
+                    AsyncImage(url: URL(string: profileUrl)) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 50, height: 50)
+                            .clipShape(Circle()) // 동그란 모양으로 자르기
+                    } placeholder: {
+                        // 로딩 중일 때 기본 로고 표시
+                        Image("SnapFitProfileLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 50, height: 50)
+                    }
+                } else {
+                    // 프로필 이미지가 없을 때
+                    Image("SnapFitProfileLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                }
             }
         }
         .padding(.horizontal, 16)
     }
 }
+
 
 struct SectionMiniCardsView: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel

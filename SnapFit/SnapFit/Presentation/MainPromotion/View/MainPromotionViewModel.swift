@@ -9,7 +9,10 @@ import Foundation
 
 class MainPromotionViewModel: NSObject, ObservableObject {
 
-
+    // 사용자 조회 관련
+    @Published var userDetails: UserDetailsResponse?
+    
+    // 상품 조회 관련
     @Published var vibes: [Vibe] = []
     @Published var products: [ProductInfo] = []
     @Published var selectedProductId: Int?

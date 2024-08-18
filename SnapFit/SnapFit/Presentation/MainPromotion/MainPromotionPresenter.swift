@@ -8,6 +8,15 @@
 import Foundation
 
 protocol MainPromotionPresentationLogic {
+    
+    
+    // MARK: - 사용자 조회관련
+    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response)
+    func presentFetchUserDetailsFailure(error: ApiError)
+    
+    
+    
+    // MARK: - 상품 조회관련
 
     func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response)
     func presentFetchProductAllFailure(error: ApiError)
@@ -40,9 +49,22 @@ protocol MainPromotionPresentationLogic {
 
 class MainPromotionPresenter: MainPromotionPresentationLogic {
     
-  
- 
     var view: MainPromotionDisplayLogic?
+    
+    // MARK: - 사용자 조회 관련
+    
+    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response) {
+        let viewModel = LoadUserDetails.ViewModel(userDetails: response.userDetails)
+        // View에 전달
+        view?.displayUserDetails(viewModel: viewModel)
+
+    }
+    
+    func presentFetchUserDetailsFailure(error: ApiError) {
+        print("Error 사용자 데이터 조회 실패: \(error)")
+    }
+    
+    // MARK: - 상품 조회 관련
     
     func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
         // Response를 ViewModel로 변환
@@ -67,7 +89,7 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     }
     
     
-    // MARK: - 작가 등록 상품 조회
+    // 작가 등록 상품 조회
     func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse) {
         let viewModel = MainPromotion.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
         view?.displayDetailProductsForMaker(viewModel: viewModel)

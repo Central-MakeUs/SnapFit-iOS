@@ -7,8 +7,10 @@
 //
 import Foundation
 
+
 enum MainPromotion {
     enum LoadMainPromotion {
+        
         struct Request {
             var limit: Int
             var offset: Int

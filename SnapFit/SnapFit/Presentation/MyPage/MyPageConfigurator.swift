@@ -15,11 +15,12 @@ extension MyPageView {
         let authWorker = AuthWorker() // AuthWorker를 초기화
         let interactor = MyPageInteractor(myPageWorker: mypageWorker, authWorker: authWorker) // 의존성 주입
         let presenter =  MyPagePresenter()
-        view.myPageInteractor = interactor
+        view.myPageInteractor = interactor as! any MyPageBusinessLogic
         interactor.presenter = presenter
         presenter.view = view
         return view
     }
 }
+
 
 

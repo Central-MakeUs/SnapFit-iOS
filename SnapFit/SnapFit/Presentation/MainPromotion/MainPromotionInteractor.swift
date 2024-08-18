@@ -12,7 +12,7 @@ protocol MainPromotionBusinessLogic: ProductBusinessLogic{
     
     
     // MARK: - 유저 정보 가져오기
-    
+    func fetchUserDetails()
     
     // MARK: - 상품 정보 가져오기
     
@@ -52,10 +52,27 @@ final class MainPromotionInteractor {
 
 extension MainPromotionInteractor: MainPromotionBusinessLogic {
     
-    
-    func load(request: Request) {
-        // presenter?.present(response:  Response)
+    func fetchUserDetails() {
+        // 서버에서 사용자 정보를 가져옵니다.
+        productWorker.fetchUserDetails()
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("사용자 정보 조회 실패: \(error)")
+                    self?.presenter?.presentFetchUserDetailsFailure(error: error)
+                }
+            } receiveValue: { [weak self] userDetails in
+                print("사용자 정보 조회 성공")
+                // Response 객체 생성
+                let response = LoadUserDetails.Response(userDetails: userDetails)
+                // Presenter에 전달
+                self?.presenter?.presentFetchUserDetailsSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
+
     
     
     func fetchProductAll(request: MainPromotion.LoadMainPromotion.Request) {

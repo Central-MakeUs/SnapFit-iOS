@@ -8,6 +8,12 @@
 import Foundation
 
 protocol MyPagePresentationLogic {
+    
+    // MARK: - 사용자 조회 관련
+    
+    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response)
+    func presentFetchUserDetailsFailure(error: ApiError)
+        
     func present(response: MyPage.LoadMyPage.Response)
     func presentLogoutFailure(error: ApiError)
     func presentLogoutSuccess()
@@ -32,6 +38,20 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+    
+    // MARK: - 사용자 조회 관련
+    
+    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response) {
+        let viewModel = LoadUserDetails.ViewModel(userDetails: response.userDetails)
+        // View에 전달
+        view?.displayUserDetails(viewModel: viewModel)
+
+    }
+    
+    func presentFetchUserDetailsFailure(error: ApiError) {
+        print("Error 사용자 데이터 조회 실패: \(error)")
+    }
+    
 
     func presentLogoutSuccess() {
         

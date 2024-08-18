@@ -11,6 +11,9 @@ import PhotosUI
 
 
 class MyPageViewModel: NSObject, ObservableObject {
+    
+    // 사용자 조회 관련
+    @Published var userDetails: UserDetailsResponse?
 
     // 사용자 프로필 관련
     @Published var selectedItem: PhotosPickerItem? {

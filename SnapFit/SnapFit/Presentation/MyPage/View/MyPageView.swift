@@ -4,6 +4,11 @@ import PhotosUI
 
 // 프로토콜 정의
 protocol MyPageDisplayLogic {
+    
+    
+    // MARK: - 사용자 조회관련
+    func displayUserDetails(viewModel: LoadUserDetails.ViewModel)
+    
     func display(viewModel: MyPage.LoadMyPage.ViewModel)
     
     // MARK: - 상품 예약관련
@@ -12,7 +17,17 @@ protocol MyPageDisplayLogic {
 }
 
 
+
 extension MyPageView: MyPageDisplayLogic {
+    
+    func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.userDetails = viewModel.userDetails
+            print("mainPromotionViewModel.userDetails \( myPageViewModel.userDetails)")
+        }
+    }
+
+    
     func display(viewModel: MyPage.LoadMyPage.ViewModel) {
         // 로그아웃 성공 여부 확인
         if viewModel.logOut {
@@ -66,8 +81,8 @@ struct MyPageView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ProfileHeaderView(viewModel: myPageViewModel)
-                    
-                    UserInfoView()
+                                   
+                    UserInfoView(viewModel: myPageViewModel)
                         .padding(.horizontal)
                     
                     NavigationButtonsView(stack: $stack)
@@ -121,6 +136,9 @@ struct MyPageView: View {
         }
         .onAppear {
             // 화면이 보일 때 토큰을 확인하여 로그인 상태 업데이트
+            DispatchQueue.main.async {
+                myPageInteractor?.fetchUserDetails()
+            }
             checkForSavedTokens()
         }
         .onChange(of: isLoggedIn) { newValue in
@@ -160,13 +178,40 @@ struct ProfileHeaderView: View {
                         .offset(x: -130, y: 81)
                 }
             
-            Image("SnapFitMainLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 117.78, height: 44.17)
+            if let profileUrl = viewModel.userDetails?.profile, let url = URL(string: profileUrl) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        // Placeholder image while loading
+                        ProgressView()
+                            .frame(width: 117.78, height: 44.17)
+                            .background(Color.gray.opacity(0.2))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 117.78, height: 44.17)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    case .failure:
+                        // Placeholder image in case of failure
+                        Image("defaultProfileLogo") // Make sure to add a default image in your assets
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 117.78, height: 44.17)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
                 .offset(x: 0, y: 20)
-            
-            
+            } else {
+                Image("SnapFitMainLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 117.78, height: 44.17)
+                    .offset(x: 0, y: 20)
+            }
             
             NavigationLink(value: "MyProfileEdit"){
                 Image("editicon")
@@ -175,25 +220,36 @@ struct ProfileHeaderView: View {
                     .frame(width: 24, height: 24)
                     .foregroundColor(.white)
             }
-            
             .offset(x: 160, y: -30)
         }
     }
 }
 
+
 // 사용자 정보 뷰
 struct UserInfoView: View {
+    @ObservedObject var viewModel: MyPageViewModel
+    
     var body: some View {
         Group {
-            Text("한소희")
-                .font(.title3)
-                .padding(.top, 40)
-            
-            StarImageLabel(text: "귀여운")
-            
+            if let user = viewModel.userDetails {
+                Text(user.nickName ?? "사용자 이름")
+                    .font(.title3)
+                    .padding(.top, 40)
+                
+                StarImageLabel(text: user.vibes?.first?.name ?? "기본")
+            } else {
+                // 기본 값 처리
+                Text("사용자 이름")
+                    .font(.title3)
+                    .padding(.top, 40)
+                
+                StarImageLabel(text: "기본")
+            }
         }
     }
 }
+
 
 // 네비게이션 버튼 뷰
 struct NavigationButtonsView: View {
