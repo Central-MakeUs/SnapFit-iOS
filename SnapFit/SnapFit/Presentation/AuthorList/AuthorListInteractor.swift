@@ -22,6 +22,10 @@ protocol AuthorListBusinessLogic: ProductBusinessLogic {
     func makeReservation(request: MainPromotion.ReservationProduct.Request)
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
+    
+    // 상품 찜하기, 취소
+    func likePost(request: MainPromotion.Like.Request)
+    func unlikePost(request: MainPromotion.Like.Request)
 }
 
 final class AuthorListInteractor {
@@ -209,4 +213,43 @@ extension AuthorListInteractor: AuthorListBusinessLogic {
             .store(in: &cancellables)
 
     }
+    
+    
+    // 좋아요 요청
+        func likePost(request: MainPromotion.Like.Request) {
+            productWorker.likePost(postId: request.postId)
+                .sink { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        print("좋아요 실패: \(error.localizedDescription)")
+                        //self?.presenter?.presentLikePostFailure(error: error)
+                    }
+                } receiveValue: { [weak self] response in
+                    print("좋아요 성공: \(response)")
+                    //self?.presenter?.presentLikePostSuccess(response: response)
+                }
+                .store(in: &cancellables)
+        }
+        
+        // 좋아요 취소 요청
+        func unlikePost(request: MainPromotion.Like.Request) {
+            productWorker.unlikePost(postId: request.postId)
+                .sink { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        print("좋아요 취소 실패: \(error.localizedDescription)")
+                        //self?.presenter?.presentUnlikePostFailure(error: error)
+                    }
+                } receiveValue: { [weak self] response in
+                    print("좋아요 취소 성공: \(response)")
+                    //self?.presenter?.presentUnlikePostSuccess(response: response)
+                }
+                .store(in: &cancellables)
+        }
+    
+    
 }

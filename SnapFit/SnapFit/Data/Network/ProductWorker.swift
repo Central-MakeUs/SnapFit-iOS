@@ -28,6 +28,10 @@ protocol ProductWorkingLogic {
     func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ReservationDetailsResponse, ApiError>
     func fetchUserReservations(limit: Int, offset: Int) -> AnyPublisher<ReservationResponse, ApiError>
     func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError>
+    
+    // 상품 찜하기
+    func likePost(postId: Int) -> AnyPublisher<Void, ApiError>
+    func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> 
 }
 
 class ProductWorker: ProductWorkingLogic {
@@ -455,7 +459,7 @@ class ProductWorker: ProductWorkingLogic {
     }
 
     
-    // 유저
+    // 유저 예약 상세 조회
 
     func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
         guard let accessToken = getAccessToken() else {
@@ -507,5 +511,110 @@ class ProductWorker: ProductWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    
+    // MARK: - 상품 좋아요
+    
+    func likePost(postId: Int) -> AnyPublisher<Void, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/post/like?postId=\(postId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Void in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    return
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/post/like?postId=\(postId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "DELETE"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Void in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    return
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
 
+    
 }

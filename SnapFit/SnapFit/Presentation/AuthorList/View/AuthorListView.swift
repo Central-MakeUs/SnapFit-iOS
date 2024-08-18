@@ -36,14 +36,14 @@ extension AuthorListView: AuthorListDisplayLogic {
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.productDetail = viewModel.productDetail
-            print("authorListViewModel.productDetail \( authorListViewModel.productDetail)")
+            //print("authorListViewModel.productDetail \( authorListViewModel.productDetail)")
         }
     }
     
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.productDetailAuthorProducts = viewModel.products.data
-            print("authorListViewModel.productDetailAuthorProducts \( authorListViewModel.productDetailAuthorProducts)")
+            //print("authorListViewModel.productDetailAuthorProducts \( authorListViewModel.productDetailAuthorProducts)")
         }
     }
     
@@ -53,7 +53,7 @@ extension AuthorListView: AuthorListDisplayLogic {
         DispatchQueue.main.async {
             // 분위기 상태 업데이트
             self.authorListViewModel.vibes = viewModel.vibes
-            print("authorListViewModel.vibes \(authorListViewModel.vibes)")
+            //print("authorListViewModel.vibes \(authorListViewModel.vibes)")
         }
     }
     
@@ -130,10 +130,12 @@ struct AuthorListView: View {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(authorListViewModel.products) { product in
                             Button(action: {
-                                authorListViewModel.selectedProductId = product.id
-                                stack.append("AuthorDetailView")
+                                DispatchQueue.main.async {
+                                    authorListViewModel.selectedProductId = product.id
+                                    stack.append("AuthorDetailView")
+                                }
                             }) {
-                                MiddleCardView(product: product)
+                                MiddleCardView(product: product, mainPromotionInteractor: authorListInteractor)
                                     .frame(width: 175, height: 324)
                                     .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
                             }
@@ -147,7 +149,6 @@ struct AuthorListView: View {
                 
             }
             .onAppear {
-                
                 // 💁 해당 전체 호출코드 필터값에서 전체 누를때만 분기 처리 필요 지금 서버에서 전체 값이 없음
                 //authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
                 
@@ -172,7 +173,7 @@ struct AuthorListView: View {
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(authorListViewModel)
                 case "ReservationView" :
-                    ReservationView(productInteractor: authorListInteractor,stack: $stack)
+                    ReservationView(productInteractor: authorListInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(authorListViewModel)
                     
@@ -185,7 +186,6 @@ struct AuthorListView: View {
                     SnapFitTabView()
                 }
             }
-            
         }
     }
 }

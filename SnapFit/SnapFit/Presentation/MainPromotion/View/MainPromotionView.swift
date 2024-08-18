@@ -39,7 +39,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetailAuthorProducts = viewModel.products.data
-            print("mainPromotionViewModel.productDetailAuthorProducts \( mainPromotionViewModel.productDetailAuthorProducts)")
+            //print("mainPromotionViewModel.productDetailAuthorProducts \( mainPromotionViewModel.productDetailAuthorProducts)")
         }
     }
     
@@ -110,7 +110,7 @@ struct MainPromotionView: View {
                     .buttonStyle(PlainButtonStyle())
                     
                     // 섹션 2: 미니 카드 뷰
-                    SectionMiniCardsView(stack: $stack)
+                    SectionMiniCardsView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .padding(.bottom, 40)
                     
                     // 섹션 3: 메이커와 추억 만들기
@@ -149,13 +149,14 @@ struct MainPromotionView: View {
                 }
             }
             .onAppear {
-                
-                mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
-                
-                print(stack.count)
-                stack = NavigationPath()
-            
-                
+                // fetchProductAll은 뷰가 나타난 후 비동기적으로 호출됩니다.
+                DispatchQueue.main.async {
+                    mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+                    
+                    if stack.isEmpty {
+                        stack = NavigationPath()
+                    }
+                }
             }
         }// 스택 블럭 안에 .navigationDestination 가 있어야함
         
@@ -198,6 +199,7 @@ struct HeaderView: View {
 
 struct SectionMiniCardsView: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    var mainPromotionInteractor: MainPromotionBusinessLogic?
     @Binding var stack: NavigationPath
 
     let layout: [GridItem] = [GridItem(.fixed(130))] // Fixed size layout
@@ -205,13 +207,15 @@ struct SectionMiniCardsView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
-                ForEach(mainPromotionViewModel.products) { product in
+                ForEach(mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { product in
                     Button(action: {
                         mainPromotionViewModel.selectedProductId = product.id
-                        stack.append("AuthorDetailView")
+                        DispatchQueue.main.async {
+                            stack.append("AuthorDetailView")
+                        }
                     }) {
-                        MiniCardView(product: product)
-                            .frame(width: 130, height: 202)
+                        MiniCardView(product: product, mainPromotionInteractor: mainPromotionInteractor)
+                            .frame(width: 130, height: 204)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }

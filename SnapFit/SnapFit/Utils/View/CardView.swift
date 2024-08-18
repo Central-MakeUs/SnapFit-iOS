@@ -10,8 +10,15 @@ import SwiftUI
 
 
 struct MiniCardView: View {
-    @State private var isLiked = false
+    @State private var isLiked: Bool
     var product: ProductInfo
+    var mainPromotionInteractor: MainPromotionBusinessLogic?
+
+    init(product: ProductInfo, mainPromotionInteractor: MainPromotionBusinessLogic?) {
+        self.product = product
+        self.mainPromotionInteractor = mainPromotionInteractor
+        _isLiked = State(initialValue: product.like ?? false)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -30,11 +37,7 @@ struct MiniCardView: View {
                     VStack {
                         if product.studio == true {
                             InOutLabel(text:"실내스냅") // InOutLabel 사용
-                                .offset(x: 0, y: 10)
-                        }else{
-                        
                         }
-                        
                         Spacer()
                     },
                     alignment: .topLeading // 왼쪽 상단 정렬
@@ -42,6 +45,7 @@ struct MiniCardView: View {
                 .overlay {
                     Button(action: {
                         isLiked.toggle()
+                        handleLikeAction()
                     }) {
                         Image(systemName: isLiked ? "heart.fill" : "heart")
                             .resizable()
@@ -56,8 +60,6 @@ struct MiniCardView: View {
                 Color.gray
                     .frame(width: 130, height: 130)
             }
-
-        
 
             Group {
                 Text(product.title ?? "Unknown")
@@ -83,13 +85,36 @@ struct MiniCardView: View {
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
         }
         .background(Color.white)
-        .frame(width: 130, height: 204) // Explicitly set frame size
+        .frame(width: 130, height: 204) // 명시적으로 프레임 크기 설정
+    }
+
+    // 좋아요 또는 좋아요 취소를 처리하는 함수
+    private func handleLikeAction() {
+        guard let interactor = mainPromotionInteractor else {
+            print("MainPromotionInteractor가 설정되지 않았습니다.")
+            return
+        }
+        
+        let request = MainPromotion.Like.Request(postId: product.id)
+        
+        if isLiked {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
     }
 }
 
 struct MiddleCardView: View {
-    @State private var isLiked = false
+    @State private var isLiked: Bool
     var product: ProductInfo
+    var mainPromotionInteractor: ProductBusinessLogic?
+    
+    init(product: ProductInfo, mainPromotionInteractor: ProductBusinessLogic?) {
+        self.product = product
+        self.mainPromotionInteractor = mainPromotionInteractor
+        _isLiked = State(initialValue: product.like ?? false)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -109,10 +134,7 @@ struct MiddleCardView: View {
                     VStack {
                         if product.studio == true {
                             InOutLabel(text:"실내스냅") // InOutLabel 사용
-                        }else{
-                        
                         }
-                        
                         Spacer()
                     },
                     alignment: .topLeading // 왼쪽 상단 정렬
@@ -120,6 +142,7 @@ struct MiddleCardView: View {
                 .overlay(
                     Button(action: {
                         isLiked.toggle()
+                        handleLikeAction()
                     }) {
                         Image(systemName: isLiked ? "heart.fill" : "heart")
                             .resizable()
@@ -164,6 +187,22 @@ struct MiddleCardView: View {
         }
         .background(Color.white)
         .frame(width: 175, height: 324) // 명시적으로 프레임 크기 설정
+    }
+
+    // 좋아요 또는 좋아요 취소를 처리하는 함수
+    private func handleLikeAction() {
+        guard let interactor = mainPromotionInteractor else {
+            print("MainPromotionInteractor가 설정되지 않았습니다.")
+            return
+        }
+        
+        let request = MainPromotion.Like.Request(postId: product.id)
+        
+        if isLiked {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
     }
 }
 
@@ -279,15 +318,15 @@ struct MainPromotionRandomCardView: View {
 }
 
 // Previews
-#Preview {
-    MiniCardView(product: ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true)))
-        .frame(width: 118, height: 244)
-}
-
-#Preview {
-    MiddleCardView(product: ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true)))
-        .frame(width: 174, height: 322)
-}
+//#Preview {
+//    MiniCardView(product: ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true),  like:  Optional(true)))
+//        .frame(width: 118, height: 244)
+//}
+//
+//#Preview {
+//    MiddleCardView(product: ProductInfo(id: 1, maker: Optional(SnapFit.Maker(id: 5, nickName: Optional("yongha"))), title: Optional("test data"), thumbNail: Optional("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"), vibes: Optional(["러블리"]), locations: Optional(["전체"]), price: Optional(10000), studio: Optional(true), like:  Optional(true)))
+//        .frame(width: 174, height: 322)
+//}
 
 #Preview {
     BigCardView()

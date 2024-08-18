@@ -19,6 +19,7 @@ struct PostDetailResponse: Codable {
     let locations: [String]?
     let prices: [Price]?
     let personPrice: Int?
+    let like: Bool
 }
 
 

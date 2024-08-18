@@ -291,12 +291,12 @@ struct ReservationInfoCardView: View {
 
 
 
-#Preview {
-    let path = NavigationPath()
-    
-    return ReservationView(stack: .constant(path))
-        .environmentObject(AuthorDetailView.sampleViewModel)
-}
+//#Preview {
+//    let path = NavigationPath()
+//    
+//    return ReservationView(stack: .constant(path))
+//        .environmentObject(AuthorDetailView.sampleViewModel)
+//}
 
 struct ReservationInfoCardView_Previews: PreviewProvider {
     static var previews: some View {

@@ -111,5 +111,11 @@ enum MainPromotion {
             var reservationDetail : ReservationDetailsResponse?
         }
     }
+    
+    enum Like{
+        struct Request {
+            let postId: Int
+        }
+    }
 }
 

@@ -10,17 +10,15 @@ import MessageUI
 struct AuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
-    @Binding var stack : NavigationPath
+    @Binding var stack: NavigationPath
     @State private var isShowingMailView = false
     @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
     
     @State private var isLoadingProducts = true // 로딩 상태 추가
-    
-    // 펄슨프라이스 가격이 10000원인데 30000만원
+    @State private var isLiked: Bool = false // 좋아요 상태 초기화
     
     var body: some View {
         GeometryReader { geometry in
@@ -39,7 +37,7 @@ struct AuthorDetailView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             if let detail = mainPromotionViewModel.productDetail {
-                                MainContentView(productDetail: detail, stack: $stack)
+                                MainContentView(productInteractor: productInteractor, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -59,6 +57,9 @@ struct AuthorDetailView: View {
             }
             .onAppear {
                 loadProductDetails() // 데이터 로드 함수 호출
+                if let likeStatus = mainPromotionViewModel.productDetail?.like {
+                    isLiked = likeStatus // 좋아요 상태 초기화
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -72,20 +73,15 @@ struct AuthorDetailView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         Button(action: {
-                            // Action for heart button
+                            isLiked.toggle()
+                            handleLikeAction()
                         }) {
-                            Image(systemName: "heart")
+                            Image(systemName: isLiked ? "heart.fill" : "heart")
                                 .foregroundColor(.black)
                         }
                         .hidden()
+                        
                         Menu {
-                            //                            Button(action: {
-                            //                                // 공유하기 액션
-                            //                                print("공유하기")
-                            //                            }) {
-                            //                                Label("공유하기", systemImage: "square.and.arrow.up")
-                            //                            }
-                            
                             Button(action: {
                                 isShowingMailView = true
                             }) {
@@ -106,16 +102,6 @@ struct AuthorDetailView: View {
                 Text("Mail services are not available")
             }
         }
-        //        .navigationDestination(for: String.self) { viewName in
-        //            switch viewName {
-        //            case "AuthorReservationView":
-        //                AuthorReservationView(stack: $stack)
-        //                    .navigationBarBackButtonHidden(true)
-        //            default:
-        //                MainPromotionView()
-        //            }
-        //        }
-        
     }
     
     private func loadProductDetails() {
@@ -134,10 +120,9 @@ struct AuthorDetailView: View {
         productInteractor?.fetchPostDetailById(
             request: MainPromotion.LoadDetailProduct.Request(id: productId))
         
-        
         // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
-            let timeout: TimeInterval = 5
-            let startTime = Date()
+        let timeout: TimeInterval = 5
+        let startTime = Date()
         
         // 제품 상세 정보가 로드될 때까지 대기합니다.
         while mainPromotionViewModel.productDetail == nil {
@@ -160,10 +145,33 @@ struct AuthorDetailView: View {
             )
         }
     }
+    
+    // 좋아요 또는 좋아요 취소를 처리하는 함수
+    private func handleLikeAction() {
+        guard let interactor = productInteractor else {
+            print("ProductInteractor가 설정되지 않았습니다.")
+            return
+        }
+        
+        guard let productId = mainPromotionViewModel.productDetail?.id else {
+            print("상품 ID가 없습니다.")
+            return
+        }
+        
+        let request = MainPromotion.Like.Request(postId: productId)
+        
+        if isLiked {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
+    }
 }
+
 
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
+    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
@@ -293,7 +301,7 @@ struct MainContentView: View {
                             mainPromotionViewModel.selectedProductId = product.id
                             stack.append("AuthorDetailView")
                         }) {
-                            MiddleCardView(product: product)
+                            MiddleCardView(product: product, mainPromotionInteractor: productInteractor)
                                 .frame(width: 175, height: 324) // 적절한 크기 설정
                         }
                     }
@@ -395,30 +403,30 @@ struct PriceView: View {
 
 
 
-
-extension AuthorDetailView {
-    // PostDetailResponse 구조체에 맞는 더미 데이터
-    static let sampleDetail = PostDetailResponse(
-        id: 1,
-        maker: Maker(id: 1, nickName: "작가 닉네임"),
-        createAt: "2024-08-15",
-        thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg",
-        images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"],
-        desc: "사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다. 사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다.",
-        title: "스냅사진｜넘치지 않는 아름다움을 담아드려요 - 개인, 커플, 우정스냅사진",
-        vibes: ["러블리", "유니크"],
-        locations: ["서울", "부산"],
-        prices: [Price(min: 10000, price: 20000)],
-        personPrice: 50000
-    )
-    
-    static let sampleViewModel = MainPromotionViewModel(productDetail: sampleDetail)
-}
-
-// 프리뷰
-#Preview {
-    let path = NavigationPath()
-    
-    return AuthorDetailView(stack: .constant(path))
-        .environmentObject(AuthorDetailView.sampleViewModel)
-}
+//
+//extension AuthorDetailView {
+//    // PostDetailResponse 구조체에 맞는 더미 데이터
+//    static let sampleDetail = PostDetailResponse(
+//        id: 1,
+//        maker: Maker(id: 1, nickName: "작가 닉네임"),
+//        createAt: "2024-08-15",
+//        thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg",
+//        images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"],
+//        desc: "사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다. 사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다.",
+//        title: "스냅사진｜넘치지 않는 아름다움을 담아드려요 - 개인, 커플, 우정스냅사진",
+//        vibes: ["러블리", "유니크"],
+//        locations: ["서울", "부산"],
+//        prices: [Price(min: 10000, price: 20000)],
+//        personPrice: 50000
+//    )
+//    
+//    static let sampleViewModel = MainPromotionViewModel(productDetail: sampleDetail)
+//}
+//
+//// 프리뷰
+//#Preview {
+//    let path = NavigationPath()
+//    
+//    return AuthorDetailView(stack: .constant(path))
+//        .environmentObject(AuthorDetailView.sampleViewModel)
+//}
