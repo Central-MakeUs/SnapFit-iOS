@@ -27,3 +27,4 @@ struct Price: Codable {
     let min: Int? // 분
     let price: Int? // 가격
 }
+

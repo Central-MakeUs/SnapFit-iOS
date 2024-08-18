@@ -14,7 +14,8 @@ protocol MainPromotionDisplayLogic {
     
     // MARK: - 상품 예약관련
     func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel)
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
@@ -59,14 +60,25 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     }
     
     
-    // 유저 예약내역 조회
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel) {
+    // 유저 예약내역 리스트  조회
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
-            mainPromotionViewModel.reservationproducts = viewModel.reservationDetails?.data ?? []
+            mainPromotionViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
             print("mainPromotionViewModel.reservationproducts: \(mainPromotionViewModel.reservationproducts)")
+        }
+    }
+    
+    
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            mainPromotionViewModel.reservationproductDetail = viewModel.reservationDetail
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("mainPromotionViewModel.reservationproductDetail: \(mainPromotionViewModel.reservationproductDetail)")
         }
     }
     
@@ -124,7 +136,12 @@ struct MainPromotionView: View {
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                 case "ReservationView" :
-                    ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
+                    ReservationView(productInteractor: mainPromotionInteractor,stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(mainPromotionViewModel)
+                    
+                case "ReservationInfoView" :
+                    ReservationInfoView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                 default:

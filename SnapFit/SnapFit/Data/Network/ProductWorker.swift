@@ -25,8 +25,9 @@ protocol ProductWorkingLogic {
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
     
     // MARK: - 상품 예약관련
-    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ShortTermReservationResponse, ApiError>
+    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ReservationDetailsResponse, ApiError>
     func fetchUserReservations(limit: Int, offset: Int) -> AnyPublisher<ReservationResponse, ApiError>
+    func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError>
 }
 
 class ProductWorker: ProductWorkingLogic {
@@ -329,7 +330,7 @@ class ProductWorker: ProductWorkingLogic {
     // MARK: - 상품예약
 
     // MARK: - 예약 요청을 서버로 보내는 함수
-    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ShortTermReservationResponse, ApiError> {
+    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
         }
@@ -360,7 +361,7 @@ class ProductWorker: ProductWorkingLogic {
         }
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .tryMap { (data: Data, urlResponse: URLResponse) -> ShortTermReservationResponse in
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
                     throw ApiError.invalidResponse
                 }
@@ -368,7 +369,7 @@ class ProductWorker: ProductWorkingLogic {
                 switch httpResponse.statusCode {
                 case 200...299:
                     // 성공적인 응답 코드 범위
-                    let response = try JSONDecoder().decode(ShortTermReservationResponse.self, from: data)
+                    let response = try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
                     
                     // 응답 데이터 유효성 검증 (옵셔널 필드 검사)
                     guard response.id != nil, response.user != nil, response.post != nil else {
@@ -453,7 +454,58 @@ class ProductWorker: ProductWorkingLogic {
             .eraseToAnyPublisher()
     }
 
+    
+    // 유저
 
-
+    func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/reservation?id=\(id)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    let response = try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
+                    return response
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
 
 }

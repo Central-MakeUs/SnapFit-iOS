@@ -84,6 +84,7 @@
 		6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB402C42CECA00381F0F /* LoginConfigurator.swift */; };
 		6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB482C43B81B00381F0F /* AuthWorker.swift */; };
 		6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB4B2C43F85C00381F0F /* TermsView.swift */; };
+		64A063192C71F14100CAF9F4 /* ReservationDetailsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */; };
 		64ACDAEC2C4642A200A4C169 /* GridSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ACDAEB2C4642A200A4C169 /* GridSelectionView.swift */; };
 		64ACDAEE2C46627000A4C169 /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ACDAED2C46627000A4C169 /* Path.swift */; };
 		64D7334B2C53D457005A217E /* LoginInteractorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D7334A2C53D457005A217E /* LoginInteractorTest.swift */; };
@@ -177,6 +178,7 @@
 		6496CB402C42CECA00381F0F /* LoginConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginConfigurator.swift; sourceTree = "<group>"; };
 		6496CB482C43B81B00381F0F /* AuthWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthWorker.swift; sourceTree = "<group>"; };
 		6496CB4B2C43F85C00381F0F /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
+		64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationDetailsResponse.swift; sourceTree = "<group>"; };
 		64ACDAEB2C4642A200A4C169 /* GridSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridSelectionView.swift; sourceTree = "<group>"; };
 		64ACDAED2C46627000A4C169 /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
 		64D733382C53D323005A217E /* SnapFitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapFitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -273,6 +275,7 @@
 				6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */,
 				644659D12C6F44580080BB03 /* ReservationRequest.swift */,
 				64561BA42C7091B90017F1ED /* ReservationResponse.swift */,
+				64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -616,6 +619,7 @@
 				64795A642C5A2ADE0018BE0D /* ProductRegistrationView.swift in Sources */,
 				64795A652C5A2ADE0018BE0D /* ReservationConfirmView.swift in Sources */,
 				64F5BD3E2C6B4B3100A0C788 /* LoginNavigationModel.swift in Sources */,
+				64A063192C71F14100CAF9F4 /* ReservationDetailsResponse.swift in Sources */,
 				64795A662C5A2ADE0018BE0D /* ReservationManagementView.swift in Sources */,
 				64795A672C5A2ADE0018BE0D /* AppInfoContent.swift in Sources */,
 				64795A682C5A2ADE0018BE0D /* DibsView.swift in Sources */,

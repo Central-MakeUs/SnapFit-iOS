@@ -68,31 +68,47 @@ enum MainPromotion {
         
         struct Response {
             var reservationSuccess : Bool
-            var reservationDetails : ShortTermReservationResponse?
+            var reservationDetails : ReservationDetailsResponse?
         }
         
         
         struct ViewModel {
             var reservationSuccess : Bool
-            var reservationDetails : ShortTermReservationResponse?
+            var reservationDetails : ReservationDetailsResponse?
         }
     }
     
-    // 예약 내역 조회
-    enum CheckReservationProduct {
+    // 예약 내역 리스트 조회
+    enum CheckReservationProducts {
         struct Request {
             var reservationRequest: ReservationRequest
         }
         
         struct Response {
             var reservationSuccess : Bool
-            var reservationDetails : ReservationResponse?
+            var reservationProducts : ReservationResponse?
         }
         
         
         struct ViewModel {
             var reservationSuccess : Bool
-            var reservationDetails : ReservationResponse?
+            var reservationProducts : ReservationResponse?
+        }
+    }
+    
+    // 예약 내역 리스트 디테일(단일) 조회
+    enum CheckReservationDetailProduct {
+        struct Request {
+            var selectedReservationId: Int
+        }
+        
+        struct Response {
+            var reservationDetail : ReservationDetailsResponse?
+        }
+        
+        
+        struct ViewModel {
+            var reservationDetail : ReservationDetailsResponse?
         }
     }
 }

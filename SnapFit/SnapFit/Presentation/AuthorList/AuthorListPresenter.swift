@@ -27,8 +27,13 @@ protocol AuthorListPresentationLogic {
     func presentReservationFailure(error: ApiError)
     func presentReservationSuccess(response: MainPromotion.ReservationProduct.Response)
     
+    // 유저 예약 내역 리스트 조회
     func presentFetchUserReservationsFailure(error: ApiError)
-    func presentFetchUserReservationsSuccess(response : MainPromotion.CheckReservationProduct.Response)
+    func presentFetchUserReservationsSuccess(response : MainPromotion.CheckReservationProducts.Response)
+    
+    // 유저 예약 내역 리스트 단일 조회
+    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
+    func presentFetchReservationDetailFailure(error: ApiError)
     
 }
 
@@ -113,13 +118,26 @@ class AuthorListPresenter: AuthorListPresentationLogic {
         print("Error occurred: \(error)")
     }
 
-    func presentFetchUserReservationsSuccess(response: MainPromotion.CheckReservationProduct.Response) {
+    func presentFetchUserReservationsSuccess(response: MainPromotion.CheckReservationProducts.Response) {
       
-        let viewModel = MainPromotion.CheckReservationProduct.ViewModel(reservationSuccess: response.reservationSuccess, reservationDetails: response.reservationDetails)
+        let viewModel = MainPromotion.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
         // View에 전달
         view?.displayFetchUserReservation(viewModel: viewModel)
     }
     
+    
+    // 유저 예약 내역 리스트 단일 조회
+    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response) {
+        let viewModel = MainPromotion.CheckReservationDetailProduct.ViewModel(reservationDetail: response.reservationDetail)
+        // View에 전달
+        view?.displayFetchUserReservationDetail(viewModel: viewModel)
+    }
+    
+    
+    func presentFetchReservationDetailFailure(error: ApiError)
+    {
+        print("Error 유저 예약 내역 리스트 단일 조회: \(error)")
+    }
       
 }
 

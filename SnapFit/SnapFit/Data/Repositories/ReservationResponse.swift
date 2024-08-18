@@ -37,40 +37,5 @@ struct MakerDetail: Codable {
     let nickName: String?
 }
 
-// 예약 하고나서 바로 보여주는 모델
 
-struct ShortTermReservationResponse: Codable {
-    let id: Int
-    let user: User?
-    let maker: Maker?
-    let post: Post?
-    let reservationTime: String
-    let reservationLocation: String
-    let person: Int
-    let personPrice: Int
-    let basePrice: Int
-    let totalPrice: Int
-    let cancelMessage: String?
-    
-    struct User: Codable {
-        let id: Int
-        let nickName: String
-    }
-    
-    struct Maker: Codable {
-        let id: Int
-        let nickName: String
-    }
-    
-    struct Post: Codable {
-        let id: Int
-        let maker: Maker
-        let title: String
-        let thumbNail: String
-        let vibes: [String]
-        let locations: [String]
-        let price: Int
-        let studio: Bool
-        let like: Bool
-    }
-}
+

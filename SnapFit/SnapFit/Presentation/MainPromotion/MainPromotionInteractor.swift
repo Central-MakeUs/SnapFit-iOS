@@ -3,7 +3,7 @@
 //  SnapFit
 //
 //  Created by 정정욱 on 8/14/24.
-//  
+//
 //
 import Foundation
 import Combine
@@ -17,6 +17,7 @@ protocol MainPromotionBusinessLogic: ProductBusinessLogic{
     // MARK: - 상품 예약관련
     func makeReservation(request: MainPromotion.ReservationProduct.Request)
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
+    func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
 }
 
 final class MainPromotionInteractor {
@@ -35,11 +36,11 @@ final class MainPromotionInteractor {
     
     private var cancellables = Set<AnyCancellable>()  // Combine 구독 관리를 위한 Set
     
-  
+    
 }
 
 extension MainPromotionInteractor: MainPromotionBusinessLogic {
-
+    
     
     func load(request: Request) {
         // presenter?.present(response:  Response)
@@ -65,7 +66,7 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
-        
+    
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request) {
         productWorker.fetchPostDetailById(postId: request.id)
             .sink { [weak self] completion in
@@ -148,24 +149,44 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
-
     
-    // 유저 예약내역
-       func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
-           productWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
-               .sink { [weak self] completion in
-                   switch completion {
-                   case .finished:
-                       break
-                   case .failure(let error):
-                       print("유저 예약 내역 로드 실패: \(error.localizedDescription)")
-                       self?.presenter?.presentFetchUserReservationsFailure(error: error)
-                   }
-               } receiveValue: { [weak self] products in
-                   print("유저 예약 내역 로드 성공: \(products)")
-                   let response = MainPromotion.CheckReservationProduct.Response(reservationSuccess: true, reservationDetails: products)
-                   self?.presenter?.presentFetchUserReservationsSuccess(response: response)
-               }
-               .store(in: &cancellables)
-       }
+    
+    // 유저 예약내역 리스트
+    func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
+        productWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("유저 예약 내역 로드 실패: \(error.localizedDescription)")
+                    self?.presenter?.presentFetchUserReservationsFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("유저 예약 내역 로드 성공: \(products)")
+                let response = MainPromotion.CheckReservationProducts.Response(reservationSuccess: true, reservationProducts: products)
+                self?.presenter?.presentFetchUserReservationsSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
+    
+    // 예약 상세내역 조회
+    func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request) {
+        productWorker.fetchReservationDetail(id: request.selectedReservationId)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("예약 상세내역 조회 실패 : \(error.localizedDescription)")
+                    self?.presenter?.presentFetchReservationDetailFailure(error: error)
+                }
+            } receiveValue: { [weak self] product in
+                print("예약 상세내역 조회 성공 : \(product)")
+                let response = MainPromotion.CheckReservationDetailProduct.Response(reservationDetail: product)
+                self?.presenter?.presentFetchReservationDetailSuccess(response: response)
+            }
+            .store(in: &cancellables)
+
+    }
 }

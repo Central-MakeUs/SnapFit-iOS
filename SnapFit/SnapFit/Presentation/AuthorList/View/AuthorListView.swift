@@ -18,7 +18,8 @@ protocol AuthorListDisplayLogic {
 
     // MARK: - 상품 예약관련
     func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) 
     
 }
 
@@ -70,14 +71,25 @@ extension AuthorListView: AuthorListDisplayLogic {
     }
     
     
-    // 유저 예약내역 조회
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel) {
+    // 유저 예약내역 리스트 조회
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
-            authorListViewModel.reservationproducts = viewModel.reservationDetails?.data ?? []
+            authorListViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
             print("authorListViewModel.reservationproducts: \(authorListViewModel.reservationproducts)")
+        }
+    }
+    
+    // 유저 예약내역 단일 조회
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            authorListViewModel.reservationproductDetail = viewModel.reservationDetail
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("authorListViewModel.reservationproductDetail: \(authorListViewModel.reservationproductDetail)")
         }
     }
     
@@ -162,6 +174,12 @@ struct AuthorListView: View {
                     ReservationView(productInteractor: authorListInteractor,stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(authorListViewModel)
+                    
+                case "ReservationInfoView" :
+                    ReservationInfoView(productInteractor: authorListInteractor, stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(authorListViewModel)
+                    
                 default:
                     SnapFitTabView()
                 }

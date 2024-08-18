@@ -18,4 +18,5 @@ protocol ProductBusinessLogic {
     // MARK: - 상품 예약관련
     func makeReservation(request: MainPromotion.ReservationProduct.Request)
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
+    func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
 }

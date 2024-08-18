@@ -60,8 +60,8 @@ struct MyPageView: View {
 //                case "ReservationView":
 //                    ReservationView()
 //                        .navigationBarBackButtonHidden(true)
-                case "ReservationInfoView" :
-                    ReservationInfoView().navigationBarBackButtonHidden(true)
+//                case "ReservationInfoView" :
+//                    ReservationInfoView().navigationBarBackButtonHidden(true)
                 case "DibsView":
                     DibsView()
                         .navigationBarBackButtonHidden(true)
