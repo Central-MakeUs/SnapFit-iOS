@@ -26,6 +26,19 @@ struct MiniCardView: View {
                     ProgressView()
                         .frame(width: 130, height: 130)
                 }
+                .overlay(
+                    VStack {
+                        if product.studio == true {
+                            InOutLabel(text:"실내스냅") // InOutLabel 사용
+                                .offset(x: 0, y: 10)
+                        }else{
+                        
+                        }
+                        
+                        Spacer()
+                    },
+                    alignment: .topLeading // 왼쪽 상단 정렬
+                )
                 .overlay {
                     Button(action: {
                         isLiked.toggle()

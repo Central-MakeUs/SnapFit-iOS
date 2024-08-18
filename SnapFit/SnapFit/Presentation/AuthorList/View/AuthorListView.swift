@@ -97,7 +97,7 @@ extension AuthorListView: AuthorListDisplayLogic {
 
 
 struct AuthorListView: View {
-    @State private var selectedTab: Int = 0
+    @State private var selectedTab: Int = -1
     @State var stack = NavigationPath()
 
     // columns 의 갯수를 2개로 설정
@@ -122,8 +122,9 @@ struct AuthorListView: View {
                 }
                 .padding(.horizontal)
                 
+                // CustomTopTabbar 사용
                 CustomTopTabbar(selectedTab: $selectedTab, authorListInteractor: authorListInteractor, vibes: authorListViewModel.vibes)
-                                .padding(.bottom)
+                               .padding(.bottom)
                 // 상품 탭의 내용
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
@@ -148,7 +149,7 @@ struct AuthorListView: View {
             .onAppear {
                 
                 // 💁 해당 전체 호출코드 필터값에서 전체 누를때만 분기 처리 필요 지금 서버에서 전체 값이 없음
-                authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+                //authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
                 
                 print(stack.count)
                 stack = NavigationPath()

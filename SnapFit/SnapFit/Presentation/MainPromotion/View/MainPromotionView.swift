@@ -114,9 +114,9 @@ struct MainPromotionView: View {
                         .padding(.bottom, 40)
                     
                     // 섹션 3: 메이커와 추억 만들기
-                    SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
-                    SectionBigCardsView(stack: $stack)
-                        .padding(.bottom, 40)
+//                    SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
+//                    SectionBigCardsView(stack: $stack)
+//                        .padding(.bottom, 40)
                 }
                 .environmentObject(mainPromotionViewModel)
             }
