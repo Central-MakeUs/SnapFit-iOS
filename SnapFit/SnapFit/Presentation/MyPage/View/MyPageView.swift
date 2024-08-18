@@ -5,7 +5,12 @@ import PhotosUI
 // 프로토콜 정의
 protocol MyPageDisplayLogic {
     func display(viewModel: MyPage.LoadMyPage.ViewModel)
+    
+    // MARK: - 상품 예약관련
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) 
 }
+
 
 extension MyPageView: MyPageDisplayLogic {
     func display(viewModel: MyPage.LoadMyPage.ViewModel) {
@@ -14,21 +19,45 @@ extension MyPageView: MyPageDisplayLogic {
             print("로그아웃 성공")
             // 로그아웃 후 로그인 화면 표시
             withAnimation {
-                loginVM.showLoginModal = true
+                loginViewModel.showLoginModal = true
             }
         }
     }
 
-    func fetch() {}
+    
+    // 유저 예약내역 리스트 조회
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            myPageViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("authorListViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
+        }
+    }
+    
+    // 유저 예약내역 단일 조회
+    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            myPageViewModel.reservationproductDetail = viewModel.reservationDetail
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("authorListViewModel.reservationproductDetail: \(myPageViewModel.reservationproductDetail)")
+        }
+    }
+    
 }
 
 struct MyPageView: View {
-    @StateObject var viewModel = ProfileViewModel()
+    
+    @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic?
     @State var stack = NavigationPath()
     
     // 로그아웃 이후 로그인 관리를 위한 뷰 모델
-    @StateObject var loginVM = LoginViewModel()
+ 
+    @StateObject var loginViewModel = LoginViewModel()
     @StateObject var loginNaviModel = LoginNavigationModel()
     @State private var isLoggedIn: Bool = false
     
@@ -36,7 +65,7 @@ struct MyPageView: View {
         NavigationStack(path: $stack) {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading) {
-                    ProfileHeaderView(viewModel: viewModel)
+                    ProfileHeaderView(viewModel: myPageViewModel)
                     
                     UserInfoView()
                         .padding(.horizontal)
@@ -55,13 +84,17 @@ struct MyPageView: View {
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "MyProfileEdit":
-                    MyProfileEdit(viewModel: viewModel)
+                    MyProfileEdit(viewModel: myPageViewModel)
                         .navigationBarBackButtonHidden(true)
-//                case "ReservationView":
-//                    ReservationView()
-//                        .navigationBarBackButtonHidden(true)
-//                case "ReservationInfoView" :
-//                    ReservationInfoView().navigationBarBackButtonHidden(true)
+                case "ReservationView" :
+                    MyPageReservationView(mypageInteractor: myPageInteractor,stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(myPageViewModel)
+                    
+                case "ReservationInfoView" :
+                    MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(myPageViewModel)
                 case "DibsView":
                     DibsView()
                         .navigationBarBackButtonHidden(true)
@@ -76,8 +109,8 @@ struct MyPageView: View {
             .ignoresSafeArea(.container, edges: .top)
             .accentColor(.black)
         }
-        .fullScreenCover(isPresented: $loginVM.showLoginModal) {
-            LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
+        .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
+            LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
                 .configureView()
                 .onDisappear {
                     // 로그인 화면이 닫힐 때 토큰을 다시 확인
@@ -92,7 +125,7 @@ struct MyPageView: View {
         }
         .onChange(of: isLoggedIn) { newValue in
             if !newValue {
-                loginVM.showLoginModal = true
+                loginViewModel.showLoginModal = true
             }
         }
     }
@@ -102,17 +135,17 @@ struct MyPageView: View {
            let refreshToken = UserDefaults.standard.string(forKey: "refreshToken"),
            !accessToken.isEmpty, !refreshToken.isEmpty {
             isLoggedIn = true
-            loginVM.showLoginModal = false
+            loginViewModel.showLoginModal = false
         } else {
             isLoggedIn = false
-            loginVM.showLoginModal = true
+            loginViewModel.showLoginModal = true
         }
     }
 }
 
 // 프로필 헤더 뷰
 struct ProfileHeaderView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: MyPageViewModel
     
     var body: some View {
         ZStack {
@@ -245,23 +278,3 @@ struct GroupBoxViews: View {
 }
 
 
-// 뷰 모델
-class ProfileViewModel: ObservableObject {
-    @Published var selectedItem: PhotosPickerItem? {
-        didSet { Task { try await loadImage() } }
-    }
-    
-    @Published var profileImage: Image?
-    
-    // 이미지 선택후 호출됨 변환하여 사진으로 만드는 메서드
-    func loadImage() async throws {
-        guard let item = selectedItem else { return }
-        guard let imageData = try await item.loadTransferable(type: Data.self) else { return }
-        guard let uiImage = UIImage(data: imageData) else { return }
-        self.profileImage = Image(uiImage: uiImage)
-    }
-}
-
-#Preview {
-    MyPageView()
-}
