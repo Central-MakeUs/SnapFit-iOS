@@ -8,7 +8,7 @@ protocol MyPageDisplayLogic {
     
     // MARK: - 사용자 조회관련
     func displayUserDetails(viewModel: LoadUserDetails.ViewModel)
-    
+    func displayCounts(viewModel: LoadUserDetails.CountViewModel)
     func display(viewModel: MyPage.LoadMyPage.ViewModel)
     
     // MARK: - 상품 예약관련
@@ -19,14 +19,22 @@ protocol MyPageDisplayLogic {
 
 
 extension MyPageView: MyPageDisplayLogic {
+
     
     func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.userDetails = viewModel.userDetails
-            print("mainPromotionViewModel.userDetails \( myPageViewModel.userDetails)")
+            print("myPageViewModel.userDetails \( myPageViewModel.userDetails)")
         }
     }
 
+    func displayCounts(viewModel: LoadUserDetails.CountViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.userCounts = viewModel.userCount
+            print("myPageViewModel.userCount \( myPageViewModel.userCounts)")
+        }
+    }
+    
     
     func display(viewModel: MyPage.LoadMyPage.ViewModel) {
         // 로그아웃 성공 여부 확인
@@ -85,7 +93,7 @@ struct MyPageView: View {
                     UserInfoView(viewModel: myPageViewModel)
                         .padding(.horizontal)
                     
-                    NavigationButtonsView(stack: $stack)
+                    NavigationButtonsView(viewModel: myPageViewModel, stack: $stack)
                         .padding(.bottom, 32)
                     
                     GroupBoxViews(myPageInteractor: myPageInteractor)
@@ -138,6 +146,7 @@ struct MyPageView: View {
             // 화면이 보일 때 토큰을 확인하여 로그인 상태 업데이트
             DispatchQueue.main.async {
                 myPageInteractor?.fetchUserDetails()
+                myPageInteractor?.fetchCounts()
             }
             checkForSavedTokens()
         }
@@ -213,14 +222,16 @@ struct ProfileHeaderView: View {
                     .offset(x: 0, y: 20)
             }
             
-            NavigationLink(value: "MyProfileEdit"){
-                Image("editicon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.white)
-            }
-            .offset(x: 160, y: -30)
+            
+            // 💁 심사 이후 다시 구현
+//            NavigationLink(value: "MyProfileEdit"){
+//                Image("editicon")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 24, height: 24)
+//                    .foregroundColor(.white)
+//            }
+//            .offset(x: 160, y: -30)
         }
     }
 }
@@ -253,12 +264,13 @@ struct UserInfoView: View {
 
 // 네비게이션 버튼 뷰
 struct NavigationButtonsView: View {
+    @ObservedObject var viewModel: MyPageViewModel
     @Binding var stack: NavigationPath // 바인딩을 통해 전달받음
     
     var body: some View {
         HStack(spacing: 0) {
             NavigationLink(value: "ReservationView") {
-                NavigationButtonLabel(title: "예약 내역", count: "0")
+                NavigationButtonLabel(title: "예약 내역", count: String(viewModel.userCounts?.likeCount ?? 0))
             }
             
             Divider()
@@ -266,7 +278,7 @@ struct NavigationButtonsView: View {
                 .background(Color.gray.opacity(0.3))
             
             NavigationLink(value: "DibsView") {
-                NavigationButtonLabel(title: "찜한 내역", count: "0")
+                NavigationButtonLabel(title: "찜한 내역", count: String(viewModel.userCounts?.reservationCount ?? 0))
             }
         }
         .frame(height: 108)

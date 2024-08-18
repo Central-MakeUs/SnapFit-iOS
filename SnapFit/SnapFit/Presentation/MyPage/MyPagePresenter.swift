@@ -10,9 +10,11 @@ import Foundation
 protocol MyPagePresentationLogic {
     
     // MARK: - 사용자 조회 관련
-    
     func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response)
     func presentFetchUserDetailsFailure(error: ApiError)
+    
+    func presentFetchCountsSuccess(response: LoadUserDetails.CountResponse)
+    func presentFetchCountsFailure(error: ApiError)
         
     func present(response: MyPage.LoadMyPage.Response)
     func presentLogoutFailure(error: ApiError)
@@ -52,6 +54,18 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("Error 사용자 데이터 조회 실패: \(error)")
     }
     
+    
+    // 카운트 관련
+    func presentFetchCountsSuccess(response: LoadUserDetails.CountResponse) {
+        // CombineResponse의 데이터를 뷰에 전달
+        let viewModel = LoadUserDetails.CountViewModel(userCount: response.userCount)
+        view?.displayCounts(viewModel: viewModel)
+    }
+    
+    func presentFetchCountsFailure(error: ApiError) {
+        // 에러를 뷰에 전달
+        print("Error 사용자 좋아요, 찜 카운트 조회 실패: \(error)")
+    }
 
     func presentLogoutSuccess() {
         

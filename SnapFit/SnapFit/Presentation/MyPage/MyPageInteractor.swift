@@ -12,6 +12,7 @@ protocol MyPageBusinessLogic {
     
     // MARK: - 유저 정보 가져오기
     func fetchUserDetails()
+    func fetchCounts()
     
     // 로그아웃, 회원 탈퇴 관련
     func serviceLogout()
@@ -59,6 +60,33 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 self?.presenter?.presentFetchUserDetailsSuccess(response: response)
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
+    
+    
+    func fetchCounts() {
+        // 병렬로 API 호출 수행
+        let likeCountPublisher = myPageWorker.fetchLikeCount()
+        let reservationCountPublisher = myPageWorker.fetchReservationCount()
+        
+        Publishers.Zip(likeCountPublisher, reservationCountPublisher)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("API 호출 실패: \(error)")
+                    self?.presenter?.presentFetchCountsFailure(error: error)
+                }
+            } receiveValue: { [weak self] likeCountResponse, reservationCountResponse in
+                // CombinedResponse 객체 생성
+                let response = LoadUserDetails.CountResponse(userCount: UserCountCombinedResponse(
+                    likeCount: likeCountResponse.count,
+                    reservationCount: reservationCountResponse.count
+                ))
+                // Presenter에 전달
+                self?.presenter?.presentFetchCountsSuccess(response: response)
+            }
+            .store(in: &cancellables)
     }
 
     

@@ -94,6 +94,7 @@
 		64D7334B2C53D457005A217E /* LoginInteractorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D7334A2C53D457005A217E /* LoginInteractorTest.swift */; };
 		64ED72D92C7244E300DE6C8E /* UserDetailsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ED72D82C7244E300DE6C8E /* UserDetailsResponse.swift */; };
 		64ED72DB2C72460200DE6C8E /* LoadUserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ED72DA2C72460200DE6C8E /* LoadUserModel.swift */; };
+		64ED72DD2C72570F00DE6C8E /* MyPageCountResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64ED72DC2C72570F00DE6C8E /* MyPageCountResponse.swift */; };
 		64F5BD3E2C6B4B3100A0C788 /* LoginNavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F5BD3D2C6B4B3100A0C788 /* LoginNavigationModel.swift */; };
 		64FDCCE92C5006030033447D /* ApiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FDCCE82C5006030033447D /* ApiError.swift */; };
 /* End PBXBuildFile section */
@@ -195,6 +196,7 @@
 		64D7334A2C53D457005A217E /* LoginInteractorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInteractorTest.swift; sourceTree = "<group>"; };
 		64ED72D82C7244E300DE6C8E /* UserDetailsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailsResponse.swift; sourceTree = "<group>"; };
 		64ED72DA2C72460200DE6C8E /* LoadUserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadUserModel.swift; sourceTree = "<group>"; };
+		64ED72DC2C72570F00DE6C8E /* MyPageCountResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageCountResponse.swift; sourceTree = "<group>"; };
 		64F5BD3D2C6B4B3100A0C788 /* LoginNavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNavigationModel.swift; sourceTree = "<group>"; };
 		64FDCCE82C5006030033447D /* ApiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -289,6 +291,7 @@
 				64561BA42C7091B90017F1ED /* ReservationResponse.swift */,
 				64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */,
 				64ED72D82C7244E300DE6C8E /* UserDetailsResponse.swift */,
+				64ED72DC2C72570F00DE6C8E /* MyPageCountResponse.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -647,6 +650,7 @@
 				64795A6A2C5A2ADE0018BE0D /* MyProfileEdit.swift in Sources */,
 				64795A6F2C5A2BDF0018BE0D /* MoodSelectionView.swift in Sources */,
 				64795A792C5A51980018BE0D /* SectionHeaderView.swift in Sources */,
+				64ED72DD2C72570F00DE6C8E /* MyPageCountResponse.swift in Sources */,
 				64795A6B2C5A2ADE0018BE0D /* ReservationInfoView.swift in Sources */,
 				64795A752C5A2C260018BE0D /* ReservationSheetView.swift in Sources */,
 				647EE4002C6D0D9500E4372F /* AuthorListViewModel.swift in Sources */,

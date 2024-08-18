@@ -14,6 +14,7 @@ class MyPageViewModel: NSObject, ObservableObject {
     
     // 사용자 조회 관련
     @Published var userDetails: UserDetailsResponse?
+    @Published var userCounts: UserCountCombinedResponse?
 
     // 사용자 프로필 관련
     @Published var selectedItem: PhotosPickerItem? {
