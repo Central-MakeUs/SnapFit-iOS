@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct AccordionView: View {
+    @Binding var selectedTime: String
+    @Binding var selectedPrice: Int
     @State private var isExpanded = false
-    @State private var selectedTime: String = "시간을 선택해주세요"
-    
-    let timeOptions = ["30분", "1시간", "1시간 30분", "2시간", "2시간 30분", "3시간"]
-    
+
+    let timeOptions: [Price]
+
     var body: some View {
         VStack {
             Button(action: {
@@ -21,10 +22,10 @@ struct AccordionView: View {
                 }
             }) {
                 HStack {
-                    Text(selectedTime)
+                    Text(selectedTime.isEmpty ? "시간을 선택해주세요" : selectedTime)
                         .foregroundStyle(Color(.systemGray2))
                         .font(.callout)
-                        
+                    
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .foregroundColor(.gray)
@@ -38,23 +39,20 @@ struct AccordionView: View {
             
             if isExpanded {
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(timeOptions, id: \.self) { time in
-                        VStack{
-                            Button(action: {
-                                withAnimation {
-                                    selectedTime = time
-                                    isExpanded = false
-                                }
-                            }) {
-                                Text(time)
-                                    .foregroundColor(.black)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                
+                    ForEach(timeOptions, id: \.min) { time in
+                        Button(action: {
+                            withAnimation {
+                                selectedTime = "\(time.min ?? 0)분"
+                                selectedPrice = time.price ?? 0
+                                isExpanded = false
                             }
-                            Divider()
+                        }) {
+                            Text("\(time.min ?? 0)분")
+                                .foregroundColor(.black)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        
+                        Divider()
                     }
                 }
                 .background(Color.white)
@@ -63,13 +61,5 @@ struct AccordionView: View {
                 .padding(.top, 5)
             }
         }
- 
     }
 }
-
-struct AccordionView_Previews: PreviewProvider {
-    static var previews: some View {
-        AccordionView()
-    }
-}
-

@@ -19,7 +19,16 @@ protocol MainPromotionPresentationLogic {
     func presentFetchProductsForMakerFailure(error: ApiError)
     
     func presentVibes(_ vibes: [Vibe])
-    func presentVibesFetchFailure(_ error: Error)
+    func presentVibesFetchFailure(_ error: ApiError)
+    
+    // MARK: - 상품 예약관련
+    func presentReservationFailure(error: ApiError)
+    func presentReservationSuccess(response: MainPromotion.ReservationProduct.Response)
+    
+    // 예약을 
+    func presentFetchUserReservationsFailure(error: ApiError)
+    func presentFetchUserReservationsSuccess(response : MainPromotion.CheckReservationProduct.Response)
+    
 }
 
 
@@ -71,10 +80,43 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     }
     
     // 분위기 정보를 가져오는 데 실패했을 때 View에 에러를 전달
-    func presentVibesFetchFailure(_ error: Error) {
+    func presentVibesFetchFailure(_ error: ApiError) {
         print("Error fetching vibes: \(error)")  // 실제 앱에서는 UI에 에러를 표시해야 함
     }
 
-    // 전달 로직
+    
+    // MARK: - 상품예약 관련
+    
+    func presentReservationSuccess(response: MainPromotion.ReservationProduct.Response) {
+        // ViewModel에 예약 성공 여부와 예약 상세 정보를 포함
+        let viewModel = MainPromotion.ReservationProduct.ViewModel(
+            reservationSuccess: response.reservationSuccess,
+            reservationDetails: response.reservationDetails // 추가된 예약 상세 정보
+        )
+        
+        // 뷰에 성공적인 예약을 표시
+        view?.displayReservationSuccess(viewModel: viewModel)
+    }
+
+
+    func presentReservationFailure(error: ApiError) {
+        print("presentReservationFailure: \(error)")
+    }
+    
+    
+    
+    // MARK: - 유저 예약 내역 조회
+    func presentFetchUserReservationsFailure(error: ApiError) {
+        print("Error occurred: \(error)")
+    }
+
+    func presentFetchUserReservationsSuccess(response: MainPromotion.CheckReservationProduct.Response) {
+      
+        let viewModel = MainPromotion.CheckReservationProduct.ViewModel(reservationSuccess: response.reservationSuccess, reservationDetails: response.reservationDetails)
+        // View에 전달
+        view?.displayFetchUserReservation(viewModel: viewModel)
+    }
+    
+    
 }
 

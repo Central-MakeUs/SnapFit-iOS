@@ -9,13 +9,18 @@ import Foundation
 import Combine
 
 protocol AuthorListBusinessLogic: ProductBusinessLogic {
-    //func load(request: MainPromotion.LoadMainPromotion.Request)
+    
+    // MARK: - 상품 호출관련
     func fetchProductAll(request : MainPromotion.LoadMainPromotion.Request)
     func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
     func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
+    func fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest)
+    
     
 
-    func fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest)
+    // MARK: - 상품 예약관련
+    func makeReservation(request: MainPromotion.ReservationProduct.Request)
+    func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     
 }
 
@@ -40,11 +45,6 @@ final class AuthorListInteractor {
 }
 
 extension AuthorListInteractor: AuthorListBusinessLogic {
-
-    
-    func load(request: Request) {
-        // presenter?.present(response:  Response)
-    }
     
     
     func fetchProductAll(request: MainPromotion.LoadMainPromotion.Request) {
@@ -142,4 +142,51 @@ extension AuthorListInteractor: AuthorListBusinessLogic {
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
+    
+    
+    
+    // MARK: - 상품 예약관련
+    func makeReservation(request: MainPromotion.ReservationProduct.Request) {
+        productWorker.makeReservation(reservation: request.reservationRequest)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    // 에러 발생 시
+                    print("상품 예약 실패: \(error.localizedDescription)")
+                    let response = MainPromotion.ReservationProduct.Response(reservationSuccess: false)
+                    self?.presenter?.presentReservationFailure(error: error)
+                }
+            } receiveValue: { [weak self] response in
+                // 성공적으로 응답을 받을 때
+                print("상품 예약 성공: \(response)")
+                let reservationResponse = MainPromotion.ReservationProduct.Response(
+                    reservationSuccess: true,
+                    reservationDetails: response // 응답 데이터를 추가로 전달할 수 있음
+                )
+                self?.presenter?.presentReservationSuccess(response: reservationResponse)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
+
+    
+    // 유저 예약내역
+       func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
+           productWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
+               .sink { [weak self] completion in
+                   switch completion {
+                   case .finished:
+                       break
+                   case .failure(let error):
+                       print("유저 예약 내역 로드 실패: \(error.localizedDescription)")
+                       self?.presenter?.presentFetchUserReservationsFailure(error: error)
+                   }
+               } receiveValue: { [weak self] products in
+                   print("유저 예약 내역 로드 성공: \(products)")
+                   let response = MainPromotion.CheckReservationProduct.Response(reservationSuccess: true, reservationDetails: products)
+                   self?.presenter?.presentFetchUserReservationsSuccess(response: response)
+               }
+               .store(in: &cancellables)
+       }
 }

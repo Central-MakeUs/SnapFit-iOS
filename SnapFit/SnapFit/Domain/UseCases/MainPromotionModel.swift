@@ -31,7 +31,7 @@ enum MainPromotion {
         }
     }
     
-    
+    // 상품 디테일 조회
     enum LoadDetailProduct {
         struct Request {
             var id: Int
@@ -57,6 +57,42 @@ enum MainPromotion {
         
         struct ProductsForMakerViewModel {
             var products : Product
+        }
+    }
+    
+    // 예약하기
+    enum ReservationProduct {
+        struct Request {
+            var reservationRequest: ReservationRequest
+        }
+        
+        struct Response {
+            var reservationSuccess : Bool
+            var reservationDetails : ShortTermReservationResponse?
+        }
+        
+        
+        struct ViewModel {
+            var reservationSuccess : Bool
+            var reservationDetails : ShortTermReservationResponse?
+        }
+    }
+    
+    // 예약 내역 조회
+    enum CheckReservationProduct {
+        struct Request {
+            var reservationRequest: ReservationRequest
+        }
+        
+        struct Response {
+            var reservationSuccess : Bool
+            var reservationDetails : ReservationResponse?
+        }
+        
+        
+        struct ViewModel {
+            var reservationSuccess : Bool
+            var reservationDetails : ReservationResponse?
         }
     }
 }

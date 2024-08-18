@@ -14,4 +14,8 @@ protocol ProductBusinessLogic {
     func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
     func fetchVibes()
     
+    
+    // MARK: - 상품 예약관련
+    func makeReservation(request: MainPromotion.ReservationProduct.Request)
+    func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
 }

@@ -57,9 +57,9 @@ struct MyPageView: View {
                 case "MyProfileEdit":
                     MyProfileEdit(viewModel: viewModel)
                         .navigationBarBackButtonHidden(true)
-                case "ReservationView":
-                    ReservationView()
-                        .navigationBarBackButtonHidden(true)
+//                case "ReservationView":
+//                    ReservationView()
+//                        .navigationBarBackButtonHidden(true)
                 case "ReservationInfoView" :
                     ReservationInfoView().navigationBarBackButtonHidden(true)
                 case "DibsView":

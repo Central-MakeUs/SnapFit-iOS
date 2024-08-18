@@ -91,9 +91,9 @@ struct OrderProductSection: View {
         Group {
             SectionHeaderView(title: "주문상품")
                 .padding(.bottom, 10)
-            ReservationCardView()
-                .frame(maxWidth: .infinity, minHeight: 130)
-                .padding(.horizontal)
+            //ReservationCardView()
+            //    .frame(maxWidth: .infinity, minHeight: 130)
+            //    .padding(.horizontal)
             CustomDividerView()
                 .padding(.bottom)
         }

@@ -11,6 +11,10 @@ protocol MainPromotionDisplayLogic {
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
+    
+    // MARK: - 상품 예약관련
+    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel)
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
@@ -23,6 +27,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
         }
     }
     
+    // 상품 들어가고 나서 보여지는 정보
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetail = viewModel.productDetail
@@ -40,6 +45,31 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {
         print()
     }
+    
+    // MARK: - 상품 예약관련
+    
+    // 예약이후 예약성공 상세화면에 값 전달
+    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            self.mainPromotionViewModel.reservationSuccess = viewModel.reservationSuccess
+            self.mainPromotionViewModel.reservationDetails = viewModel.reservationDetails
+            print("mainPromotionViewModel.reservationSuccess \(self.mainPromotionViewModel.reservationSuccess)")
+            print("mainPromotionViewModel.reservationDetails \(self.mainPromotionViewModel.reservationDetails)")
+        }
+    }
+    
+    
+    // 유저 예약내역 조회
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            mainPromotionViewModel.reservationproducts = viewModel.reservationDetails?.data ?? []
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("mainPromotionViewModel.reservationproducts: \(mainPromotionViewModel.reservationproducts)")
+        }
+    }
+    
     
 }
 
@@ -86,11 +116,17 @@ struct MainPromotionView: View {
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                 case "AuthorReservationView":
-                    AuthorReservationView(stack: $stack)
+                    AuthorReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(mainPromotionViewModel)
                 case "AuthorReservationReceptionView" :
                     AuthorReservationReceptionView(stack: $stack)
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(mainPromotionViewModel)
+                case "ReservationView" :
+                    ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(mainPromotionViewModel)
                 default:
                     SnapFitTabView()
                 }

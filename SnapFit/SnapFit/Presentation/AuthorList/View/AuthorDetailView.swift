@@ -20,6 +20,7 @@ struct AuthorDetailView: View {
     
     @State private var isLoadingProducts = true // 로딩 상태 추가
     
+    // 펄슨프라이스 가격이 10000원인데 30000만원
     
     var body: some View {
         GeometryReader { geometry in

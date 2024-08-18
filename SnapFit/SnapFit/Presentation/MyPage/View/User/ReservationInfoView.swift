@@ -40,9 +40,9 @@ struct ReservationInfoView: View {
                     SectionHeaderView(title: "주문상품")
                         .padding(.bottom, 20)
                     
-                    ReservationCardView()
-                        .frame(width: .infinity, height: 130)
-                        .padding(.horizontal)
+                    //ReservationCardView()
+                    //    .frame(width: .infinity, height: 130)
+                    //    .padding(.horizontal)
                     
                     CustomDividerView()
                         .padding(.bottom)

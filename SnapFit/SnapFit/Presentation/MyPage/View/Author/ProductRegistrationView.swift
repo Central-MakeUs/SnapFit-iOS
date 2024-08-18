@@ -216,8 +216,8 @@ struct ProductRegistrationView: View {
             SectionHeaderView(title: "옵션")
                 .padding(.bottom, 16)
             VStack(spacing: 20) {
-                AccordionView()
-                    .frame(maxWidth: .infinity) // 유동적인 너비를 설정
+                //AccordionView(selectedTime: <#Binding<String>#>, selectedPrice: <#Binding<Int>#>, timeOptions: <#[Price]#>)
+                //    .frame(maxWidth: .infinity) // 유동적인 너비를 설정
                 
                 TextField("가격", text: $priceText)
                     .padding(.horizontal, 15)

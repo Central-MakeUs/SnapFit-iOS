@@ -22,7 +22,8 @@ struct PostDetailResponse: Codable {
 }
 
 
+// 30의 1만 1시간의 2만
 struct Price: Codable {
-    let min: Int?
-    let price: Int?
+    let min: Int? // 분
+    let price: Int? // 가격
 }

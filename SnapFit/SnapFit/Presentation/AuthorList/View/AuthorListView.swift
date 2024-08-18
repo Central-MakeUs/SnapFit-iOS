@@ -14,11 +14,16 @@ protocol AuthorListDisplayLogic {
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
     func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
+
+
+    // MARK: - 상품 예약관련
+    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel)
+    
 }
 
 extension AuthorListView: AuthorListDisplayLogic {
- 
-    
+
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.products = viewModel.products.data
@@ -50,6 +55,32 @@ extension AuthorListView: AuthorListDisplayLogic {
             print("authorListViewModel.vibes \(authorListViewModel.vibes)")
         }
     }
+    
+    
+    // MARK: - 상품 예약관련
+    
+    // 예약이후 예약성공 상세화면에 값 전달
+    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            self.authorListViewModel.reservationSuccess = viewModel.reservationSuccess
+            self.authorListViewModel.reservationDetails = viewModel.reservationDetails
+            print("authorListViewModel.reservationSuccess \(self.authorListViewModel.reservationSuccess)")
+            print("authorListViewModel.reservationDetails \(self.authorListViewModel.reservationDetails)")
+        }
+    }
+    
+    
+    // 유저 예약내역 조회
+    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            authorListViewModel.reservationproducts = viewModel.reservationDetails?.data ?? []
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("authorListViewModel.reservationproducts: \(authorListViewModel.reservationproducts)")
+        }
+    }
+    
 }
 
 
@@ -120,11 +151,17 @@ struct AuthorListView: View {
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(authorListViewModel)
                 case "AuthorReservationView":
-                    AuthorReservationView(stack: $stack)
+                    AuthorReservationView(productInteractor: authorListInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(authorListViewModel)
                 case "AuthorReservationReceptionView" :
                     AuthorReservationReceptionView(stack: $stack)
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(authorListViewModel)
+                case "ReservationView" :
+                    ReservationView(productInteractor: authorListInteractor,stack: $stack)
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(authorListViewModel)
                 default:
                     SnapFitTabView()
                 }
