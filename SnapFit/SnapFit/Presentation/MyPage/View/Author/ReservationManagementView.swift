@@ -26,8 +26,8 @@ struct ReservationManagementView: View {
                 spacing: 6){
                     ForEach(0..<2) { index in
                         NavigationLink(destination: ReservationConfirmView().navigationBarBackButtonHidden(true)) {
-                            ReservationInfoCardView()
-                                .frame(width: 390, height: 163)
+                            //ReservationInfoCardView()
+                            //    .frame(width: 390, height: 163)
                         }
                         Divider()
                     }

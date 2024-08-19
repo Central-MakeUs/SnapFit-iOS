@@ -12,7 +12,7 @@ struct LoginView: View, LoginDisplayLogic {
     
     @ObservedObject var loginviewModel: LoginViewModel  // 로그인 관련 상태를 관리하는 ViewModel
     @ObservedObject var navigationModel: LoginNavigationModel  // 네비게이션 상태를 관리하는 모델
-   
+    
     //@Binding private var showLoginModal: Bool
     
     var interactor: LoginBusinessLogic?  // Interactor와의 통신을 위한 참조
@@ -68,7 +68,7 @@ struct LoginView: View, LoginDisplayLogic {
                 print("Unsupported social login type")  // 지원하지 않는 로그인 타입 처리
             }
             
-          
+            
         }
     }
     
@@ -83,41 +83,49 @@ struct LoginView: View, LoginDisplayLogic {
     var body: some View {
         NavigationStack(path: $navigationModel.navigationPath) {
             GeometryReader { geometry in
-                VStack(alignment: .leading) {
-                    Spacer().frame(height: 148)
+                ZStack {
+                    Image("LoginBack")  // 배경 이미지
+                        .resizable()
+                        .scaledToFill()  // 화면 전체에 채우기
+                        .frame(width: geometry.size.width, height: geometry.size.height)  // GeometryReader 크기로 설정
+                        .ignoresSafeArea()  // Safe area 무시하여 전체 화면 채우기
                     
-                    Group {
-                        Image("appLogo")  // 앱 로고
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 155, height: 63)
-                            .padding(.bottom, 24)
+                    VStack(alignment: .leading) {
+                        Spacer().frame(height: 148)
                         
-                        Text("당신의 아름다운 순간을 담다.")
-                            .font(.callout)
-                            .foregroundColor(Color("LoginFontColor"))
+                        Group {
+                            Image("appLogo")  // 앱 로고
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 155, height: 63)
+                                .padding(.bottom, 24)
+                            
+                            Text("당신의 아름다운 순간을 담다.")
+                                .font(.callout)
+                                .foregroundColor(Color("LoginFontColor"))
+                        }
+                        .font(.title3)
+                        
+                        Spacer()
+                        
+                        // 로그인 버튼 그룹
+                        LoginViewGroup(interactor: interactor)
+                        
+                        Spacer().frame(height: 32)
                     }
-                    .font(.title3)
-                    
-                    Spacer()
-                    
-                    // 로그인 버튼 그룹
-                    LoginViewGroup(interactor: interactor)
-                    
-                    Spacer().frame(height: 32)
+                    .padding(.horizontal, 16)
                 }
                 .padding(.horizontal, 16)
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                .background(
-                    ZStack {
-                        Color.black.ignoresSafeArea()  // 배경 색상
-                        Image("LoginImages")  // 배경 이미지
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 211, height: 426)
-                            .position(x: geometry.size.width - 16 - 211 / 2, y: 224 + 426 / 2)
-                    }
-                )
+//                .background(
+//                    ZStack {
+//                        //Color.black.ignoresSafeArea()  // 배경 색상
+//                        Image("LoginBack")  // 배경 이미지
+//                            .resizable()
+//                            .scaledToFit()
+//                        
+//                    }
+//                )
             }
             .navigationDestination(for: String.self) { destination in
                 // 네비게이션 목적지에 따라 View를 설정
@@ -137,10 +145,10 @@ struct LoginView: View, LoginDisplayLogic {
                         .environmentObject(loginviewModel)
                         .environmentObject(navigationModel)
                         .navigationBarBackButtonHidden(true)
-//                case "splashAndTabView":
-//                    SplashAndTabView()
-//                        .navigationBarBackButtonHidden(true)
-          
+                    //                case "splashAndTabView":
+                    //                    SplashAndTabView()
+                    //                        .navigationBarBackButtonHidden(true)
+                    
                 default:
                     EmptyView()  // 기본적으로 아무것도 표시하지 않음
                 }

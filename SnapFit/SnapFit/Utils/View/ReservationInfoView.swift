@@ -9,6 +9,10 @@ import SwiftUI
 
 struct ReservationInfoView: View {
     
+    var productInteractor: ProductBusinessLogic?
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @Binding var stack: NavigationPath
+    
     @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
     
     @State private var showSheet: Bool = false
@@ -28,7 +32,6 @@ struct ReservationInfoView: View {
                     SectionHeaderView(title: "연락처")
                         .padding(.bottom, 32)
                     
-                    
                     InfoRow(label: "이메일", value: "snap@naver.com")
                         .padding(.horizontal)
                     
@@ -40,56 +43,61 @@ struct ReservationInfoView: View {
                     SectionHeaderView(title: "주문상품")
                         .padding(.bottom, 20)
                     
-                    ReservationCardView()
-                        .frame(width: .infinity, height: 130)
-                        .padding(.horizontal)
+                    if let reservationDetails = mainPromotionViewModel.reservationproductDetail {
+                        ReservationDetailCardView(reservationDetails: reservationDetails)
+                            .padding(.horizontal)
+                            .padding(.bottom, 32)
+                            .frame(height: 130) // Height fixed
+                    }
                     
                     CustomDividerView()
                         .padding(.bottom)
                 }
                 
-             
                 Group {
                     SectionHeaderView(title: "예약내역")
                         .padding(.bottom, 20)
                     
-                    VStack(alignment: .leading, spacing: 15) {
-                        Group {
-                            InfoRow(label: "옵션", value: "30분 스냅")
-                            InfoRow(label: "위치", value: "홍대")
-                            InfoRow(label: "예약일시", value: "24.02.22(목) 오후 5:00")
-                            InfoRow(label: "인원", value: "성인 1명")
+                    if let details = mainPromotionViewModel.reservationproductDetail {
+                        VStack(alignment: .leading, spacing: 15) {
+                            Group {
+                                InfoRow(label: "옵션", value: "30분 스냅") // Update as necessary
+                                InfoRow(label: "위치", value: details.reservationLocation)
+                                InfoRow(label: "예약일시", value: formatDate(details.reservationTime))
+                                InfoRow(label: "인원", value: "성인 \(details.person)명")
+                                InfoRow(label: "이메일", value: "snap@naver.com") // Update as necessary
+                            }
+                            .padding()
                         }
+                        .frame(maxWidth: .infinity)
+                        .background(Color(UIColor.systemGray5))
+                        //.cornerRadius(5)
                         .padding(.horizontal)
-                    }
-                    .frame(width: .infinity, height: 184)
-                    .background(Color(UIColor.systemGray5))
-                    .cornerRadius(5)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    
-                    Divider()
                         .padding(.bottom)
+                        
+                        Divider()
+                            .padding(.bottom)
+                    }
                 }
                 
                 Group {
                     SectionHeaderView(title: "가격정보")
                         .padding(.bottom, 20)
                     
-                    VStack(alignment: .leading, spacing: 8) {
-                        InfoRow(label: "기본", value: "32,400원")
-                        InfoRow(label: "인원 1명", value: "0원")
-                        Divider()
-                            .padding(.bottom)
-                        
-                        InfoRow(label: "최종 결제액", value: "32,400원")
-                            .bold()
+                    if let details = mainPromotionViewModel.reservationproductDetail {
+                        VStack(alignment: .leading, spacing: 8) {
+                            InfoRow(label: "기본", value: "\(details.basePrice)원")
+                            InfoRow(label: "인원 \(details.person)명", value: "\(details.personPrice)원")
+                            Divider()
+                                .padding(.bottom)
+                            
+                            InfoRow(label: "최종 결제액", value: "\(details.totalPrice)원")
+                                .bold()
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 40)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    
                 }
-                
                 
                 Button(action: {
                     // 버튼 액션
@@ -106,17 +114,20 @@ struct ReservationInfoView: View {
                 }
                 .padding(.horizontal)
             }
+            .onAppear {
+                if let selectedId = mainPromotionViewModel.selectedProductId {
+                    DispatchQueue.main.async {
+                        productInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
+                    }
+                }
+            }
             .padding(.vertical)
         }
         
         .sheet(isPresented: $showSheet) {
-            
             ReservationSheetView(selectedReason: $selectedReason, showSheet: $showSheet, showAlert: $showAlert)
-            .padding(.horizontal)
-            // iOS 16 Custom Size
-            // 처음 small
-            .presentationDetents([.small, .large])
-            
+                .padding(.horizontal)
+                .presentationDetents([.small, .large])
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -150,14 +161,21 @@ struct ReservationInfoView: View {
             }
         )
     }
+    
+    // 날짜 포맷팅 함수
+    private func formatDate(_ isoDate: String) -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        guard let date = isoFormatter.date(from: isoDate) else { return "날짜 없음" }
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "yyyy.MM.dd HH:mm"
+        return displayFormatter.string(from: date)
+    }
 }
 
 // Sheet Size 더 작게 Custom
 extension PresentationDetent {
     static let small = Self.height(348)
 }
-
-
 
 struct InfoRow: View {
     let label: String
@@ -167,19 +185,12 @@ struct InfoRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
+                .foregroundStyle(Color("LoginFontColor"))
             Spacer()
             Text(value)
                 .foregroundColor(.black)
                 .font(.subheadline)
                 .bold()
         }
-    }
-}
-
-
-
-struct ReservationInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReservationInfoView()
     }
 }

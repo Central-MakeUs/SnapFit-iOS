@@ -10,12 +10,12 @@ struct SnapFitTabView: View {
     @State private var selectedTab = 0
     
     @StateObject var mainPromotionViewModel = MainPromotionViewModel()
-    
+    @StateObject var authorListViewModel = MainPromotionViewModel()
+    @StateObject var myPageViewModel = MyPageViewModel()
     var body: some View {
         TabView(selection: $selectedTab) {
             MainPromotionView(mainPromotionViewModel: mainPromotionViewModel)
                 .configureView()
-                .environmentObject(mainPromotionViewModel)
                 .tabItem {
                     VStack {
                         Image(selectedTab == 0 ? "iconHome" : "iconHomeNoTab")
@@ -24,7 +24,7 @@ struct SnapFitTabView: View {
                 }
                 .tag(0)
 
-            AuthorListView()
+            AuthorListView(authorListViewModel: authorListViewModel).configureView()
                 .tabItem {
                     VStack {
                         Image(selectedTab == 1 ? "iconList" : "iconListNoTab")
@@ -33,7 +33,7 @@ struct SnapFitTabView: View {
                 }
                 .tag(1)
 
-            MyPageView()
+            MyPageView(myPageViewModel: myPageViewModel)
                 .configureView()
                 .tabItem {
                     VStack {

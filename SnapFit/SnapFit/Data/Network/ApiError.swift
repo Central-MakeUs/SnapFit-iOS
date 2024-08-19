@@ -22,6 +22,8 @@ enum ApiError : Error {
     case notFound
     case serverError
     case invalidRefreshToken
+    case encodingError
+    case invalidResponse
     
     var info : String {
         switch self {
@@ -39,6 +41,9 @@ enum ApiError : Error {
         case .forbidden:           return "접근이 금지되었습니다. (403)"
         case .notFound:            return "요청한 리소스를 찾을 수 없습니다. (404)"
         case .serverError:         return "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        case .encodingError:        return "encodingError 입니다."
+        case .invalidResponse:      return "invalidResponse 입니다."
+            
         }
     }
 }

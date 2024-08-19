@@ -13,7 +13,7 @@ struct ReservationConfirmView: View {
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
-    
+    @State private var alertCancelAction: () -> Void = {}
     enum Reason {
         case contactIssue, wrongSelection
     }
@@ -91,9 +91,9 @@ struct OrderProductSection: View {
         Group {
             SectionHeaderView(title: "주문상품")
                 .padding(.bottom, 10)
-            ReservationCardView()
-                .frame(maxWidth: .infinity, minHeight: 130)
-                .padding(.horizontal)
+            //ReservationCardView()
+            //    .frame(maxWidth: .infinity, minHeight: 130)
+            //    .padding(.horizontal)
             CustomDividerView()
                 .padding(.bottom)
         }

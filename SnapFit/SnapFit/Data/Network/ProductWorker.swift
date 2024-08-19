@@ -17,18 +17,83 @@ import MultipartForm
 // AuthWorker의 기능을 정의하는 프로토콜
 protocol ProductWorkingLogic {
     
+    
+    // MARK: - 유저 정보 가져오기
+    func fetchUserDetails() -> AnyPublisher<UserDetailsResponse, ApiError>
+    
+    // MARK: - 상품 예약관련
     func fetchProductsFromServer(limit: Int, offset: Int) -> AnyPublisher<Product, ApiError>
     func fetchProductsFromServerWithFilter(vibes: String, limit: Int, offset: Int) -> AnyPublisher<Product, ApiError> // 분위기값 서버에서 가져오기
     func fetchProductsForMaker(userId: Int, limit: Int, offset: Int) -> AnyPublisher<Product, ApiError>
     func fetchPostDetailById(postId: Int) -> AnyPublisher<PostDetailResponse, ApiError>
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
+    
+    // MARK: - 상품 예약관련
+    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ReservationDetailsResponse, ApiError>
+    func fetchUserReservations(limit: Int, offset: Int) -> AnyPublisher<ReservationResponse, ApiError>
+    func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError>
+    
+    // 상품 찜하기
+    func likePost(postId: Int) -> AnyPublisher<Void, ApiError>
+    func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> 
 }
 
 class ProductWorker: ProductWorkingLogic {
     
     static let baseURL = "http://34.47.94.218/snapfit" // 서버 주소
     
-    
+    func fetchUserDetails() -> AnyPublisher<UserDetailsResponse, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        
+        let urlString = "http://34.47.94.218/snapfit/user"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> UserDetailsResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    let response = try JSONDecoder().decode(UserDetailsResponse.self, from: data)
+                    return response
+                case 400...403:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
     
     
     // MARK: - 메인 뷰 상품 가져오기
@@ -318,5 +383,296 @@ class ProductWorker: ProductWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    
+    // MARK: - 상품예약
+
+    // MARK: - 예약 요청을 서버로 보내는 함수
+    func makeReservation(reservation: ReservationRequest) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        print("reservation \(reservation)")
+        
+        let urlString = "http://34.47.94.218/snapfit/reservation"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        
+        do {
+            let jsonData = try JSONEncoder().encode(reservation)
+            urlRequest.httpBody = jsonData
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("Request JSON: \(jsonString)")
+            }
+        } catch {
+            return Fail(error: ApiError.encodingError).eraseToAnyPublisher()
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    // 성공적인 응답 코드 범위
+                    let response = try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
+                    
+                    // 응답 데이터 유효성 검증 (옵셔널 필드 검사)
+                    guard response.id != nil, response.user != nil, response.post != nil else {
+                        throw ApiError.unknown(nil)
+                    }
+                    
+                    return response // 성공시 예약 응답 반환
+                case 400...404:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 401:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Unauthorized"
+                    throw ApiError.invalidRefreshToken
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+
+    // MARK: - 유저 예약 내역 조회
+
+    func fetchUserReservations(limit: Int = 10, offset: Int = 0) -> AnyPublisher<ReservationResponse, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/reservation/user?limit=\(limit)&offset=\(offset)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    let response = try JSONDecoder().decode(ReservationResponse.self, from: data)
+                    return response
+                case 400...404:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
+    
+    // 유저 예약 상세 조회
+
+
+    func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/reservation?id=\(id)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    return try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
+
+
+    
+    
+    
+    // MARK: - 상품 좋아요
+    
+    func likePost(postId: Int) -> AnyPublisher<Void, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/post/like?postId=\(postId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Void in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    return
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> {
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        let urlString = "http://34.47.94.218/snapfit/post/like?postId=\(postId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "DELETE"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Void in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    return
+                case 400:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 404:
+                    throw ApiError.notFound
+                case 500:
+                    throw ApiError.serverError
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
     
 }

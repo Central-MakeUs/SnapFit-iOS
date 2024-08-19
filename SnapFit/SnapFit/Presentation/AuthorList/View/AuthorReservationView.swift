@@ -9,42 +9,52 @@ import SwiftUI
 
 struct AuthorReservationView: View {
     @State private var selectedTab: Int = 0
-    
     @State var locationText: String = ""
-    @State var dateText: String = ""
     @State var emailText: String = ""
     @State var phoneText: String = ""
+    @State private var counter: Int = 1
+    @State private var selectedDate: Date = Date()
     
-    @State private var counter: Int = 0
-    @Binding var stack : NavigationPath
+    @State private var selectedTime: String = ""
+    @State private var selectedPrice: Int = 0
     
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    var productInteractor: ProductBusinessLogic?
+    @Binding var stack: NavigationPath
     
     var body: some View {
         VStack(alignment: .leading) {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ProductSection()
-                    OptionSection()
+                    OptionSection(selectedTime: $selectedTime, selectedPrice: $selectedPrice)
                     LocationSection(locationText: $locationText)
-                    DateTimeSection(dateText: $dateText)
+                    DateTimeSection(selectedDate: $selectedDate)
                     PeopleSection(counter: $counter)
                     EmailSection(emailText: $emailText)
                     PhoneSection(phoneText: $phoneText)
-                    SubmitButton(stack: $stack)
+                    SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete)
                 }
             }
             .padding(.bottom)
         }
-//        .navigationDestination(for: String.self) { viewName in
-//            switch viewName {
-//            case "AuthorReservationReceptionView" :
-//                AuthorReservationReceptionView(stack: $stack)
-//                    .navigationBarBackButtonHidden(true)
-//            default:
-//                MainPromotionView()
-//            }
+        .contentShape(Rectangle())
+//        .onTapGesture {
+//            hideKeyboard()
 //        }
+        .onChange(of: locationText) { _ in updateReservationRequest() }
+        .onChange(of: selectedDate) { _ in updateReservationRequest() }
+        .onChange(of: emailText) { _ in updateReservationRequest() }
+        .onChange(of: phoneText) { _ in updateReservationRequest() }
+        .onChange(of: counter) { _ in updateReservationRequest() }
+        .onChange(of: selectedTime) { _ in updateReservationRequest() }
+        .onChange(of: selectedPrice) { _ in updateReservationRequest() }
+        .onChange(of: mainPromotionViewModel.reservationSuccess ?? false) { success in
+            if success {
+                stack.append("AuthorReservationReceptionView")
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -60,32 +70,127 @@ struct AuthorReservationView: View {
             }
         }
     }
+    
+    private func updateReservationRequest() {
+        guard let productDetail = mainPromotionViewModel.productDetail,
+              let makerId = productDetail.maker?.id,
+              let personPrice = mainPromotionViewModel.productDetail?.personPrice else {
+            print("상품 세부 정보가 없습니다")
+            return
+        }
+        
+        let totalPrice = selectedPrice
+        
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        
+        mainPromotionViewModel.reservationRequest = ReservationRequest(
+            email: emailText,
+            phoneNumber: phoneText,
+            postId: productDetail.id,
+            makerId: makerId,
+            minutes: selectedTimeInMinutes(),
+            price: totalPrice,
+            person: counter,
+            personPrice: personPrice,
+            reservationLocation: locationText,
+            reservationTime: formattedDate
+        )
+    }
+
+    private func selectedTimeInMinutes() -> Int {
+        guard let selectedMinutes = Int(selectedTime.replacingOccurrences(of: "분", with: "")) else {
+            return 0
+        }
+        return selectedMinutes
+    }
+    
+    private var isFormComplete: Bool {
+        let isDateValid = selectedDate > Date()
+        let isEmailValid = isValidEmail(emailText)
+        let isPhoneValid = isValidPhone(phoneText)
+        let isLocationValid = !locationText.isEmpty
+        let isCounterValid = counter > 0
+        let formComplete = isLocationValid && isDateValid && isEmailValid && isPhoneValid && isCounterValid
+        return formComplete
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: email)
+    }
+
+//    private func isValidPhone(_ phone: String) -> Bool {
+//        let phoneRegEx = "^01([0|1|6|7|8|9])-([0-9]{3,4})-([0-9]{4})$"
+//        let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegEx)
+//        return phoneTest.evaluate(with: phone)
+//    }
+    private func isValidPhone(_ phone: String) -> Bool {
+        let phoneDigits = phone.filter { $0.isNumber } // 숫자만 필터링
+        return phoneDigits.count == 11 // 숫자가 11자리인지 확인
+    }
+
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
 
+
 struct ProductSection: View {
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    
     var body: some View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "주문상품")
                 .padding(.bottom, 16)
-            ReservationCardView()
-                .padding(.horizontal)
-                .padding(.bottom, 32)
+            
+            if let productDetail = mainPromotionViewModel.productDetail {
+                    ReservationCardView(productDetail: productDetail)
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+            } else {
+                Text("상품 정보를 불러올 수 없습니다.")
+                    .font(.callout)
+                    .foregroundColor(Color(.systemGray2))
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+            }
+            
             CustomDividerView()
         }
     }
 }
 
+
 struct OptionSection: View {
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @Binding var selectedTime: String
+    @Binding var selectedPrice: Int
+
     var body: some View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "옵션")
                 .padding(.bottom, 27)
-            AccordionView()
-                .padding(.horizontal)
-                .padding(.bottom, 32)
+
+            if let prices = mainPromotionViewModel.productDetail?.prices {
+                AccordionView(selectedTime: $selectedTime, selectedPrice: $selectedPrice, timeOptions: prices)
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+            } else {
+                Text("가격 정보가 없습니다.")
+                    .font(.callout)
+                    .foregroundStyle(Color(.systemGray2))
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+            }
         }
     }
 }
+
+
+
 
 struct LocationSection: View {
     @Binding var locationText: String
@@ -108,34 +213,44 @@ struct LocationSection: View {
 }
 
 struct DateTimeSection: View {
-    @Binding var dateText: String
+    @Binding var selectedDate: Date
     
     var body: some View {
         VStack(alignment: .leading) {
-            SectionHeaderView(title: "원하는 날짜와 시간을 적어주세요", showRequired: true)
+            SectionHeaderView(title: "원하는 날짜와 시간을 선택해주세요", showRequired: true)
                 .padding(.bottom, 27)
-            TextField("00월 00일 00시", text: $dateText)
-                .font(.callout)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
-                .padding(.horizontal)
-                .padding(.bottom, 32)
+            
+            DatePicker(
+                "날짜와 시간 선택",
+                selection: $selectedDate,
+                displayedComponents: [.date, .hourAndMinute]
+            )
+            .datePickerStyle(.graphical) // 달력 스타일 사용
+            .labelsHidden()
+            .padding()
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.gray, lineWidth: 1)
+            )
+            .padding(.horizontal)
+            .padding(.bottom, 32)
         }
+        .environment(\.locale, Locale(identifier: "ko_KR")) // 한국어 로케일 설정
     }
 }
 
+
+
+
 struct PeopleSection: View {
     @Binding var counter: Int
-    
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     var body: some View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "인원을 선택해주세요")
                 .padding(.bottom, 16)
             VStack(alignment:.leading) {
-                Text("2인 이상 1인당 17,000원 추가")
+                Text("2인 이상 1인당 \(mainPromotionViewModel.productDetail?.personPrice ?? 0)원 추가") // 여기에서 personPrice를 사용합니다.
                     .font(.callout)
                     .foregroundStyle(Color(.systemGray2))
                     .padding(.leading, 17.5)
@@ -180,6 +295,7 @@ struct PeopleSection: View {
     }
 }
 
+
 struct PhoneSection: View {
     @Binding var phoneText: String
     
@@ -187,7 +303,7 @@ struct PhoneSection: View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "연락 받을 전화번호를 적어주세요", showRequired: true)
                 .padding(.bottom, 24)
-            TextField("010 - **** - ****", text: $phoneText)
+            TextField("010********", text: $phoneText)
                 .font(.callout)
                 .padding()
                 .overlay(
@@ -200,11 +316,18 @@ struct PhoneSection: View {
     }
 }
 
+
 struct SubmitButton: View {
-    @Binding var stack : NavigationPath
+
+    @Binding var stack: NavigationPath
+    var productInteractor: ProductBusinessLogic?
+    let isFormComplete: Bool
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+
+    @State private var isSubmitting = false
     
     var body: some View {
-        NavigationLink(value: "AuthorReservationReceptionView"){
+        Button(action: submitAction) {
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -215,12 +338,24 @@ struct SubmitButton: View {
             }
             .padding()
             .frame(height: 48)
-            .background(Color.black)
+            .background(isFormComplete ? Color.black : Color.gray)
             .cornerRadius(5)
             .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
         }
+        .disabled(!isFormComplete || isSubmitting) // 버튼 비활성화
+    }
+    
+    private func submitAction() {
+        guard isFormComplete, !isSubmitting else { return }
+        isSubmitting = true
+        
+        // 예약 요청을 서버에 보내기
+        if let reservationRequest = mainPromotionViewModel.reservationRequest {
+            productInteractor?.makeReservation(request: MainPromotion.ReservationProduct.Request(reservationRequest: reservationRequest))
+        }
     }
 }
+
 
 struct EmailSection: View {
     @Binding var emailText: String

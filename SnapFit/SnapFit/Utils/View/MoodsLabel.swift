@@ -12,16 +12,25 @@ struct MoodsLabel: View {
     var bigCardViewType: Bool = false
     
     var body: some View {
+//        Text(text)
+//            .font(.caption)
+//            .bold()
+//            .foregroundColor(Color("labelFontColor"))
+//            .padding(.vertical, 5)
+//            .padding(.horizontal, 15)
+//            .background(bigCardViewType ? Color("labelBackColor").opacity(0.3) : Color("InOutLableBackColor"))
+//            .cornerRadius(5)
+        
         Text(text)
             .font(.caption)
-            .bold()
-            .foregroundColor(Color("labelFontColor"))
+            .foregroundColor(Color(.black))
             .padding(.vertical, 5)
             .padding(.horizontal, 15)
-            .background(bigCardViewType ? Color("labelBackColor").opacity(0.3) : Color("InOutLableBackColor"))
-            .cornerRadius(5)
+            .background(bigCardViewType ? Color("MainBoxbBackColor").opacity(0.3) : Color("InOutLableBackColor"))
+            .cornerRadius(2)
     }
 }
+
 
 #Preview {
     VStack {
@@ -33,6 +42,33 @@ struct MoodsLabel: View {
 
 
 
+struct DeteailInOutLabel: View {
+    var text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .bold()
+            .foregroundColor(Color(.white)) // 폰트 색상
+            .padding(.vertical, 6) // 세로 패딩을 줄임
+            .padding(.horizontal, 10) // 가로 패딩을 줄임
+            .background(Color("InOutLableFontColor")) // 배경색
+            .cornerRadius(2)
+    }
+}
+
+
+// Custom Shape for specific corners
+struct RoundedCornersShape: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
+}
+
 struct InOutLabel: View {
     var text: String
     
@@ -40,11 +76,11 @@ struct InOutLabel: View {
         Text(text)
             .font(.caption)
             .bold()
-            .foregroundColor(Color("InOutLableFontColor")) // 폰트 색상
-            .padding(.vertical, 5) // 세로 패딩을 줄임
+            .foregroundColor(Color(.white)) // 폰트 색상
+            .padding(.vertical, 6) // 세로 패딩을 줄임
             .padding(.horizontal, 10) // 가로 패딩을 줄임
-            .background(Color("InOutLableBackColor")) // 배경색
-            .cornerRadius(5)
+            .background(Color("InOutLableFontColor")) // 배경색
+            .clipShape(RoundedCornersShape(radius: 5, corners: [.topLeft, .bottomRight])) // 특정 코너에만 반경 적용
     }
 }
 

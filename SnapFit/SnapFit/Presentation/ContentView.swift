@@ -30,7 +30,11 @@ struct ContentView: View {
             LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
                 .configureView() // VIP 패턴에 맞게 뷰를 구성
                 .onDisappear {
-                    checkForSavedTokens() // 모달이 닫힐 때 다시 토큰을 확인
+                    // 모달이 닫힐 때 다시 토큰을 확인
+                    // 이 시점에서는 모달이 닫혔기 때문에 다시 토큰 확인 후 상태 업데이트
+                    DispatchQueue.main.async {
+                        checkForSavedTokens()
+                    }
                 }
         }
         .onChange(of: isLoggedIn) { newValue in
@@ -42,11 +46,15 @@ struct ContentView: View {
 
     // 저장된 토큰이 있는지 확인하는 함수
     private func checkForSavedTokens() {
-        if let _ = UserDefaults.standard.string(forKey: "accessToken"),
-           let _ = UserDefaults.standard.string(forKey: "refreshToken") {
-            isLoggedIn = true // 토큰이 있으면 자동 로그인으로 이동
+        if let accessToken = UserDefaults.standard.string(forKey: "accessToken"),
+           let refreshToken = UserDefaults.standard.string(forKey: "refreshToken"),
+           !accessToken.isEmpty, !refreshToken.isEmpty {
+            // 토큰이 비어있지 않다면 로그인 상태로 설정
+            isLoggedIn = true
+            loginVM.showLoginModal = false
         } else {
-            isLoggedIn = false // 토큰이 없으면 로그인 화면으로 이동
+            // 토큰이 없으면 로그인 화면으로 이동
+            isLoggedIn = false
             loginVM.showLoginModal = true // 로그인 모달 표시
         }
     }

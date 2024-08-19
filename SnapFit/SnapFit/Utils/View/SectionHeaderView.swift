@@ -14,8 +14,8 @@ struct SectionHeaderView: View {
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
-            Rectangle()
-                .frame(width: 16, height: 2)
+            Rectangle().hidden()
+                .frame(width: 10, height: 2)
             Text(title)
                 .font(.callout)
                 .bold()

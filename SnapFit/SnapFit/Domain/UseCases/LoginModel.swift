@@ -30,7 +30,7 @@ enum Login {
             let socialAccessToken: String?
             let membershipRequired : Bool
         }
-        struct VibesPresentationViewModel { //엔터티
+        struct VibesPresentationViewModel { 
             let vibes: Vibes
         }
     }

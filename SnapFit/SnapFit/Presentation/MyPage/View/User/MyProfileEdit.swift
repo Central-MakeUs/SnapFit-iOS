@@ -3,7 +3,7 @@ import _PhotosUI_SwiftUI
 
 struct MyProfileEdit: View {
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: MyPageViewModel
     @State private var inputText: String = ""
     @State private var isConfirmButtonEnabled = false
 
@@ -42,7 +42,7 @@ struct MyProfileEdit: View {
 
 // 프로필 이미지 선택 섹션
 struct ProfileImagePicker: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: MyPageViewModel
     
     var body: some View {
         PhotosPicker(selection: $viewModel.selectedItem) {
@@ -127,5 +127,5 @@ struct SaveButton: View {
 }
 
 #Preview {
-    MyProfileEdit(viewModel: ProfileViewModel())
+    MyProfileEdit(viewModel: MyPageViewModel())
 }

@@ -5,47 +5,61 @@
 //  Created by 정정욱 on 8/2/24.
 //
 import SwiftUI
+import MessageUI
 
 struct AuthorDetailView: View {
-
+    
     @Environment(\.presentationMode) var presentationMode
-    
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
-    var mainPromotionInteractor: MainPromotionBusinessLogic?
+    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
-    @Binding var stack : NavigationPath
+    @Binding var stack: NavigationPath
+    @State private var isShowingMailView = false
+    @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
+    
+    @State private var isLoadingProducts = true // 로딩 상태 추가
+    @State private var isLiked: Bool = false // 좋아요 상태 초기화
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
-                        if let detail = mainPromotionViewModel.productDetail {
-                            MainContentView(productDetail: detail)
-                        } else {
-                            ProgressView()
-                                .padding()
-                        }
-                        DividerAndRegulationView()
-                        Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+                if isLoadingProducts {
+                    // 로딩 중일 때 ProgressView를 표시
+                    VStack {
+                        ProgressView("Loading...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.5) // 크기를 키울 수 있음
+                            .padding()
                     }
-                    .padding(.bottom)
-                }
-
-                // 고정된 NextButton
-                VStack {
-                    Spacer()
-                    NextButton(stack: $stack)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    // 데이터 로딩이 완료되면 실제 콘텐츠를 표시
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(alignment: .leading) {
+                            if let detail = mainPromotionViewModel.productDetail {
+                                MainContentView(productInteractor: productInteractor, productDetail: detail, stack: $stack)
+                            } else {
+                                ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
+                                    .padding()
+                            }
+                            
+                            Spacer().frame(height: 100) // 예약 버튼에 대한 공간 추가
+                        }
+                        .padding(.bottom)
+                    }
+                    
+                    // 고정된 NextButton
+                    VStack {
+                        Spacer()
+                        NextButton(stack: $stack)
+                    }
                 }
             }
             .onAppear {
-                
-                if let productId = mainPromotionViewModel.selectedProductId {
-                    mainPromotionInteractor?.fetchPostDetailById(
-                        request: MainPromotion.LoadDetailProduct.Request(id: productId))
+                loadProductDetails() // 데이터 로드 함수 호출
+                if let likeStatus = mainPromotionViewModel.productDetail?.like {
+                    isLiked = likeStatus // 좋아요 상태 초기화
                 }
-                
-                
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -59,22 +73,17 @@ struct AuthorDetailView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         Button(action: {
-                            // Action for heart button
+                            isLiked.toggle()
+                            handleLikeAction()
                         }) {
-                            Image(systemName: "heart")
+                            Image(systemName: isLiked ? "heart.fill" : "heart")
                                 .foregroundColor(.black)
                         }
+                        .hidden()
+                        
                         Menu {
                             Button(action: {
-                                // 공유하기 액션
-                                print("공유하기")
-                            }) {
-                                Label("공유하기", systemImage: "square.and.arrow.up")
-                            }
-                            
-                            Button(action: {
-                                // 신고하기 액션
-                                print("신고하기")
+                                isShowingMailView = true
                             }) {
                                 Label("신고하기", systemImage: "exclamationmark.bubble")
                             }
@@ -86,106 +95,216 @@ struct AuthorDetailView: View {
                 }
             }
         }
-//        .navigationDestination(for: String.self) { viewName in
-//            switch viewName {
-//            case "AuthorReservationView":
-//                AuthorReservationView(stack: $stack)
-//                    .navigationBarBackButtonHidden(true)
-//            default:
-//                MainPromotionView()
-//            }
-//        }
+        .sheet(isPresented: $isShowingMailView) {
+            if MFMailComposeViewController.canSendMail() {
+                MailView(result: $mailResult)
+            } else {
+                Text("Mail services are not available")
+            }
+        }
+    }
+    
+    private func loadProductDetails() {
+        guard let productId = mainPromotionViewModel.selectedProductId else { return }
+        
+        Task {
+            isLoadingProducts = true
+            await fetchProductDetails(productId: productId)
+            isLoadingProducts = false
+        }
+    }
+    
+    @MainActor
+    private func fetchProductDetails(productId: Int) async {
+        // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
+        await productInteractor?.fetchPostDetailById(
+            request: MainPromotion.LoadDetailProduct.Request(id: productId)
+        )
+        
+        // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
+        let timeout: TimeInterval = 5
+        let startTime = Date()
+        
+        // 제품 상세 정보가 로드될 때까지 대기합니다.
+        while mainPromotionViewModel.productDetail == nil {
+            await Task.yield()
+            
+            if Date().timeIntervalSince(startTime) > timeout {
+                print("Timeout: Product detail loading took too long.")
+                break
+            }
+        }
+        
+        // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
+        if let makerId = mainPromotionViewModel.productDetail?.maker?.id {
+            await productInteractor?.fetchProductsForMaker(
+                request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
+                    makerid: makerId,
+                    limit: 30,
+                    offset: 0
+                )
+            )
+        }
+    }
+    
+    // 좋아요 또는 좋아요 취소를 처리하는 함수
+    private func handleLikeAction() {
+        guard let interactor = productInteractor else {
+            print("ProductInteractor가 설정되지 않았습니다.")
+            return
+        }
+        
+        guard let productId = mainPromotionViewModel.productDetail?.id else {
+            print("상품 ID가 없습니다.")
+            return
+        }
+        
+        let request = MainPromotion.Like.Request(postId: productId)
+        
+        if isLiked {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
     }
 }
 
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
+    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
-
+    @Binding var stack : NavigationPath
+    
     var body: some View {
-        Group {
-            // 이미지 슬라이더
-            if let imageUrls = productDetail.images, !imageUrls.isEmpty {
-                ImageSliderView(images: imageUrls)
-                    .frame(maxWidth: .infinity) // 너비를 최대화하여 사용
-                    .aspectRatio(contentMode: .fit) // 비율 유지
-                    .padding(.bottom)
-            } else {
-                Text("이미지가 없습니다.")
-                    .padding(.bottom)
+        
+        // 이미지 슬라이더
+        if let imageUrls = productDetail.images, !imageUrls.isEmpty {
+            ImageSliderView(images: imageUrls)
+                .frame(maxWidth: .infinity) // 너비를 최대화하여 사용
+                .aspectRatio(contentMode: .fit) // 비율 유지
+                .padding(.bottom)
+        } else {
+            Text("이미지가 없습니다.")
+                .hidden()
+        }
+        
+        // 무드와 위치
+        HStack(spacing: 16){
+            if let vibes = productDetail.vibes {
+                ForEach(vibes, id: \.self) { vibe in
+                    MoodsLabel(text: vibe)
+                }
             }
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 16)
+        
+        // 제목
+        Text(productDetail.title ?? "제목 없음")
+            .lineLimit(2)
+            .font(.title3)
+            .bold()
+            .padding(.horizontal)
+        
+        HStack(spacing: 8) {
+            Image("point")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
             
-            // 제목
-            Text(productDetail.title ?? "제목 없음")
-                .font(.title3)
+            if let locations = productDetail.locations {
+                Text(locations.joined(separator: " | "))
+                    .font(.footnote)
+                    .foregroundColor(Color("LoginFontColor"))
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 24)
+        
+        // 가격
+        if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
+            Text("\(minPrice) - \(price)")
+                .font(.system(size: 24))
                 .bold()
                 .padding(.horizontal)
-            
-            // 무드와 위치
-            HStack {
-                if let vibes = productDetail.vibes {
-                    ForEach(vibes, id: \.self) { vibe in
-                        MoodsLabel(text: vibe)
-                    }
-                }
-                
-                if let locations = productDetail.locations {
-                    ForEach(locations, id: \.self) { location in
-                        InOutLabel(text: location)
-                    }
-                }
-            }
-            .padding(.horizontal)
-            
-            // 가격
-            if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
-                PriceView(price: "\(minPrice) - \(price)")
-            } else {
-                PriceView(price: "가격 정보 없음")
-            }
-            
-            SectionHeaderView(title: "위치")
-            
-            HStack(spacing: 8) {
-                if let locations = productDetail.locations {
-                    ForEach(locations, id: \.self) { location in
-                        StarImageLabel(text: location)
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 40)
-            
-            // 작가의 설명
-            HStack(spacing: 8) {
-                Image("AuthorDec")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                Text("작가의 설명")
-            }
-            .padding(.horizontal)
+        } else {
+            PriceView(price: "가격 정보 없음")
+        }
+        
+        DividerAndRegulationView()
+        
+        Spacer().frame(height: 32)
+        
+        // 작가의 설명
+        VStack(alignment: .leading, spacing: 12){
+            Text("작가의 설명")
+                .font(.callout)
+                .bold()
+                .padding(.horizontal)
             
             Text(productDetail.desc ?? "설명이 없습니다.")
                 .font(.caption)
                 .foregroundColor(Color(.systemGray))
                 .padding(.horizontal)
                 .padding(.bottom, 40)
-            
-            // 등록된 상품
-            SectionHeaderView(title: "등록된 상품")
-            
+        }
+        
+        CustomDividerView()
+            .padding(.bottom, 32)
+        
+        // 등록된 상품
+        Text("작가의 등록된 상품")
+            .font(.callout)
+            .bold()
+            .padding(.horizontal)
+        
+        if mainPromotionViewModel.productDetailAuthorProducts.isEmpty {
+            HStack() {
+                Spacer()
+                ProductEmptyView()
+                Spacer()
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 32)
+        } else {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: layout, spacing: 8) {
-                    ForEach(0..<10, id: \.self) { item in
-                        MiddleCardView()
-                            .frame(width: 175, height: 270) // 적절한 크기 설정
+                    ForEach(mainPromotionViewModel.productDetailAuthorProducts, id: \.id) { product in
+                        Button(action: {
+                            mainPromotionViewModel.selectedProductId = product.id
+                            stack.append("AuthorDetailView")
+                        }) {
+                            MiddleCardView(product: product, mainPromotionInteractor: productInteractor)
+                                .frame(width: 175, height: 324) // 적절한 크기 설정
+                        }
                     }
                 }
             }
             .padding(.horizontal)
-            .padding(.bottom, 40)
+        }
+        
+        CustomDividerView()
+            .padding(.bottom, 32)
+        
+        VStack(alignment: .leading, spacing: 12){
+            Text("취소 규정")
+                .font(.body)
+                .bold()
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+            
+            Text("""
+                가. 기본 환불 규정
+                1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.
+                2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.
+                3. 촬영 또는 편집 작업 착수 이후 청약 철회 시, 진행된 작업량 또는 작업 일수를 산정한 금액을 공제한 금액을 환불 가능합니다.
+                """)
+            .font(.subheadline)
+            .foregroundColor(Color(.systemGray))
+            .padding(.horizontal)
+            .padding(.bottom, 16)
         }
     }
 }
@@ -207,20 +326,6 @@ struct DividerAndRegulationView: View {
             .padding(16)
             
             CustomDividerView()
-            
-            SectionHeaderView(title: "취소 규정")
-                .padding(.bottom, 16)
-            
-            Text("""
-                가. 기본 환불 규정
-                1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.
-                2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.
-                3. 촬영 또는 편집 작업 착수 이후 청약 철회 시, 진행된 작업량 또는 작업 일수를 산정한 금액을 공제한 금액을 환불 가능합니다.
-                """)
-                .font(.subheadline)
-                .foregroundColor(Color(.systemGray))
-                .padding(.horizontal)
-                .padding(.bottom, 16)
         }
     }
 }
@@ -266,9 +371,31 @@ struct PriceView: View {
 }
 
 
-#Preview {
-    // Preview를 위한 NavigationPath 초기화
-    let path = NavigationPath()
-    
-    return AuthorDetailView(stack: .constant(path))
-}
+
+//
+//extension AuthorDetailView {
+//    // PostDetailResponse 구조체에 맞는 더미 데이터
+//    static let sampleDetail = PostDetailResponse(
+//        id: 1,
+//        maker: Maker(id: 1, nickName: "작가 닉네임"),
+//        createAt: "2024-08-15",
+//        thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg",
+//        images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"],
+//        desc: "사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다. 사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다.",
+//        title: "스냅사진｜넘치지 않는 아름다움을 담아드려요 - 개인, 커플, 우정스냅사진",
+//        vibes: ["러블리", "유니크"],
+//        locations: ["서울", "부산"],
+//        prices: [Price(min: 10000, price: 20000)],
+//        personPrice: 50000
+//    )
+//    
+//    static let sampleViewModel = MainPromotionViewModel(productDetail: sampleDetail)
+//}
+//
+//// 프리뷰
+//#Preview {
+//    let path = NavigationPath()
+//    
+//    return AuthorDetailView(stack: .constant(path))
+//        .environmentObject(AuthorDetailView.sampleViewModel)
+//}

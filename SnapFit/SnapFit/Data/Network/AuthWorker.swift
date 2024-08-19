@@ -199,7 +199,7 @@ class AuthWorker: AuthWorkingLogic {
               let savedRefreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
             return Fail(error: ApiError.invalidAccessToken).eraseToAnyPublisher()
         }
-        
+        print("로그아웃 savedRefreshToken \(savedRefreshToken)")
         let urlString = AuthWorker.baseURL + "/logout?refreshToken=\(savedRefreshToken)"
         
         guard let url = URL(string: urlString) else {
@@ -209,7 +209,6 @@ class AuthWorker: AuthWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { output in

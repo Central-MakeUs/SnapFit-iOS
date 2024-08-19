@@ -12,11 +12,14 @@ struct AppInfoContent: View {
     var name: String
     var linkDestination: String? = nil
     var interactor: MyPageBusinessLogic?
-    var canNavigate: Bool = true  // New property to control navigation
+    var canNavigate: Bool = true
     
     @State private var showModal: Bool = false
-    @State private var showAlert: Bool = false
-    
+    @State private var showConfirmationAlert: Bool = false
+    @State private var alertMessage: String = ""
+    @State private var confirmAction: () -> Void = {}
+    @State private var cancelAction: () -> Void = {}
+
     var body: some View {
         VStack {
             Spacer()
@@ -31,25 +34,37 @@ struct AppInfoContent: View {
                         }
                     } else {
                         Button(action: {
-                            showAlert = true
+                            alertMessage = "작가의 권한이 없습니다."
+                            confirmAction = {}
+                            cancelAction = {}
+                            showConfirmationAlert = true
                         }) {
                             content
-                        }
-                        .alert(isPresented: $showAlert) {
-                            Alert(title: Text("알림"),
-                                  message: Text("작가의 권한이 없습니다."),
-                                  dismissButton: .default(Text("확인")))
                         }
                     }
                 } else if name == "로그아웃" {
                     Button {
-                        interactor?.logoutFromKakao() // Kakao 로그아웃 처리
+                        alertMessage = "로그아웃 하시겠습니까?"
+                        confirmAction = {
+                            interactor?.serviceLogout() // Kakao 로그아웃 처리
+                        }
+                        cancelAction = {
+                            // 취소 액션 처리
+                        }
+                        showConfirmationAlert = true
                     } label: {
                         content
                     }
                 } else if name == "탈퇴하기" {
                     Button {
-                        interactor?.cancelmembership() // Kakao 탈퇴 처리
+                        alertMessage = "정말 탈퇴하시겠습니까?\n스냅핏과의 추억이 모두 사라집니다!"
+                        confirmAction = {
+                            interactor?.cancelmembership() // Kakao 탈퇴 처리
+                        }
+                        cancelAction = {
+                            // 취소 액션 처리
+                        }
+                        showConfirmationAlert = true
                     } label: {
                         content
                     }
@@ -70,6 +85,14 @@ struct AppInfoContent: View {
             Divider()
         }
         .frame(height: 68)
+        .alert(isPresented: $showConfirmationAlert) {
+            Alert(
+                title: Text("알림"),
+                message: Text(alertMessage),
+                primaryButton: .destructive(Text("확인"), action: confirmAction),
+                secondaryButton: .default(Text("취소"), action: cancelAction) // "취소" 버튼으로 변경
+            )
+        }
     }
     
     private var content: some View {
@@ -93,6 +116,7 @@ struct AppInfoContent: View {
         }
     }
 }
+
 
 struct WebViewWithCustomBackButton: View {
     @Environment(\.presentationMode) var presentationMode
@@ -145,6 +169,10 @@ struct AppInfoLabel: View {
         }
     }
 }
+
+
+
+
 
 #Preview {
     Group {
