@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import Kingfisher
 
 struct ImageSliderView: View {
     let images: [String] // Array of image URLs
@@ -17,28 +17,12 @@ struct ImageSliderView: View {
             TabView(selection: $currentIndex) {
                 ForEach(images.indices, id: \.self) { index in
                     if let url = URL(string: images[index]) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .clipped()
-                            case .failure:
-                                Image(systemName: "xmark.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .foregroundColor(.gray)
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        .tag(index)
+                        KFImage(url)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .clipped()
+                            .tag(index)
                     }
                 }
             }
@@ -64,7 +48,7 @@ struct ImageSliderView: View {
     }
 }
 
-struct testView: View {
+struct TestView: View {
     var body: some View {
         ImageSliderView(images: [
             "https://cdn.pixabay.com/photo/2021/08/03/11/48/canal-6519196_640.jpg",
@@ -74,8 +58,8 @@ struct testView: View {
     }
 }
 
-struct testView_Previews: PreviewProvider {
+struct TestView_Previews: PreviewProvider {
     static var previews: some View {
-        testView()
+        TestView()
     }
 }

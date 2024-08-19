@@ -9,6 +9,9 @@ import SwiftUI
 
 
 
+import SwiftUI
+import Kingfisher
+
 struct MiniCardView: View {
     @State private var isLiked: Bool
     var product: ProductInfo
@@ -23,39 +26,34 @@ struct MiniCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             if let imageUrl = product.thumbNail, let url = URL(string: imageUrl) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 130, height: 130)
-                        .clipped()
-                } placeholder: {
-                    ProgressView()
-                        .frame(width: 130, height: 130)
-                }
-                .overlay(
-                    VStack {
-                        if product.studio == true {
-                            InOutLabel(text:"실내스냅") // InOutLabel 사용
+                KFImage(url)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 130, height: 130)
+                    .clipped()
+                    .overlay(
+                        VStack {
+                            if product.studio == true {
+                                InOutLabel(text:"실내스냅")
+                            }
+                            Spacer()
+                        },
+                        alignment: .topLeading
+                    )
+                    .overlay(
+                        Button(action: {
+                            isLiked.toggle()
+                            handleLikeAction()
+                        }) {
+                            Image(systemName: isLiked ? "heart.fill" : "heart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 15)
+                                .foregroundColor(.white)
                         }
-                        Spacer()
-                    },
-                    alignment: .topLeading // 왼쪽 상단 정렬
-                )
-                .overlay {
-                    Button(action: {
-                        isLiked.toggle()
-                        handleLikeAction()
-                    }) {
-                        Image(systemName: isLiked ? "heart.fill" : "heart")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 15)
-                            .foregroundColor(.white)
-                    }
-                    .offset(x: 42, y: -42)
-                }
-                .padding(.bottom, 5)
+                        .offset(x: 42, y: -42)
+                    )
+                    .padding(.bottom, 5)
             } else {
                 Color.gray
                     .frame(width: 130, height: 130)
@@ -85,10 +83,9 @@ struct MiniCardView: View {
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
         }
         .background(Color.white)
-        .frame(width: 130, height: 204) // 명시적으로 프레임 크기 설정
+        .frame(width: 130, height: 204)
     }
 
-    // 좋아요 또는 좋아요 취소를 처리하는 함수
     private func handleLikeAction() {
         guard let interactor = mainPromotionInteractor else {
             print("MainPromotionInteractor가 설정되지 않았습니다.")
@@ -119,40 +116,35 @@ struct MiddleCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             if let imageUrl = product.thumbNail, let url = URL(string: imageUrl) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 175, height: 170)
-                        .cornerRadius(5)
-                        .clipped()
-                } placeholder: {
-                    ProgressView()
-                        .frame(width: 175, height: 170)
-                }
-                .overlay(
-                    VStack {
-                        if product.studio == true {
-                            InOutLabel(text:"실내스냅") // InOutLabel 사용
+                KFImage(url)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 175, height: 170)
+                    .cornerRadius(5)
+                    .clipped()
+                    .overlay(
+                        VStack {
+                            if product.studio == true {
+                                InOutLabel(text:"실내스냅") // InOutLabel 사용
+                            }
+                            Spacer()
+                        },
+                        alignment: .topLeading // 왼쪽 상단 정렬
+                    )
+                    .overlay(
+                        Button(action: {
+                            isLiked.toggle()
+                            handleLikeAction()
+                        }) {
+                            Image(systemName: isLiked ? "heart.fill" : "heart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.white)
                         }
-                        Spacer()
-                    },
-                    alignment: .topLeading // 왼쪽 상단 정렬
-                )
-                .overlay(
-                    Button(action: {
-                        isLiked.toggle()
-                        handleLikeAction()
-                    }) {
-                        Image(systemName: isLiked ? "heart.fill" : "heart")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundColor(.white)
-                    }
-                    .offset(x: 62, y: -62)
-                )
-                .padding(.bottom, 5)
+                        .offset(x: 62, y: -62)
+                    )
+                    .padding(.bottom, 5)
             } else {
                 Color.gray
                     .frame(width: 175, height: 170)

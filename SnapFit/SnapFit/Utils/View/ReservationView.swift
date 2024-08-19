@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ReservationView: View {
     
@@ -80,22 +81,19 @@ struct ReservationCardView: View {
             HStack(spacing: 34) {
                 if let thumbnailUrlString = productDetail.thumbnail,
                    let thumbnailUrl = URL(string: thumbnailUrlString) {
-                    AsyncImage(url: thumbnailUrl) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 130, height: 130)
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    } placeholder: {
-                        ProgressView()
-                            .frame(width: 130, height: 130)
-                    }
+                    KFImage(thumbnailUrl)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 130, height: 130)
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                 
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                 }
+                
                 VStack(alignment: .leading, spacing: 8) {
                     Text(productDetail.title ?? "제목 없음")
                         .lineLimit(2)
@@ -124,6 +122,9 @@ struct ReservationCardView: View {
                     }
                 }
             }
+            .padding()
+            .background(Color.white)
+            .frame(width: 358, height: 130)
         }
     }
 }
@@ -137,16 +138,12 @@ struct ReservationDetailCardView: View {
             HStack(spacing: 32) {
                 if let thumbnailUrlString = reservationDetails.post?.thumbNail,
                    let thumbnailUrl = URL(string: thumbnailUrlString) {
-                    AsyncImage(url: thumbnailUrl) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 130, height: 130)
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    } placeholder: {
-                        ProgressView()
-                            .frame(width: 130, height: 130)
-                    }
+                    KFImage(thumbnailUrl)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 130, height: 130)
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                        
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
@@ -205,16 +202,12 @@ struct ReservationInfoCardView: View {
             HStack(spacing: 32) {
                 if let thumbnailUrlString = productInfo.post?.thumbNail,
                    let thumbnailUrl = URL(string: thumbnailUrlString) {
-                    AsyncImage(url: thumbnailUrl) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 130, height: 130)
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    } placeholder: {
-                        ProgressView()
-                            .frame(width: 130, height: 130)
-                    }
+                    KFImage(thumbnailUrl)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 130, height: 130)
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                        
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))

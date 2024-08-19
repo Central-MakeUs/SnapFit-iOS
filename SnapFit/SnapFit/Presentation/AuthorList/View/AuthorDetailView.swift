@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import MessageUI
+import Kingfisher
 
 struct AuthorDetailView: View {
     
@@ -175,7 +176,7 @@ struct MainContentView: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
-    @Binding var stack : NavigationPath
+    @Binding var stack: NavigationPath
     
     var body: some View {
         
@@ -191,7 +192,8 @@ struct MainContentView: View {
         }
         
         // 무드와 위치
-        HStack(spacing: 16){
+        HStack(spacing: 16) {
+            
             if let vibes = productDetail.vibes {
                 ForEach(vibes, id: \.self) { vibe in
                     MoodsLabel(text: vibe)
@@ -238,7 +240,7 @@ struct MainContentView: View {
         Spacer().frame(height: 32)
         
         // 작가의 설명
-        VStack(alignment: .leading, spacing: 12){
+        VStack(alignment: .leading, spacing: 12) {
             Text("작가의 설명")
                 .font(.callout)
                 .bold()
@@ -261,7 +263,7 @@ struct MainContentView: View {
             .padding(.horizontal)
         
         if mainPromotionViewModel.productDetailAuthorProducts.isEmpty {
-            HStack() {
+            HStack {
                 Spacer()
                 ProductEmptyView()
                 Spacer()
@@ -288,7 +290,7 @@ struct MainContentView: View {
         CustomDividerView()
             .padding(.bottom, 32)
         
-        VStack(alignment: .leading, spacing: 12){
+        VStack(alignment: .leading, spacing: 12) {
             Text("취소 규정")
                 .font(.body)
                 .bold()

@@ -71,7 +71,7 @@ struct AuthorReservationReceptionView: View {
                             .cornerRadius(5)
                             .padding(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
                         }
-                        .hidden()
+                        
                         
                         Button(action: {
                             // 모든 항목을 제거하고 스택을 새로 초기화하여 홈으로 돌아가기
