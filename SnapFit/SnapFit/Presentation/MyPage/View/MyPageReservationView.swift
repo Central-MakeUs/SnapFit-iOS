@@ -24,8 +24,10 @@ struct MyPageReservationView: View {
                 alignment: .center,
                 spacing: 16) {
                     
-                    // 예약된 상품 리스트를 보여줍니다.
-                    ForEach(myPageViewModel.reservationproducts) { product in
+                    // 예약된 상품 리스트를 id로 정렬하여 보여줍니다.
+                    ForEach(myPageViewModel.reservationproducts.sorted(by: {
+                        ($0.id ?? Int.min) < ($1.id ?? Int.min)
+                    })) { product in
                         Button(action: {
                             myPageViewModel.selectedReservationId = product.id
                             stack.append("ReservationInfoView")
@@ -40,16 +42,14 @@ struct MyPageReservationView: View {
                             }
                         }
                         .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
-                        // NavigationLink를 사용할 때 텍스트 색상이 파란색으로 바뀌는 것을 방지
                     }
                     
                 
             }
-            //.padding() // ScrollView에 여백 추가
         }
         .onAppear(perform: {
             // 예약 내역 불러오기
-            mypageInteractor?.fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+            mypageInteractor?.fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
         })
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -69,8 +69,3 @@ struct MyPageReservationView: View {
         }
     }
 }
-
-
-
-
-

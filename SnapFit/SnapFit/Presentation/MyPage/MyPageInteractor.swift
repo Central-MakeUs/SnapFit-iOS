@@ -21,6 +21,11 @@ protocol MyPageBusinessLogic {
     // MARK: - 상품 예약관련
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
+    func fetchUserLikes(request: MainPromotion.LoadMainPromotion.Request)
+
+    // 상품 찜하기, 취소
+    func likePost(request: MainPromotion.Like.Request)
+    func unlikePost(request: MainPromotion.Like.Request)
 }
 
 
@@ -135,30 +140,29 @@ final class MyPageInteractor: MyPageBusinessLogic {
     
     
     func cancelmembership() {
-            // 사용자 계정 삭제 작업 시작
+        // 사용자 계정 삭제 작업 시작
         print("MyPageInteractor cancelmembership")
-            authWorker.deleteUserAccount()
-                .sink { [weak self] completion in
-                    switch completion {
-                    case .finished:
-                        // 계정 삭제 완료
-                        print("Cancel membership 성공")
-                        //self?.presenter?.presentCancelMembershipSuccess()
-                    case .failure(let error):
-                        // 계정 삭제 실패
-                        print("Cancel membership failed: \(error)")
-                        //self?.presenter?.presentCancelMembershipFailure(error: error)
-                    }
-                } receiveValue: { success in
-                    // 성공 여부 처리 (여기서는 결과가 항상 true임을 가정)
-                    if success {
-                        print("User account has been successfully deleted.")
-                    }
+        authWorker.deleteUserAccount()
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    // 계정 삭제 완료
+                    print("Cancel membership 성공")
+                case .failure(let error):
+                    // 계정 삭제 실패
+                    print("Cancel membership failed: \(error)")
+                    self?.presenter?.presentCancelMembershipFailure(error: error)
                 }
-                .store(in: &cancellables)
-        }
-    
-    
+            } receiveValue: { success in
+                // 성공 여부 처리 (여기서는 결과가 항상 true임을 가정)
+                if success {
+                    print("User account has been successfully deleted.")
+                    self.presenter?.presentCancelMembershipSuccess()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
     // 유저 예약내역 리스트
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
         myPageWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
@@ -178,7 +182,28 @@ final class MyPageInteractor: MyPageBusinessLogic {
             .store(in: &cancellables)
     }
     
-    // 예약 상세내역 조회
+    // 유저 찜 리스트
+    func fetchUserLikes(request: MainPromotion.LoadMainPromotion.Request) {
+        myPageWorker.fetchUserLikes(limit: request.limit, offset: request.offset)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("유저 찜 내역 로드 실패: \(error.localizedDescription)")
+                    self?.presenter?.presentFetchUserLikesFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("유저 찜 내역 로드 성공: \(products)")
+                let response = MainPromotion.CheckReservationProducts.Response(reservationSuccess: true, reservationProducts: products)
+                self?.presenter?.presentFetchUserLikesSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
+    
+    
+    
+    // 상세내역 조회
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request) {
         myPageWorker.fetchReservationDetail(id: request.selectedReservationId)
             .sink { [weak self] completion in
@@ -197,5 +222,43 @@ final class MyPageInteractor: MyPageBusinessLogic {
             .store(in: &cancellables)
 
     }
+    
+    // 좋아요 요청
+        func likePost(request: MainPromotion.Like.Request) {
+            myPageWorker.likePost(postId: request.postId)
+                .sink { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        print("좋아요 실패: \(error.localizedDescription)")
+                        //self?.presenter?.presentLikePostFailure(error: error)
+                    }
+                } receiveValue: { [weak self] response in
+                    print("좋아요 성공: \(response)")
+                    //self?.presenter?.presentLikePostSuccess(response: response)
+                }
+                .store(in: &cancellables)
+        }
+        
+        // 좋아요 취소 요청
+        func unlikePost(request: MainPromotion.Like.Request) {
+            myPageWorker.unlikePost(postId: request.postId)
+                .sink { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        print("좋아요 취소 실패: \(error.localizedDescription)")
+                        //self?.presenter?.presentUnlikePostFailure(error: error)
+                    }
+                } receiveValue: { [weak self] response in
+                    print("좋아요 취소 성공: \(response)")
+                    //self?.presenter?.presentUnlikePostSuccess(response: response)
+                }
+                .store(in: &cancellables)
+        }
+    
+   
 }
 

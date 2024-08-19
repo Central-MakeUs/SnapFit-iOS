@@ -516,6 +516,7 @@ class ProductWorker: ProductWorkingLogic {
     
     // 유저 예약 상세 조회
 
+
     func fetchReservationDetail(id: Int) -> AnyPublisher<ReservationDetailsResponse, ApiError> {
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
@@ -540,8 +541,7 @@ class ProductWorker: ProductWorkingLogic {
                 
                 switch httpResponse.statusCode {
                 case 200...299:
-                    let response = try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
-                    return response
+                    return try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
                 case 400:
                     let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
                     let message = errorResponse?.message ?? "Bad Request"
@@ -566,6 +566,9 @@ class ProductWorker: ProductWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
+
+
     
     
     

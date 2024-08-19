@@ -30,7 +30,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.userDetails = viewModel.userDetails
-            print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
+            //print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
         }
     }
 
@@ -38,7 +38,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
         DispatchQueue.main.async {
             mainPromotionViewModel.products = viewModel.products.data
             //print("viewModel.products.data \(viewModel.products.data)")
-            print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
+            //print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
         }
     }
     
@@ -46,7 +46,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetail = viewModel.productDetail
-            print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
+            //print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
         }
     }
     
@@ -75,15 +75,19 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     
     
     // 유저 예약내역 리스트  조회
+    // 유저 예약내역 리스트 조회
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
-            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
-            mainPromotionViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화 후 id로 정렬
+            mainPromotionViewModel.reservationproducts = (viewModel.reservationProducts?.data ?? []).sorted(by: {
+                ($0.id ?? Int.min) < ($1.id ?? Int.min)
+            })
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
             print("mainPromotionViewModel.reservationproducts: \(mainPromotionViewModel.reservationproducts)")
         }
     }
+
     
     
     func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
@@ -103,34 +107,38 @@ extension MainPromotionView: MainPromotionDisplayLogic {
 struct MainPromotionView: View {
     @State var stack = NavigationPath()
     var mainPromotionInteractor: MainPromotionBusinessLogic?
-    
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
-    
+
+    var randomProduct: ProductInfo? {
+        guard !mainPromotionViewModel.products.isEmpty else { return nil }
+        return mainPromotionViewModel.products.randomElement()
+    }
+
     var body: some View {
         NavigationStack(path: $stack) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // 상단 로고 및 인사말
                     HeaderView(mainPromotionViewModel: mainPromotionViewModel)
                         .padding(.bottom, 30)
                     
-                    // 섹션 1: 추천 사진
                     SectionHeaderView(title: "이런 사진은 어때요?")
                     
-                    NavigationLink(value: "AuthorDetailView"){
-                        MainPromotionRandomCardView()
-                            .padding(.vertical, 16)
+                    if let randomProduct = randomProduct {
+                        Button(action: {
+                            mainPromotionViewModel.selectedProductId = randomProduct.id
+                            DispatchQueue.main.async {
+                                stack.append("AuthorDetailView")
+                            }
+                        }) {
+                            MainPromotionRandomCardView(product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
+                                .padding(.vertical, 16)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.vertical, 16)
                     }
-                    .buttonStyle(PlainButtonStyle())
                     
-                    // 섹션 2: 미니 카드 뷰
                     SectionMiniCardsView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .padding(.bottom, 40)
-                    
-                    // 섹션 3: 메이커와 추억 만들기
-//                    SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
-//                    SectionBigCardsView(stack: $stack)
-//                        .padding(.bottom, 40)
                 }
                 .environmentObject(mainPromotionViewModel)
             }
@@ -150,7 +158,7 @@ struct MainPromotionView: View {
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                 case "ReservationView" :
-                    ReservationView(productInteractor: mainPromotionInteractor,stack: $stack)
+                    ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
                     
@@ -163,21 +171,20 @@ struct MainPromotionView: View {
                 }
             }
             .onAppear {
-                // fetchProductAll은 뷰가 나타난 후 비동기적으로 호출됩니다.
+                // 뷰가 나타난 후 비동기적으로 호출
                 DispatchQueue.main.async {
                     mainPromotionInteractor?.fetchUserDetails()
-                    mainPromotionInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+                    mainPromotionInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
                     
                     if stack.isEmpty {
                         stack = NavigationPath()
                     }
                 }
             }
-        }// 스택 블럭 안에 .navigationDestination 가 있어야함
-        
+        }
     }
-    
 }
+
 
 struct HeaderView: View {
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel

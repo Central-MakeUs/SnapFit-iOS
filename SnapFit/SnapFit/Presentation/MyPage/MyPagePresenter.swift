@@ -20,6 +20,10 @@ protocol MyPagePresentationLogic {
     func presentLogoutFailure(error: ApiError)
     func presentLogoutSuccess()
     
+    func presentCancelMembershipSuccess()
+    func presentCancelMembershipFailure(error: ApiError)
+
+    
     // MARK: - 상품 예약관련
     
     // 유저 예약 내역 리스트 조회
@@ -29,7 +33,12 @@ protocol MyPagePresentationLogic {
     // 유저 예약 내역 리스트 단일 조회
     func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
     func presentFetchReservationDetailFailure(error: ApiError)
-
+    
+    // 유저 찜 내역 리스트 조회
+    func presentFetchUserLikesFailure(error: ApiError)
+    func presentFetchUserLikesSuccess(response: MainPromotion.CheckReservationProducts.Response)
+    
+  
     
 }
 
@@ -40,6 +49,17 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+  
+    // 사용자 탈퇴후 로그인뷰 보이게
+    func presentCancelMembershipSuccess() {
+        let viewModel = MyPage.LoadMyPage.ViewModel(logOut: true)
+        view?.display(viewModel: viewModel)
+    }
+    
+    func presentCancelMembershipFailure(error: ApiError) {
+        print("Error 사용자 탈퇴 실패: \(error)")
+    }
+    
     
     // MARK: - 사용자 조회 관련
     
@@ -93,6 +113,19 @@ extension MyPagePresenter: MyPagePresentationLogic {
         // View에 전달
         view?.displayFetchUserReservation(viewModel: viewModel)
     }
+    
+    // MARK: - 유저 찜 내역 조회
+    func presentFetchUserLikesFailure(error: ApiError) {
+        print("Error occurred: \(error)")
+    }
+
+    func presentFetchUserLikesSuccess(response: MainPromotion.CheckReservationProducts.Response) {
+      
+        let viewModel = MainPromotion.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
+        // View에 전달
+        view?.displayFetchUserReservation(viewModel: viewModel)
+    }
+    
     
     // 유저 예약 내역 리스트 단일 조회
     func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response) {

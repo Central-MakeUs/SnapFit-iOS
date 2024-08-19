@@ -96,24 +96,26 @@ extension AuthorListView: AuthorListDisplayLogic {
 }
 
 
+import SwiftUI
+
 struct AuthorListView: View {
     @State private var selectedTab: Int = -1
-    @State var stack = NavigationPath()
+    @State private var stack = NavigationPath()
 
-    // columns 의 갯수를 2개로 설정
+    // 두 개의 열을 가진 그리드 설정
     let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 8, alignment: nil),
-        GridItem(.flexible(), spacing: 8, alignment: nil),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
     ]
     
-    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
+    @Environment(\.presentationMode) var presentationMode // 뷰를 닫기 위한 환경 변수
     
     var authorListInteractor: AuthorListBusinessLogic?
     @ObservedObject var authorListViewModel: MainPromotionViewModel
     
     var body: some View {
         NavigationStack(path: $stack) {
-            VStack{
+            VStack {
                 HStack {
                     Image("mainSnapFitLogo")
                         .resizable()
@@ -122,73 +124,78 @@ struct AuthorListView: View {
                 }
                 .padding(.horizontal)
                 
-                // CustomTopTabbar 사용
                 CustomTopTabbar(selectedTab: $selectedTab, authorListInteractor: authorListInteractor, vibes: authorListViewModel.vibes)
-                               .padding(.bottom)
-                // 상품 탭의 내용
+                    .padding(.bottom)
+                
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(authorListViewModel.products) { product in
                             Button(action: {
-                                DispatchQueue.main.async {
-                                    authorListViewModel.selectedProductId = product.id
-                                    stack.append("AuthorDetailView")
-                                }
+                                handleProductSelection(product)
                             }) {
                                 MiddleCardView(product: product, mainPromotionInteractor: authorListInteractor)
                                     .frame(width: 175, height: 324)
-                                    .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+                                    .padding(2)
                             }
-                            .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
-                            // NavigationLink를 사용할 때 텍스트 색상이 파란색으로 바뀌는 것을 방지
+                            .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
                         }
                     }
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
-                
             }
             .onAppear {
-                // 💁 해당 전체 호출코드 필터값에서 전체 누를때만 분기 처리 필요 지금 서버에서 전체 값이 없음
-                //authorListInteractor?.fetchProductAll(request : MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
-                
-                print(stack.count)
-                stack = NavigationPath()
-                
-                authorListInteractor?.fetchVibes()
-                
+                loadInitialData()
             }
             .navigationDestination(for: String.self) { viewName in
-                switch viewName {
-                case "AuthorDetailView":
-                    AuthorDetailView(productInteractor: authorListInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(authorListViewModel)
-                case "AuthorReservationView":
-                    AuthorReservationView(productInteractor: authorListInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(authorListViewModel)
-                case "AuthorReservationReceptionView" :
-                    AuthorReservationReceptionView(stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(authorListViewModel)
-                case "ReservationView" :
-                    ReservationView(productInteractor: authorListInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(authorListViewModel)
-                    
-                case "ReservationInfoView" :
-                    ReservationInfoView(productInteractor: authorListInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(authorListViewModel)
-                    
-                default:
-                    SnapFitTabView()
-                }
+                navigateToView(viewName)
             }
         }
     }
+
+    // 상품 선택 처리
+    private func handleProductSelection(_ product: ProductInfo) {
+        DispatchQueue.main.async {
+            authorListViewModel.selectedProductId = product.id
+            stack.append("AuthorDetailView")
+        }
+    }
+
+    // 초기 데이터 로딩
+    private func loadInitialData() {
+        // 초기 데이터 로딩 함수
+        authorListInteractor?.fetchVibes()
+    }
+
+    // 네비게이션 처리
+    private func navigateToView(_ viewName: String) -> some View {
+        switch viewName {
+        case "AuthorDetailView":
+            return AnyView(AuthorDetailView(productInteractor: authorListInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(authorListViewModel))
+        case "AuthorReservationView":
+            return AnyView(AuthorReservationView(productInteractor: authorListInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(authorListViewModel))
+        case "AuthorReservationReceptionView":
+            return AnyView(AuthorReservationReceptionView(stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(authorListViewModel))
+        case "ReservationView":
+            return AnyView(ReservationView(productInteractor: authorListInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(authorListViewModel))
+        case "ReservationInfoView":
+            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(authorListViewModel))
+        default:
+            return AnyView(SnapFitTabView())
+        }
+    }
 }
+
 
 #Preview {
     AuthorListView(authorListViewModel: MainPromotionViewModel())

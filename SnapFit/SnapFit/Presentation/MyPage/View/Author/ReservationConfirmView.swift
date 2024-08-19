@@ -13,7 +13,7 @@ struct ReservationConfirmView: View {
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
-    
+    @State private var alertCancelAction: () -> Void = {}
     enum Reason {
         case contactIssue, wrongSelection
     }

@@ -114,12 +114,13 @@ struct ReservationInfoView: View {
                 }
                 .padding(.horizontal)
             }
-            .onAppear(perform: {
-                // 상품 상세 조회
+            .onAppear {
                 if let selectedId = mainPromotionViewModel.selectedProductId {
-                    productInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
+                    DispatchQueue.main.async {
+                        productInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
+                    }
                 }
-            })
+            }
             .padding(.vertical)
         }
         
@@ -171,14 +172,10 @@ struct ReservationInfoView: View {
     }
 }
 
-
-
 // Sheet Size 더 작게 Custom
 extension PresentationDetent {
     static let small = Self.height(348)
 }
-
-
 
 struct InfoRow: View {
     let label: String
@@ -197,11 +194,3 @@ struct InfoRow: View {
         }
     }
 }
-
-
-//
-//struct ReservationInfoView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ReservationInfoView()
-//    }
-//}

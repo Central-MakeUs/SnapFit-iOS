@@ -29,16 +29,19 @@ struct MyPageReservationInfoView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 
-                Group {
-                    SectionHeaderView(title: "연락처")
-                        .padding(.bottom, 32)
-                    
-                    InfoRow(label: "이메일", value: "snap@naver.com")
-                        .padding(.horizontal)
-                    
-                    CustomDividerView()
-                        .padding(.bottom)
-                }
+//                Group {
+//                    
+//                    InfoRow(label: "연락처", value: "snap@naver.com")
+//                        .padding(.horizontal)
+//                    
+//                    
+//                    InfoRow(label: "이메일", value: "snap@naver.com")
+//                        .padding(.horizontal)
+//                    
+//                    CustomDividerView()
+//                        .padding(.bottom)
+//                }
+                
                 
                 Group {
                     SectionHeaderView(title: "주문상품")

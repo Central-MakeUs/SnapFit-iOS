@@ -117,8 +117,9 @@ struct AuthorDetailView: View {
     @MainActor
     private func fetchProductDetails(productId: Int) async {
         // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
-        productInteractor?.fetchPostDetailById(
-            request: MainPromotion.LoadDetailProduct.Request(id: productId))
+        await productInteractor?.fetchPostDetailById(
+            request: MainPromotion.LoadDetailProduct.Request(id: productId)
+        )
         
         // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
         let timeout: TimeInterval = 5
@@ -136,10 +137,10 @@ struct AuthorDetailView: View {
         
         // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
         if let makerId = mainPromotionViewModel.productDetail?.maker?.id {
-            productInteractor?.fetchProductsForMaker(
+            await productInteractor?.fetchProductsForMaker(
                 request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
                     makerid: makerId,
-                    limit: 10,
+                    limit: 30,
                     offset: 0
                 )
             )
@@ -167,7 +168,6 @@ struct AuthorDetailView: View {
         }
     }
 }
-
 
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
@@ -197,13 +197,6 @@ struct MainContentView: View {
                     MoodsLabel(text: vibe)
                 }
             }
-            
-            // 실내 스냅 여부
-            //                if let locations = productDetail.locations {
-            //                    ForEach(locations, id: \.self) { location in
-            //                        InOutLabel(text: location)
-            //                    }
-            //                }
         }
         .padding(.horizontal)
         .padding(.bottom, 16)
@@ -214,8 +207,6 @@ struct MainContentView: View {
             .font(.title3)
             .bold()
             .padding(.horizontal)
-        
-        //SectionHeaderView(title: "위치")
         
         HStack(spacing: 8) {
             Image("point")
@@ -234,7 +225,6 @@ struct MainContentView: View {
         
         // 가격
         if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
-            //PriceView(price: "\(minPrice) - \(price)")
             Text("\(minPrice) - \(price)")
                 .font(.system(size: 24))
                 .bold()
@@ -248,15 +238,6 @@ struct MainContentView: View {
         Spacer().frame(height: 32)
         
         // 작가의 설명
-        //        HStack(spacing: 8) {
-        //            Image("AuthorDec")
-        //                .resizable()
-        //                .scaledToFit()
-        //                .frame(width: 24, height: 24)
-        //            Text("작가의 설명")
-        //        }
-        //        .padding(.horizontal)
-        
         VStack(alignment: .leading, spacing: 12){
             Text("작가의 설명")
                 .font(.callout)
@@ -274,16 +255,12 @@ struct MainContentView: View {
             .padding(.bottom, 32)
         
         // 등록된 상품
-        // SectionHeaderView(title: "등록된 상품")
         Text("작가의 등록된 상품")
             .font(.callout)
             .bold()
             .padding(.horizontal)
         
-        
-        // 수정된 부분: productDetailAuthorProducts를 사용하여 MiddleCardView 연결
         if mainPromotionViewModel.productDetailAuthorProducts.isEmpty {
-            
             HStack() {
                 Spacer()
                 ProductEmptyView()
@@ -291,8 +268,6 @@ struct MainContentView: View {
             }
             .padding(.top, 12)
             .padding(.bottom, 32)
-            
-            
         } else {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: layout, spacing: 8) {
@@ -310,8 +285,6 @@ struct MainContentView: View {
             .padding(.horizontal)
         }
         
-        
-        
         CustomDividerView()
             .padding(.bottom, 32)
         
@@ -322,20 +295,17 @@ struct MainContentView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 12)
             
-            
             Text("""
-                            가. 기본 환불 규정
-                            1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.
-                            2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.
-                            3. 촬영 또는 편집 작업 착수 이후 청약 철회 시, 진행된 작업량 또는 작업 일수를 산정한 금액을 공제한 금액을 환불 가능합니다.
-                            """)
+                가. 기본 환불 규정
+                1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.
+                2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.
+                3. 촬영 또는 편집 작업 착수 이후 청약 철회 시, 진행된 작업량 또는 작업 일수를 산정한 금액을 공제한 금액을 환불 가능합니다.
+                """)
             .font(.subheadline)
             .foregroundColor(Color(.systemGray))
             .padding(.horizontal)
             .padding(.bottom, 16)
         }
-        
-        
     }
 }
 
@@ -356,7 +326,6 @@ struct DividerAndRegulationView: View {
             .padding(16)
             
             CustomDividerView()
-            
         }
     }
 }

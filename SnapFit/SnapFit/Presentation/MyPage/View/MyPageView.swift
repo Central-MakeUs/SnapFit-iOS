@@ -51,13 +51,16 @@ extension MyPageView: MyPageDisplayLogic {
     // 유저 예약내역 리스트 조회
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
-            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
-            myPageViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화 후 id로 정렬
+            myPageViewModel.reservationproducts = (viewModel.reservationProducts?.data ?? []).sorted(by: {
+                ($0.id ?? Int.min) < ($1.id ?? Int.min)
+            })
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
-            print("authorListViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
+            print("myPageViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
         }
     }
+
     
     // 유저 예약내역 단일 조회
     func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
@@ -73,86 +76,84 @@ extension MyPageView: MyPageDisplayLogic {
 }
 
 struct MyPageView: View {
-    
     @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic?
     @State var stack = NavigationPath()
     
-    // 로그아웃 이후 로그인 관리를 위한 뷰 모델
- 
     @StateObject var loginViewModel = LoginViewModel()
     @StateObject var loginNaviModel = LoginNavigationModel()
     @State private var isLoggedIn: Bool = false
     
     var body: some View {
-        NavigationStack(path: $stack) {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading) {
-                    ProfileHeaderView(viewModel: myPageViewModel)
-                                   
-                    UserInfoView(viewModel: myPageViewModel)
-                        .padding(.horizontal)
-                    
-                    NavigationButtonsView(viewModel: myPageViewModel, stack: $stack)
-                        .padding(.bottom, 32)
-                    
-                    GroupBoxViews(myPageInteractor: myPageInteractor)
-                    
-                    Spacer()
-                        .frame(height: 40)
-                    
-                    Spacer()
-                }
-            }
-            .navigationDestination(for: String.self) { viewName in
-                switch viewName {
-                case "MyProfileEdit":
-                    MyProfileEdit(viewModel: myPageViewModel)
-                        .navigationBarBackButtonHidden(true)
-                case "ReservationView" :
-                    MyPageReservationView(mypageInteractor: myPageInteractor,stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(myPageViewModel)
-                    
-                case "ReservationInfoView" :
-                    MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(myPageViewModel)
-                case "DibsView":
-                    DibsView()
-                        .navigationBarBackButtonHidden(true)
-                case "SnapFitTabView":
-                    SnapFitTabView()
-                        .navigationBarBackButtonHidden(true)
-                default:
-                    SnapFitTabView()
-                }
-            }
-            .navigationBarHidden(true)
-            .ignoresSafeArea(.container, edges: .top)
-            .accentColor(.black)
-        }
-        .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
-            LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
-                .configureView()
-                .onDisappear {
-                    // 로그인 화면이 닫힐 때 토큰을 다시 확인
-                    DispatchQueue.main.async {
-                        checkForSavedTokens()
+        ZStack {
+            NavigationStack(path: $stack) {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        ProfileHeaderView(viewModel: myPageViewModel)
+                                       
+                        UserInfoView(viewModel: myPageViewModel)
+                            .padding(.horizontal)
+                        
+                        NavigationButtonsView(viewModel: myPageViewModel, stack: $stack)
+                            .padding(.bottom, 32)
+                        
+                        GroupBoxViews(myPageInteractor: myPageInteractor)
+                        
+                        Spacer()
+                            .frame(height: 40)
+                        
+                        Spacer()
                     }
                 }
-        }
-        .onAppear {
-            // 화면이 보일 때 토큰을 확인하여 로그인 상태 업데이트
-            DispatchQueue.main.async {
-                myPageInteractor?.fetchUserDetails()
-                myPageInteractor?.fetchCounts()
+                .navigationDestination(for: String.self) { viewName in
+                    switch viewName {
+                    case "MyProfileEdit":
+                        MyProfileEdit(viewModel: myPageViewModel)
+                            .navigationBarBackButtonHidden(true)
+                    case "ReservationView" :
+                        MyPageReservationView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                    
+                    case "ReservationInfoView" :
+                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                    case "DibsView":
+                        DibsView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                    case "SnapFitTabView":
+                        SnapFitTabView()
+                            .navigationBarBackButtonHidden(true)
+                    default:
+                        SnapFitTabView()
+                    }
+                }
+                .navigationBarHidden(true)
+                .ignoresSafeArea(.container, edges: .top)
+                .accentColor(.black)
             }
-            checkForSavedTokens()
-        }
-        .onChange(of: isLoggedIn) { newValue in
-            if !newValue {
-                loginViewModel.showLoginModal = true
+            .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
+                LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
+                    .configureView()
+                    .onDisappear {
+                        DispatchQueue.main.async {
+                            checkForSavedTokens()
+                        }
+                    }
+            }
+            .onAppear {
+                DispatchQueue.main.async {
+                    myPageInteractor?.fetchUserDetails()
+                    myPageInteractor?.fetchCounts()
+                }
+                checkForSavedTokens()
+            }
+            .onChange(of: isLoggedIn) { newValue in
+                if !newValue {
+                    loginViewModel.showLoginModal = true
+                }
             }
         }
     }
@@ -280,6 +281,7 @@ struct NavigationButtonsView: View {
             NavigationLink(value: "DibsView") {
                 NavigationButtonLabel(title: "찜한 내역", count: String(viewModel.userCounts?.reservationCount ?? 0))
             }
+            .hidden()
         }
         .frame(height: 108)
         .background(Color.white)
