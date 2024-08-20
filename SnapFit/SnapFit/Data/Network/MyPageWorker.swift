@@ -325,6 +325,12 @@ class MyPageWorker: MyPageWorkingLogic {
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
         urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
+        // Log the URLRequest details
+        print("MyPage Request URL: \(urlRequest.url?.absoluteString ?? "No URL")")
+        print("HTTP Method: \(urlRequest.httpMethod ?? "No Method")")
+        print("Headers: \(urlRequest.allHTTPHeaderFields ?? [:])")
+        print("ID: \(id)") // Log the ID value
+        
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {

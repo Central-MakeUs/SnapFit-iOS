@@ -8,7 +8,7 @@
 import Foundation
 
 class MainPromotionViewModel: NSObject, ObservableObject {
-
+    
     // 사용자 조회 관련
     @Published var userDetails: UserDetailsResponse?
     
@@ -30,5 +30,18 @@ class MainPromotionViewModel: NSObject, ObservableObject {
     init(productDetail: PostDetailResponse? = nil, reservationproductDetails: ReservationDetailsResponse? = nil) {
         self.productDetail = productDetail
         self.reservationproductDetail = reservationproductDetails
+    }
+    
+    // 네 가지 값을 모두 리셋하는 메서드
+    func resetAllDetails() {
+        selectedProductId = nil
+        productDetail = nil
+        productDetailAuthorProducts = []
+        reservationRequest = nil
+    }
+    
+    // 예약 성공 후 값을 리셋하는 메서드
+    func resetReservationSuccess() {
+        reservationSuccess = false
     }
 }

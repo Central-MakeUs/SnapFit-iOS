@@ -42,6 +42,7 @@ struct MoodsLabel: View {
 
 
 
+// 실내스냅 표시 라벨
 struct DeteailInOutLabel: View {
     var text: String
     
@@ -69,6 +70,8 @@ struct RoundedCornersShape: Shape {
     }
 }
 
+
+// 실내스냅 표시 라벨 (카드뷰)
 struct InOutLabel: View {
     var text: String
     

@@ -115,9 +115,9 @@ struct ReservationInfoView: View {
                 .padding(.horizontal)
             }
             .onAppear {
-                if let selectedId = mainPromotionViewModel.selectedProductId {
+                if let selectedReservationId = mainPromotionViewModel.selectedReservationId {
                     DispatchQueue.main.async {
-                        productInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
+                        productInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedReservationId))
                     }
                 }
             }

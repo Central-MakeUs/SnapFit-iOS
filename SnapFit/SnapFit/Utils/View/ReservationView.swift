@@ -32,6 +32,7 @@ struct ReservationView: View {
                     })) { product in
                         Button(action: {
                             mainPromotionViewModel.selectedReservationId = product.id
+                            print("ReservationView 지금 보려는 id \(product.id)")
                             stack.append("ReservationInfoView")
                         }) {
                             VStack(spacing: 0) {
@@ -45,6 +46,7 @@ struct ReservationView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
+                    
             }
         }
         .onAppear {
@@ -93,17 +95,19 @@ struct ReservationCardView: View {
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                 }
-                
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text(productDetail.title ?? "제목 없음")
                         .lineLimit(2)
                         .font(.subheadline)
                         .foregroundColor(.black)
-                    
+                        .frame(height: 40, alignment: .leading) // 높이 고정
+
                     if let locations = productDetail.locations, !locations.isEmpty {
                         Text(locations.joined(separator: " | "))
                             .font(.caption)
                             .foregroundColor(Color("LoginFontColor"))
+                            .frame(maxWidth: .infinity, alignment: .leading) // 넓이 고정
                     }
                     
                     if let firstPrice = productDetail.prices?.first {
@@ -121,13 +125,15 @@ struct ReservationCardView: View {
                         }
                     }
                 }
+                .frame(height: 130, alignment: .leading) // 전체 높이 고정
             }
             .padding()
             .background(Color.white)
-            .frame(width: 358, height: 130)
+            .frame(width: 358, height: 130) // 전체 카드의 크기 고정
         }
     }
 }
+
 
 // 예약하기 리스트에서 상세 정보에서 보여줄 카드뷰
 struct ReservationDetailCardView: View {
@@ -277,7 +283,7 @@ struct ReservationInfoCardView_Previews: PreviewProvider {
                 studio: true,
                 like: false
             ),
-            totalPrice: 200
+            totalPrice: 200, cancelMessage: nil
         )
         
         return ReservationInfoCardView(productInfo: sampleReservationData)

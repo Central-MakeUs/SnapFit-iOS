@@ -199,8 +199,13 @@ class AuthWorker: AuthWorkingLogic {
               let savedRefreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
             return Fail(error: ApiError.invalidAccessToken).eraseToAnyPublisher()
         }
+        
+        print("로그아웃 accessToken \(accessToken)")
         print("로그아웃 savedRefreshToken \(savedRefreshToken)")
-        let urlString = AuthWorker.baseURL + "/logout?refreshToken=\(savedRefreshToken)"
+        
+        // URL 인코딩 추가
+        let encodedRefreshToken = savedRefreshToken.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? savedRefreshToken
+        let urlString = AuthWorker.baseURL + "/logout?refreshToken=\(encodedRefreshToken)"
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -208,7 +213,22 @@ class AuthWorker: AuthWorkingLogic {
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
-        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("*/*", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+          
+        // 빈 데이터 설정
+        urlRequest.httpBody = Data()
+        
+        // 요청 헤더와 바디 출력
+        print("로그아웃 요청 URL: \(urlRequest.url?.absoluteString ?? "URL 없음")")
+        print("로그아웃 요청 HTTP 메서드: \(urlRequest.httpMethod ?? "메서드 없음")")
+        print("로그아웃 요청 헤더: \(urlRequest.allHTTPHeaderFields ?? [:])")
+        if let httpBody = urlRequest.httpBody, !httpBody.isEmpty {
+            print("로그아웃 요청 바디: \(String(data: httpBody, encoding: .utf8) ?? "바디 없음")")
+        } else {
+            print("로그아웃 요청 바디: 빈 바디")
+        }
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { output in
@@ -219,6 +239,8 @@ class AuthWorker: AuthWorkingLogic {
                 if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
                     self.clearTokens() // 로그아웃 성공 시 토큰 삭제
                     return true
+                } else if httpResponse.statusCode == 404 {
+                    throw ApiError.badRequest(message: "Endpoint not found", errorCode: 404)
                 } else if httpResponse.statusCode >= 400 && httpResponse.statusCode < 500 {
                     let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: output.data)
                     let message = errorResponse?.message ?? "Bad Request"
@@ -237,6 +259,9 @@ class AuthWorker: AuthWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
+
+
 
     // MARK: - Refresh Token
     func refreshToken() -> AnyPublisher<Tokens, ApiError> {

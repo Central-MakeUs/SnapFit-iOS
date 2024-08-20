@@ -57,7 +57,7 @@ extension MyPageView: MyPageDisplayLogic {
             })
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
-            print("myPageViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
+            //print("myPageViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
         }
     }
 

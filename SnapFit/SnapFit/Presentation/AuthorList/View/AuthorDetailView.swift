@@ -194,6 +194,11 @@ struct MainContentView: View {
         // 무드와 위치
         HStack(spacing: 16) {
             
+            if let studio = productDetail.studio, studio == true {
+                DeteailInOutLabel(text: "실내스냅")
+            }
+
+            
             if let vibes = productDetail.vibes {
                 ForEach(vibes, id: \.self) { vibe in
                     MoodsLabel(text: vibe)

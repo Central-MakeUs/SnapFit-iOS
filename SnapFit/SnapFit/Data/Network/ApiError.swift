@@ -20,6 +20,7 @@ enum ApiError : Error {
     case badRequest(message: String, errorCode: Int)
     case forbidden
     case notFound
+    case notFoundMessage(message: String) // 메시지 포함된 notFound 케이스
     case serverError
     case invalidRefreshToken
     case encodingError
@@ -39,6 +40,7 @@ enum ApiError : Error {
         case let .badRequest(message, errorCode):
                                    return "잘못된 요청입니다: \(message) (코드: \(errorCode))"
         case .forbidden:           return "접근이 금지되었습니다. (403)"
+        case let .notFoundMessage(message):  return "요청한 리소스를 찾을 수 없습니다: \(message) (404)" // 메시지 포함된 오류 메시지
         case .notFound:            return "요청한 리소스를 찾을 수 없습니다. (404)"
         case .serverError:         return "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
         case .encodingError:        return "encodingError 입니다."

@@ -24,25 +24,29 @@ struct AuthorReservationView: View {
     @Binding var stack: NavigationPath
     
     var body: some View {
-        VStack(alignment: .leading) {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading) {
-                    ProductSection()
-                    OptionSection(selectedTime: $selectedTime, selectedPrice: $selectedPrice)
-                    LocationSection(locationText: $locationText)
-                    DateTimeSection(selectedDate: $selectedDate)
-                    PeopleSection(counter: $counter)
-                    EmailSection(emailText: $emailText)
-                    PhoneSection(phoneText: $phoneText)
-                    SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete)
+        GeometryReader { geometry in
+            VStack(alignment: .leading) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        ProductSection()
+                        OptionSection(selectedTime: $selectedTime, selectedPrice: $selectedPrice)
+                        LocationSection(locationText: $locationText)
+                        DateTimeSection(selectedDate: $selectedDate)
+                        PeopleSection(counter: $counter)
+                        EmailSection(emailText: $emailText)
+                        PhoneSection(phoneText: $phoneText)
+                        SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete)
+                    }
+                    .padding(.bottom)
+                    .frame(minHeight: geometry.size.height) // 스크롤뷰의 최소 높이를 설정합니다.
                 }
+                .padding(.bottom)
             }
-            .padding(.bottom)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                hideKeyboard()
+            }
         }
-        .contentShape(Rectangle())
-//        .onTapGesture {
-//            hideKeyboard()
-//        }
         .onChange(of: locationText) { _ in updateReservationRequest() }
         .onChange(of: selectedDate) { _ in updateReservationRequest() }
         .onChange(of: emailText) { _ in updateReservationRequest() }
@@ -53,6 +57,7 @@ struct AuthorReservationView: View {
         .onChange(of: mainPromotionViewModel.reservationSuccess ?? false) { success in
             if success {
                 stack.append("AuthorReservationReceptionView")
+                mainPromotionViewModel.resetReservationSuccess() // 예약 성공 후 값 리셋
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -122,11 +127,6 @@ struct AuthorReservationView: View {
         return emailTest.evaluate(with: email)
     }
 
-//    private func isValidPhone(_ phone: String) -> Bool {
-//        let phoneRegEx = "^01([0|1|6|7|8|9])-([0-9]{3,4})-([0-9]{4})$"
-//        let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegEx)
-//        return phoneTest.evaluate(with: phone)
-//    }
     private func isValidPhone(_ phone: String) -> Bool {
         let phoneDigits = phone.filter { $0.isNumber } // 숫자만 필터링
         return phoneDigits.count == 11 // 숫자가 11자리인지 확인
@@ -136,7 +136,6 @@ struct AuthorReservationView: View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
-
 
 struct ProductSection: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
@@ -163,7 +162,6 @@ struct ProductSection: View {
     }
 }
 
-
 struct OptionSection: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     @Binding var selectedTime: String
@@ -189,9 +187,6 @@ struct OptionSection: View {
     }
 }
 
-
-
-
 struct LocationSection: View {
     @Binding var locationText: String
     
@@ -212,34 +207,83 @@ struct LocationSection: View {
     }
 }
 
+
 struct DateTimeSection: View {
     @Binding var selectedDate: Date
+    @State private var showingDatePicker = false // DatePicker 표시 여부
     
     var body: some View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "원하는 날짜와 시간을 선택해주세요", showRequired: true)
                 .padding(.bottom, 27)
             
+            Button(action: {
+                showingDatePicker.toggle() // 버튼 클릭 시 시트 표시
+            }) {
+                HStack {
+                    Text("날짜와 시간 선택")
+                        .font(.callout)
+                        .foregroundColor(.black) // 텍스트 색상을 검정색으로 변경
+                    Spacer()
+                    Text(dateFormatter.string(from: selectedDate))
+                        .font(.callout)
+                        .foregroundColor(.black) // 텍스트 색상을 검정색으로 변경
+                }
+                .padding()
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color.gray, lineWidth: 1)
+                )
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 32)
+        }
+        .sheet(isPresented: $showingDatePicker) {
+            DatePickerView(selectedDate: $selectedDate, isPresented: $showingDatePicker)
+                .environment(\.locale, Locale(identifier: "ko_KR")) // 한국어 로케일 설정
+        }
+    }
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "ko_KR") // 한국어 로케일 설정
+        return formatter
+    }
+}
+
+
+struct DatePickerView: View {
+    @Binding var selectedDate: Date
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        VStack {
+            Text("날짜와 시간을 선택하세요")
+                .font(.headline)
+                .padding()
+                .foregroundColor(.black) // 텍스트 색상을 검정색으로 변경
+            
             DatePicker(
                 "날짜와 시간 선택",
                 selection: $selectedDate,
                 displayedComponents: [.date, .hourAndMinute]
             )
-            .datePickerStyle(.graphical) // 달력 스타일 사용
+            .datePickerStyle(GraphicalDatePickerStyle()) // 달력 스타일 사용
             .labelsHidden()
             .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray, lineWidth: 1)
-            )
-            .padding(.horizontal)
-            .padding(.bottom, 32)
+            
+            Button("확인") {
+                isPresented = false
+            }
+            .padding()
+            .foregroundColor(.black) // 버튼 텍스트 색상을 검정색으로 변경
         }
-        .environment(\.locale, Locale(identifier: "ko_KR")) // 한국어 로케일 설정
+        .presentationDetents([.medium, .large]) // 시트 높이 설정
     }
 }
-
-
 
 
 struct PeopleSection: View {
@@ -295,7 +339,6 @@ struct PeopleSection: View {
     }
 }
 
-
 struct PhoneSection: View {
     @Binding var phoneText: String
     
@@ -315,7 +358,6 @@ struct PhoneSection: View {
         }
     }
 }
-
 
 struct SubmitButton: View {
 
@@ -352,10 +394,10 @@ struct SubmitButton: View {
         // 예약 요청을 서버에 보내기
         if let reservationRequest = mainPromotionViewModel.reservationRequest {
             productInteractor?.makeReservation(request: MainPromotion.ReservationProduct.Request(reservationRequest: reservationRequest))
+            isSubmitting = false // 요청 후 상태를 리셋
         }
     }
 }
-
 
 struct EmailSection: View {
     @Binding var emailText: String

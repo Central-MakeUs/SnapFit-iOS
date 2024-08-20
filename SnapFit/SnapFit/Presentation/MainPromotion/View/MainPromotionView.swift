@@ -30,7 +30,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.userDetails = viewModel.userDetails
-            //print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
+            print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
         }
     }
 
@@ -68,13 +68,12 @@ extension MainPromotionView: MainPromotionDisplayLogic {
         DispatchQueue.main.async {
             self.mainPromotionViewModel.reservationSuccess = viewModel.reservationSuccess
             self.mainPromotionViewModel.reservationDetails = viewModel.reservationDetails
-            print("mainPromotionViewModel.reservationSuccess \(self.mainPromotionViewModel.reservationSuccess)")
-            print("mainPromotionViewModel.reservationDetails \(self.mainPromotionViewModel.reservationDetails)")
+            //print("mainPromotionViewModel.reservationSuccess \(self.mainPromotionViewModel.reservationSuccess)")
+            //print("mainPromotionViewModel.reservationDetails \(self.mainPromotionViewModel.reservationDetails)")
         }
     }
     
     
-    // 유저 예약내역 리스트  조회
     // 유저 예약내역 리스트 조회
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
@@ -175,7 +174,7 @@ struct MainPromotionView: View {
                 DispatchQueue.main.async {
                     mainPromotionInteractor?.fetchUserDetails()
                     mainPromotionInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
-                    
+                    mainPromotionViewModel.resetAllDetails() // 예약하고 돌아온 사용자 데이터 초기화
                     if stack.isEmpty {
                         stack = NavigationPath()
                     }

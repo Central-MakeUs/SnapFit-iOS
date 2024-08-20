@@ -14,10 +14,11 @@ struct ReservationResponse: Codable {
 }
 
 struct ReservationData: Codable, Identifiable {
-    let id: Int?
+    let id: Int? // 이게 고유값이
     let reservationTime: String?
     let post: PostDetail?
     let totalPrice: Int?
+    let cancelMessage: String?
 }
 
 struct PostDetail: Codable {

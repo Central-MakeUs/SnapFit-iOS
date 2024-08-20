@@ -67,6 +67,7 @@ extension AuthorListView: AuthorListDisplayLogic {
             self.authorListViewModel.reservationDetails = viewModel.reservationDetails
             print("authorListViewModel.reservationSuccess \(self.authorListViewModel.reservationSuccess)")
             print("authorListViewModel.reservationDetails \(self.authorListViewModel.reservationDetails)")
+            self.authorListViewModel.reservationSuccess = false
         }
     }
     
@@ -129,7 +130,7 @@ struct AuthorListView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(authorListViewModel.products) { product in
+                        ForEach(authorListViewModel.products.sorted(by: { $0.id < $1.id })) { product in
                             Button(action: {
                                 handleProductSelection(product)
                             }) {

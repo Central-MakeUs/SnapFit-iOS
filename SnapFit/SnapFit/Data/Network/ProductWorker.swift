@@ -521,24 +521,33 @@ class ProductWorker: ProductWorkingLogic {
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
         }
-        
+
         let urlString = "http://34.47.94.218/snapfit/reservation?id=\(id)"
-        
+
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
-        
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
         urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
+
+        // Log the URLRequest details
+        print("Request URL: \(urlRequest.url?.absoluteString ?? "No URL")")
+        print("HTTP Method: \(urlRequest.httpMethod ?? "No Method")")
+        print("Headers: \(urlRequest.allHTTPHeaderFields ?? [:])")
+        print("ID: \(id)") // Log the ID value
+
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationDetailsResponse in
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
                     throw ApiError.invalidResponse
                 }
-                
+
+                // Log the HTTP response details
+                print("Response Status Code: \(httpResponse.statusCode)")
+
                 switch httpResponse.statusCode {
                 case 200...299:
                     return try JSONDecoder().decode(ReservationDetailsResponse.self, from: data)
@@ -548,7 +557,9 @@ class ProductWorker: ProductWorkingLogic {
                     let errorCode = errorResponse?.errorCode ?? 0
                     throw ApiError.badRequest(message: message, errorCode: errorCode)
                 case 404:
-                    throw ApiError.notFound
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Not Found"
+                    throw ApiError.notFoundMessage(message: message) // 404 오류 메시지 포함
                 case 500:
                     throw ApiError.serverError
                 default:
@@ -566,6 +577,7 @@ class ProductWorker: ProductWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
 
 
 

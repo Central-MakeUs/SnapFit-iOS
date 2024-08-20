@@ -128,7 +128,7 @@ extension AuthorListInteractor: AuthorListBusinessLogic {
     }
     
     func fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest) {
-        productWorker.fetchProductsFromServerWithFilter(vibes: request.vibes, limit: 10, offset: 0)
+        productWorker.fetchProductsFromServerWithFilter(vibes: request.vibes, limit: 30, offset: 0)
             .sink { [weak self] completion in
                 switch completion {
                 case .finished:
