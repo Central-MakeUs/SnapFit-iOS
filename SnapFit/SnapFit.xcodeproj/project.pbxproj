@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64095D9C2C761EF500D1C697 /* MakerProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095D9B2C761EF500D1C697 /* MakerProductRequest.swift */; };
+		64095D9E2C762CD400D1C697 /* PostProductResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095D9D2C762CD300D1C697 /* PostProductResponse.swift */; };
 		6416BCDC2C6CC88200E55367 /* PostDetailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */; };
 		6416BCDE2C6CCA8100E55367 /* MainPromotionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */; };
 		641D140C2C7340FF005752F4 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 641D140B2C7340FF005752F4 /* Kingfisher */; };
@@ -36,7 +38,7 @@
 		643E57142C6C96A50026226D /* MainPromotionConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E570E2C6C96A50026226D /* MainPromotionConfigurator.swift */; };
 		643E57162C6C97C30026226D /* ProductWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E57152C6C97C30026226D /* ProductWorker.swift */; };
 		643E57182C6C99DD0026226D /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E57172C6C99DD0026226D /* Product.swift */; };
-		643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F648A2C68F1C40017ACCD /* Vibes.swift */; };
+		643F648B2C68F1C40017ACCD /* VibesAndLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643F648A2C68F1C40017ACCD /* VibesAndLocations.swift */; };
 		64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */; };
 		644659D02C6F41930080BB03 /* SnapFitSplashImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 644659CF2C6F41930080BB03 /* SnapFitSplashImage.png */; };
 		644659D22C6F44590080BB03 /* ReservationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644659D12C6F44580080BB03 /* ReservationRequest.swift */; };
@@ -113,6 +115,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		64095D9B2C761EF500D1C697 /* MakerProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerProductRequest.swift; sourceTree = "<group>"; };
+		64095D9D2C762CD300D1C697 /* PostProductResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProductResponse.swift; sourceTree = "<group>"; };
 		6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailResponse.swift; sourceTree = "<group>"; };
 		6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionViewModel.swift; sourceTree = "<group>"; };
 		6428A4892C3D20C600C47990 /* SnapFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -139,7 +143,7 @@
 		643E570E2C6C96A50026226D /* MainPromotionConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionConfigurator.swift; sourceTree = "<group>"; };
 		643E57152C6C97C30026226D /* ProductWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWorker.swift; sourceTree = "<group>"; };
 		643E57172C6C99DD0026226D /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
-		643F648A2C68F1C40017ACCD /* Vibes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vibes.swift; sourceTree = "<group>"; };
+		643F648A2C68F1C40017ACCD /* VibesAndLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibesAndLocations.swift; sourceTree = "<group>"; };
 		64425DE32C61155800491FBC /* AuthorReservationReceptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorReservationReceptionView.swift; sourceTree = "<group>"; };
 		644659CF2C6F41930080BB03 /* SnapFitSplashImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SnapFitSplashImage.png; sourceTree = "<group>"; };
 		644659D12C6F44580080BB03 /* ReservationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationRequest.swift; sourceTree = "<group>"; };
@@ -290,7 +294,7 @@
 			isa = PBXGroup;
 			children = (
 				642D9E9D2C4D458500B31B51 /* Tokens.swift */,
-				643F648A2C68F1C40017ACCD /* Vibes.swift */,
+				643F648A2C68F1C40017ACCD /* VibesAndLocations.swift */,
 				643E57172C6C99DD0026226D /* Product.swift */,
 				6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */,
 				644659D12C6F44580080BB03 /* ReservationRequest.swift */,
@@ -299,6 +303,8 @@
 				64ED72D82C7244E300DE6C8E /* UserDetailsResponse.swift */,
 				64ED72DC2C72570F00DE6C8E /* MyPageCountResponse.swift */,
 				64C699A72C75ECAA00965005 /* MakerProductResponse.swift */,
+				64095D9B2C761EF500D1C697 /* MakerProductRequest.swift */,
+				64095D9D2C762CD300D1C697 /* PostProductResponse.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -675,6 +681,7 @@
 				64781B8B2C69D72B006BFBC6 /* MyPageInteractor.swift in Sources */,
 				64781B8D2C69D72B006BFBC6 /* MyPageModel.swift in Sources */,
 				64ED72DB2C72460200DE6C8E /* LoadUserModel.swift in Sources */,
+				64095D9E2C762CD400D1C697 /* PostProductResponse.swift in Sources */,
 				64795A7B2C5A68FB0018BE0D /* SplashAndTabView.swift in Sources */,
 				6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */,
 				642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */,
@@ -699,11 +706,12 @@
 				6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */,
 				64795A4B2C5908FD0018BE0D /* SnapFitTabView.swift in Sources */,
 				644659D22C6F44590080BB03 /* ReservationRequest.swift in Sources */,
-				643F648B2C68F1C40017ACCD /* Vibes.swift in Sources */,
+				643F648B2C68F1C40017ACCD /* VibesAndLocations.swift in Sources */,
 				64C699A82C75ECAA00965005 /* MakerProductResponse.swift in Sources */,
 				6496CB452C42CECA00381F0F /* LoginModel.swift in Sources */,
 				643549382C6DEE3900486EBE /* AuthorListPresenter.swift in Sources */,
 				6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */,
+				64095D9C2C761EF500D1C697 /* MakerProductRequest.swift in Sources */,
 				64795A4F2C5A109B0018BE0D /* MainPromotionView.swift in Sources */,
 				64FDCCE92C5006030033447D /* ApiError.swift in Sources */,
 				643E570F2C6C96A50026226D /* MainPromotionPresenter.swift in Sources */,

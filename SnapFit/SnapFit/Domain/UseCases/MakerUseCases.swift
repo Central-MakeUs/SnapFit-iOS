@@ -31,7 +31,26 @@ enum MakerUseCases {
         }
     }
     
-
+    enum LoadVibeAndLocation {
+        
+        struct VibesResponse {
+            let vibes: Vibes
+        }
+        
+        
+        struct VibesViewModel { //엔터티
+            let vibes: Vibes
+        }
+        
+        struct LocationsResponse {
+            let locations: MakerLocations
+        }
+        
+        
+        struct LocationsViewModel { //엔터티
+            let locations: MakerLocations
+        }
+    }
     
 //    // 예약 내역 리스트 조회
 //    enum CheckReservationProducts {

@@ -47,4 +47,6 @@ class MyPageViewModel: NSObject, ObservableObject {
     // MARK: - 메이커 관련
     @Published var makerProductlist: MakerProductResponse?
     @Published var selectedProductId: Int? // 어떤 상품을 조회 할건지
+    @Published var vibes: [Vibe] = []
+    @Published var locations: [MakerLocation] = []
 }

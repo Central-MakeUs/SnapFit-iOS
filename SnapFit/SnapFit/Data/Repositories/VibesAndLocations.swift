@@ -14,3 +14,11 @@ struct Vibe: Codable {
 }
 
 typealias Vibes = [Vibe]
+
+
+struct MakerLocation: Codable {
+    let id: Int?
+    let adminName: String?
+}
+
+typealias MakerLocations = [MakerLocation]

@@ -48,6 +48,12 @@ protocol MyPagePresentationLogic {
     func presentFetchMakerProductsFailure(error: ApiError)
     func presentFetchMakerProductsSuccess(response: MakerUseCases.LoadProducts.ProductsForMakerResponse)
     
+    func presentVibes(response : MakerUseCases.LoadVibeAndLocation.VibesResponse)
+    func presentVibesFetchFailure(_ error: ApiError)
+    
+    func presentLocations(response : MakerUseCases.LoadVibeAndLocation.LocationsResponse)
+    func presentLocationsFetchFailure(_ error: ApiError)
+    
 }
 
 final class MyPagePresenter {
@@ -57,7 +63,6 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
-
 
   
     // 사용자 탈퇴후 로그인뷰 보이게
@@ -178,5 +183,26 @@ extension MyPagePresenter: MyPagePresentationLogic {
         view?.displayFetchMakerProducts(viewModel: viewModel)
     }
     
+    // 분위기 정보를 View에 전달
+    func presentVibes(response : MakerUseCases.LoadVibeAndLocation.VibesResponse) {
+        let viewModel = MakerUseCases.LoadVibeAndLocation.VibesViewModel(vibes: response.vibes)
+        view?.displayVibes(viewModel: viewModel)
+    }
     
+    // 분위기 정보를 가져오는 데 실패했을 때 View에 에러를 전달
+    func presentVibesFetchFailure(_ error: ApiError) {
+        print("Error fetching vibes: \(error)")  // 실제 앱에서는 UI에 에러를 표시해야 함
+    }
+
+    
+    func presentLocations(response : MakerUseCases.LoadVibeAndLocation.LocationsResponse) {
+        let viewModel = MakerUseCases.LoadVibeAndLocation.LocationsViewModel(locations: response.locations)
+        view?.displayLocations(viewModel: viewModel)
+    }
+    
+    func presentLocationsFetchFailure(_ error: ApiError) {
+        print("Error fetching Locations: \(error)")  // 실제 앱에서는 UI에 에러를 표시해야 함
+    }
+    
+ 
 }

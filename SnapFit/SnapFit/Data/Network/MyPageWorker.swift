@@ -40,7 +40,8 @@ protocol MyPageWorkingLogic {
     
     // MARK: - 메이커 관련 기능
     func fetchMakerPosts(userId: Int, limit: Int, offset: Int) -> AnyPublisher<MakerProductResponse, ApiError>
-    
+    func fetchVibes() -> AnyPublisher<Vibes, ApiError>
+    func fetchLocations() -> AnyPublisher<MakerLocations, ApiError>
 }
 
 class MyPageWorker: MyPageWorkingLogic {
@@ -604,5 +605,198 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    // MARK: - 분위기 가져오기
+    func fetchVibes() -> AnyPublisher<Vibes, ApiError> {
+        let urlString = AuthWorker.baseURL + "/vibes"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        
+        // API 호출 및 응답 처리
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case (400...404):
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                default:
+                    if !(200...299).contains(httpResponse.statusCode) {
+                        throw ApiError.badStatus(code: httpResponse.statusCode)
+                    }
+                }
+                
+                return data
+            }
+            .decode(type: Vibes.self, decoder: JSONDecoder())
+            .mapError { err in
+                if let apiError = err as? ApiError {
+                    return apiError
+                }
+                if let _ = err as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(nil)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    
+    // MARK: - 분위기 가져오기
+    func fetchLocations() -> AnyPublisher<MakerLocations, ApiError> {
+        let urlString = AuthWorker.baseURL + "/locations"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        
+        // API 호출 및 응답 처리
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case (400...404):
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                default:
+                    if !(200...299).contains(httpResponse.statusCode) {
+                        throw ApiError.badStatus(code: httpResponse.statusCode)
+                    }
+                }
+                
+                return data
+            }
+            .decode(type: MakerLocations.self, decoder: JSONDecoder())
+            .mapError { err in
+                if let apiError = err as? ApiError {
+                    return apiError
+                }
+                if let _ = err as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(nil)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    
+    // MARK: - API 호출 함수
+    func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError> {
+        let urlString = "http://34.47.94.218/snapfit/post"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer YOUR_ACCESS_TOKEN", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        
+        // POST할 데이터를 JSON으로 인코딩
+        do {
+            let jsonData = try JSONEncoder().encode(request)
+            urlRequest.httpBody = jsonData
+        } catch {
+            return Fail(error: ApiError.unknown(error)).eraseToAnyPublisher()
+        }
+        
+        // API 호출 및 응답 처리
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case 200:
+                    return data
+                case (400...499):
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 403:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Unauthorized"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                default:
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .decode(type: PostProductResponse.self, decoder: JSONDecoder())
+            .mapError { err in
+                if let apiError = err as? ApiError {
+                    return apiError
+                }
+                if let _ = err as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(nil)
+            }
+            .eraseToAnyPublisher()
+    }
 
+    
+    // MARK: - 이미지 경로 가져오는 함수
+    func getImages(ext: String) -> AnyPublisher<[String], ApiError> {
+        let urlString = "http://34.47.94.218/snapfit/image/paths?ext=\(ext)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        
+        // API 호출 및 응답 처리
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                if !(200...299).contains(httpResponse.statusCode) {
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+                
+                return data
+            }
+            .decode(type: ImageInfoResponse.self, decoder: JSONDecoder())
+            .map { $0.fileInfos.map { $0.fileName } }  // fileName만 추출
+            .mapError { err in
+                if let apiError = err as? ApiError {
+                    return apiError
+                }
+                if let _ = err as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(nil)
+            }
+            .eraseToAnyPublisher()
+    }
 }

@@ -3,7 +3,7 @@
 //  SnapFit
 //
 //  Created by 정정욱 on 8/12/24.
-//  
+//
 //
 import Foundation
 import Combine
@@ -29,8 +29,11 @@ protocol MyPageBusinessLogic {
     func unlikePost(request: MainPromotion.Like.Request)
     
     
-    // MARK: - 유저 상품 등록 관련
+    // MARK: - 메이커 관련
     func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest)
+    func fetchVibes()
+    func fetchLocations()
+    
 }
 
 
@@ -41,16 +44,16 @@ final class MyPageInteractor: MyPageBusinessLogic {
     typealias Request = MyPage.LoadMyPage.Request
     typealias Response = MyPage.LoadMyPage.Response
     var presenter: MyPagePresentationLogic?
-
+    
     private let myPageWorker: MyPageWorkingLogic
     private let authWorker: AuthWorkingLogic
     private var cancellables = Set<AnyCancellable>()
-
+    
     init(myPageWorker: MyPageWorkingLogic, authWorker: AuthWorkingLogic) {
         self.myPageWorker = myPageWorker
         self.authWorker = authWorker
     }
-
+    
     func fetchUserDetails() {
         // 서버에서 사용자 정보를 가져옵니다.
         myPageWorker.fetchUserDetails()
@@ -98,50 +101,50 @@ final class MyPageInteractor: MyPageBusinessLogic {
             }
             .store(in: &cancellables)
     }
-
+    
     
     func serviceLogout() {
-            print("MyPageInteractor logoutFromKakao")
-            authWorker.logoutFromKakao { [weak self] result in
-                guard let self = self else { return } // self가 nil일 경우 종료
+        print("MyPageInteractor logoutFromKakao")
+        authWorker.logoutFromKakao { [weak self] result in
+            guard let self = self else { return } // self가 nil일 경우 종료
+            
+            switch result {
+            case .success:
+                // 카카오 로그아웃 성공 후 SnapFit 서버 로그아웃 처리
+                self.authWorker.socialLogoutSnapfitServer()
+                    .sink { completion in
+                        switch completion {
+                        case .finished:
+                            print("SnapFit server logout completed")
+                        case .failure(let apiError):
+                            // 서버 로그아웃 실패 시 프레젠터에 실패 전달
+                            self.presenter?.presentLogoutFailure(error: apiError)
+                        }
+                    } receiveValue: { success in
+                        // 서버 로그아웃 성공 시 프레젠터에 성공 전달
+                        self.presenter?.presentLogoutSuccess()
+                    }
+                    .store(in: &self.cancellables)
                 
-                switch result {
-                case .success:
-                    // 카카오 로그아웃 성공 후 SnapFit 서버 로그아웃 처리
-                    self.authWorker.socialLogoutSnapfitServer()
-                        .sink { completion in
-                            switch completion {
-                            case .finished:
-                                print("SnapFit server logout completed")
-                            case .failure(let apiError):
-                                // 서버 로그아웃 실패 시 프레젠터에 실패 전달
-                                self.presenter?.presentLogoutFailure(error: apiError)
-                            }
-                        } receiveValue: { success in
-                            // 서버 로그아웃 성공 시 프레젠터에 성공 전달
-                            self.presenter?.presentLogoutSuccess()
+            case .failure(let error):
+                // 카카오 로그아웃 실패 시에도 SnapFit 서버 로그아웃 처리 애플이 따로 로그아웃이 없기 때문임
+                self.authWorker.socialLogoutSnapfitServer()
+                    .sink { completion in
+                        switch completion {
+                        case .finished:
+                            print("SnapFit server logout completed")
+                        case .failure(let apiError):
+                            // 서버 로그아웃 실패 시 프레젠터에 실패 전달
+                            self.presenter?.presentLogoutFailure(error: apiError)
                         }
-                        .store(in: &self.cancellables)
-                    
-                case .failure(let error):
-                    // 카카오 로그아웃 실패 시에도 SnapFit 서버 로그아웃 처리 애플이 따로 로그아웃이 없기 때문임
-                    self.authWorker.socialLogoutSnapfitServer()
-                        .sink { completion in
-                            switch completion {
-                            case .finished:
-                                print("SnapFit server logout completed")
-                            case .failure(let apiError):
-                                // 서버 로그아웃 실패 시 프레젠터에 실패 전달
-                                self.presenter?.presentLogoutFailure(error: apiError)
-                            }
-                        } receiveValue: { success in
-                            // 서버 로그아웃 성공 시 프레젠터에 카카오 로그아웃 실패 전달
-                            self.presenter?.presentLogoutSuccess()
-                        }
-                        .store(in: &self.cancellables)
-                }
+                    } receiveValue: { success in
+                        // 서버 로그아웃 성공 시 프레젠터에 카카오 로그아웃 실패 전달
+                        self.presenter?.presentLogoutSuccess()
+                    }
+                    .store(in: &self.cancellables)
             }
         }
+    }
     
     
     func cancelmembership() {
@@ -167,7 +170,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
             }
             .store(in: &cancellables)
     }
-
+    
     // 유저 예약내역 리스트
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
         myPageWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
@@ -225,7 +228,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 self?.presenter?.presentFetchReservationDetailSuccess(response: response)
             }
             .store(in: &cancellables)
-
+        
     }
     
     // 예약 내역 취소
@@ -248,42 +251,42 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     // 좋아요 요청
-        func likePost(request: MainPromotion.Like.Request) {
-            myPageWorker.likePost(postId: request.postId)
-                .sink { [weak self] completion in
-                    switch completion {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        print("좋아요 실패: \(error.localizedDescription)")
-                        //self?.presenter?.presentLikePostFailure(error: error)
-                    }
-                } receiveValue: { [weak self] response in
-                    print("좋아요 성공: \(response)")
-                    //self?.presenter?.presentLikePostSuccess(response: response)
+    func likePost(request: MainPromotion.Like.Request) {
+        myPageWorker.likePost(postId: request.postId)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("좋아요 실패: \(error.localizedDescription)")
+                    //self?.presenter?.presentLikePostFailure(error: error)
                 }
-                .store(in: &cancellables)
-        }
-        
-        // 좋아요 취소 요청
-        func unlikePost(request: MainPromotion.Like.Request) {
-            myPageWorker.unlikePost(postId: request.postId)
-                .sink { [weak self] completion in
-                    switch completion {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        print("좋아요 취소 실패: \(error.localizedDescription)")
-                        //self?.presenter?.presentUnlikePostFailure(error: error)
-                    }
-                } receiveValue: { [weak self] response in
-                    print("좋아요 취소 성공: \(response)")
-                    //self?.presenter?.presentUnlikePostSuccess(response: response)
-                }
-                .store(in: &cancellables)
-        }
+            } receiveValue: { [weak self] response in
+                print("좋아요 성공: \(response)")
+                //self?.presenter?.presentLikePostSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
     
-   
+    // 좋아요 취소 요청
+    func unlikePost(request: MainPromotion.Like.Request) {
+        myPageWorker.unlikePost(postId: request.postId)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("좋아요 취소 실패: \(error.localizedDescription)")
+                    //self?.presenter?.presentUnlikePostFailure(error: error)
+                }
+            } receiveValue: { [weak self] response in
+                print("좋아요 취소 성공: \(response)")
+                //self?.presenter?.presentUnlikePostSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
+    
+    
     
     // MARK: - 메이커 관련 기능
     
@@ -305,6 +308,41 @@ final class MyPageInteractor: MyPageBusinessLogic {
             }
             .store(in: &cancellables)
     }
-   
+    
+    // 분위기 정보 가져오기
+    func fetchVibes() {
+        myPageWorker.fetchVibes()
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.presenter?.presentVibesFetchFailure(error)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { vibes in
+                let response = MakerUseCases.LoadVibeAndLocation.VibesResponse(vibes: vibes)
+                self.presenter?.presentVibes(response:response)
+            })
+            .store(in: &cancellables)
+    }
+    
+    // 위치 정보 가져오기
+    func fetchLocations() {
+        myPageWorker.fetchLocations()
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.presenter?.presentLocationsFetchFailure(error)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { locations in
+                let response = MakerUseCases.LoadVibeAndLocation.LocationsResponse(locations: locations)
+                self.presenter?.presentLocations(response: response)
+            })
+            .store(in: &cancellables)
+    }
+    
+    
 }
 
