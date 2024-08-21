@@ -19,6 +19,7 @@ protocol ProductBusinessLogic {
     func makeReservation(request: MainPromotion.ReservationProduct.Request)
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
+    func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request)
     
     // 상품 찜하기, 취소
     func likePost(request: MainPromotion.Like.Request)

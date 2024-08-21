@@ -23,6 +23,8 @@ protocol MainPromotionDisplayLogic {
     func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
     func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel)
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
+    
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
@@ -98,6 +100,15 @@ extension MainPromotionView: MainPromotionDisplayLogic {
             print("mainPromotionViewModel.reservationproductDetail: \(mainPromotionViewModel.reservationproductDetail)")
         }
     }
+    
+    // 유저 예약 삭제
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            mainPromotionViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
+            print("mainPromotionViewModel.deleteReservationSuccess \(mainPromotionViewModel.deleteReservationSuccess)")
+        }
+    }
+    
     
     
 }

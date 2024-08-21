@@ -14,9 +14,7 @@ struct ReservationConfirmView: View {
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
     @State private var alertCancelAction: () -> Void = {}
-    enum Reason {
-        case contactIssue, wrongSelection
-    }
+
     @State private var selectedReason: Reason? = nil
     
     var body: some View {
@@ -32,11 +30,23 @@ struct ReservationConfirmView: View {
             }
             .padding(.vertical)
         }
-        .sheet(isPresented: $showSheet) {
-            ReservationConfirmSheetView(selectedReason: $selectedReason, showSheet: $showSheet, showAlert: $showAlert)
-                .padding(.horizontal)
-                .presentationDetents([.small, .large])
-        }
+//        .sheet(isPresented: $showSheet) {
+//                    ReservationSheetView(
+//                        selectedReason: $selectedReason,
+//                        showSheet: $showSheet,
+//                        showAlert: $showAlert,
+//                        onConfirm: { reason in
+//                            // 취소 이유를 받아서 메시지로 전송
+//                            cancelMessage = reason
+//                            if let selectedId = myPageViewModel.selectedReservationId {
+//                                mypageInteractor?.deleteReservation(request: MainPromotion.DeleteReservationProduct.Request(selectedReservationId: selectedId, message: cancelMessage))
+//                                showAlert = true // 알림 표시
+//                            }
+//                        }
+//                    )
+//                    .padding(.horizontal)
+//                    .presentationDetents([.small, .large])
+//        }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
@@ -109,6 +119,7 @@ struct ReservationDetailsSection: View {
                 InfoRow(label: "옵션", value: "30분 스냅")
                 InfoRow(label: "위치", value: "홍대")
                 InfoRow(label: "예약일시", value: "24.02.22(목) 오후 5:00")
+                    .fixedSize(horizontal: false, vertical: true) // 이 줄을 추가
                 InfoRow(label: "인원", value: "성인 1명")
             }
             .frame(maxWidth: .infinity, minHeight: 184)

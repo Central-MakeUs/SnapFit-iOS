@@ -25,6 +25,7 @@ protocol MainPromotionBusinessLogic: ProductBusinessLogic{
     func makeReservation(request: MainPromotion.ReservationProduct.Request)
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
+    func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request)
     
     // 상품 찜하기, 취소
     func likePost(request: MainPromotion.Like.Request)
@@ -216,6 +217,25 @@ extension MainPromotionInteractor: MainPromotionBusinessLogic {
             }
             .store(in: &cancellables)
 
+    }
+    
+    // 예약 내역 취소
+    func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request) {
+        productWorker.deleteReservation(id: request.selectedReservationId, message: request.message)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("예약 상세내역 조회 실패 : \(error.localizedDescription)")
+                    self?.presenter?.presentDeleteReservationFailure(error: error)
+                }
+            } receiveValue: { [weak self] success in
+                print("예약 상세내역 조회 성공 : \(success)")
+                let response = MainPromotion.DeleteReservationProduct.Response(deleteReservationSuccess: success)
+                self?.presenter?.presentDeleteReservationSuccess(response: response)
+            }
+            .store(in: &cancellables)
     }
     
     // 좋아요 요청

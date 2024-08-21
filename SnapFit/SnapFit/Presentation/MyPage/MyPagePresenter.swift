@@ -34,6 +34,10 @@ protocol MyPagePresentationLogic {
     func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
     func presentFetchReservationDetailFailure(error: ApiError)
     
+    // 유저 예약 내역 취소
+    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response)
+    func presentDeleteReservationFailure(error: ApiError)
+    
     // 유저 찜 내역 리스트 조회
     func presentFetchUserLikesFailure(error: ApiError)
     func presentFetchUserLikesSuccess(response: MainPromotion.CheckReservationProducts.Response)
@@ -49,6 +53,7 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+
   
     // 사용자 탈퇴후 로그인뷰 보이게
     func presentCancelMembershipSuccess() {
@@ -113,6 +118,21 @@ extension MyPagePresenter: MyPagePresentationLogic {
         // View에 전달
         view?.displayFetchUserReservation(viewModel: viewModel)
     }
+    
+    
+    
+    // MARK: - 유저 예약 취소
+    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response) {
+        let viewModel = MainPromotion.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
+        // View에 전달
+        view?.displayDeleteUserReservation(viewModel: viewModel)
+    }
+    
+    func presentDeleteReservationFailure(error: ApiError) {
+        print("예약 취소 실패 : \(error)")
+    }
+    
+    
     
     // MARK: - 유저 찜 내역 조회
     func presentFetchUserLikesFailure(error: ApiError) {

@@ -42,6 +42,10 @@ protocol MainPromotionPresentationLogic {
     func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
     func presentFetchReservationDetailFailure(error: ApiError)
 
+    // 유저 예약 내역 취소
+    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response)
+    func presentDeleteReservationFailure(error: ApiError)
+    
     
 }
 
@@ -156,6 +160,18 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     {
         print("Error 유저 예약 내역 리스트 단일 조회: \(error)")
     }
+    
+    // MARK: - 유저 예약 취소
+    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response) {
+        let viewModel = MainPromotion.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
+        // View에 전달
+        view?.displayDeleteUserReservation(viewModel: viewModel)
+    }
+    
+    func presentDeleteReservationFailure(error: ApiError) {
+        print("예약 취소 실패 : \(error)")
+    }
+    
     
     
 }

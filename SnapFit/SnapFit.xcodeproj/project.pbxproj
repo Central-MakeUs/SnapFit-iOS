@@ -71,7 +71,7 @@
 		64795A6F2C5A2BDF0018BE0D /* MoodSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A6E2C5A2BDF0018BE0D /* MoodSelectionView.swift */; };
 		64795A712C5A2BFA0018BE0D /* SelectPhotosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A702C5A2BFA0018BE0D /* SelectPhotosView.swift */; };
 		64795A732C5A2C100018BE0D /* AccordionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A722C5A2C100018BE0D /* AccordionView.swift */; };
-		64795A752C5A2C260018BE0D /* ReservationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A742C5A2C260018BE0D /* ReservationSheetView.swift */; };
+		64795A752C5A2C260018BE0D /* DeleteReservationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A742C5A2C260018BE0D /* DeleteReservationSheetView.swift */; };
 		64795A792C5A51980018BE0D /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A782C5A51980018BE0D /* SectionHeaderView.swift */; };
 		64795A7B2C5A68FB0018BE0D /* SplashAndTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64795A7A2C5A68FA0018BE0D /* SplashAndTabView.swift */; };
 		647EE3FD2C6D0C6700E4372F /* AuthorListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647EE3F82C6D0C6700E4372F /* AuthorListModel.swift */; };
@@ -172,7 +172,7 @@
 		64795A6E2C5A2BDF0018BE0D /* MoodSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodSelectionView.swift; sourceTree = "<group>"; };
 		64795A702C5A2BFA0018BE0D /* SelectPhotosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectPhotosView.swift; sourceTree = "<group>"; };
 		64795A722C5A2C100018BE0D /* AccordionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccordionView.swift; sourceTree = "<group>"; };
-		64795A742C5A2C260018BE0D /* ReservationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationSheetView.swift; sourceTree = "<group>"; };
+		64795A742C5A2C260018BE0D /* DeleteReservationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteReservationSheetView.swift; sourceTree = "<group>"; };
 		64795A782C5A51980018BE0D /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		64795A7A2C5A68FA0018BE0D /* SplashAndTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashAndTabView.swift; sourceTree = "<group>"; };
 		647EE3F82C6D0C6700E4372F /* AuthorListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorListModel.swift; sourceTree = "<group>"; };
@@ -339,7 +339,7 @@
 				64795A6E2C5A2BDF0018BE0D /* MoodSelectionView.swift */,
 				64795A702C5A2BFA0018BE0D /* SelectPhotosView.swift */,
 				64795A722C5A2C100018BE0D /* AccordionView.swift */,
-				64795A742C5A2C260018BE0D /* ReservationSheetView.swift */,
+				64795A742C5A2C260018BE0D /* DeleteReservationSheetView.swift */,
 				64795A782C5A51980018BE0D /* SectionHeaderView.swift */,
 				64600F052C5D072700C34929 /* CustomTopTabbar.swift */,
 				64600F092C5D0B7400C34929 /* ImageSliderView.swift */,
@@ -656,7 +656,7 @@
 				64795A792C5A51980018BE0D /* SectionHeaderView.swift in Sources */,
 				64ED72DD2C72570F00DE6C8E /* MyPageCountResponse.swift in Sources */,
 				64795A6B2C5A2ADE0018BE0D /* ReservationInfoView.swift in Sources */,
-				64795A752C5A2C260018BE0D /* ReservationSheetView.swift in Sources */,
+				64795A752C5A2C260018BE0D /* DeleteReservationSheetView.swift in Sources */,
 				647EE4002C6D0D9500E4372F /* AuthorListViewModel.swift in Sources */,
 				64795A6C2C5A2ADE0018BE0D /* ReservationView.swift in Sources */,
 				64A063212C7227A700CAF9F4 /* MyPageReservationInfoView.swift in Sources */,

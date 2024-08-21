@@ -20,7 +20,7 @@ protocol AuthorListDisplayLogic {
     func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
     func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) 
-    
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
 }
 
 extension AuthorListView: AuthorListDisplayLogic {
@@ -67,7 +67,6 @@ extension AuthorListView: AuthorListDisplayLogic {
             self.authorListViewModel.reservationDetails = viewModel.reservationDetails
             print("authorListViewModel.reservationSuccess \(self.authorListViewModel.reservationSuccess)")
             print("authorListViewModel.reservationDetails \(self.authorListViewModel.reservationDetails)")
-            self.authorListViewModel.reservationSuccess = false
         }
     }
     
@@ -93,6 +92,15 @@ extension AuthorListView: AuthorListDisplayLogic {
             print("authorListViewModel.reservationproductDetail: \(authorListViewModel.reservationproductDetail)")
         }
     }
+    
+    // 유저 예약 삭제
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            authorListViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
+            print("authorListViewModel.deleteReservationSuccess \(authorListViewModel.deleteReservationSuccess)")
+        }
+    }
+    
     
 }
 

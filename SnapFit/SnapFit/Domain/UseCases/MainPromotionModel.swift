@@ -114,6 +114,23 @@ enum MainPromotion {
         }
     }
     
+    // 예약내역 취소
+    enum DeleteReservationProduct {
+        struct Request {
+            var selectedReservationId: Int
+            var message: String
+        }
+        
+        struct Response {
+            var deleteReservationSuccess : Bool
+        }
+        
+        
+        struct ViewModel {
+            var deleteReservationSuccess : Bool
+        }
+    }
+    
     enum Like{
         struct Request {
             let postId: Int

@@ -14,6 +14,9 @@ protocol MyPageDisplayLogic {
     // MARK: - 상품 예약관련
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
     func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) 
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
+
+   
 }
 
 
@@ -51,15 +54,29 @@ extension MyPageView: MyPageDisplayLogic {
     // 유저 예약내역 리스트 조회
     func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
+            // 데이터를 불러오기 전에 기존 데이터를 초기화하여 중복을 방지
+            myPageViewModel.reservationproducts.removeAll()
+
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화 후 id로 정렬
             myPageViewModel.reservationproducts = (viewModel.reservationProducts?.data ?? []).sorted(by: {
                 ($0.id ?? Int.min) < ($1.id ?? Int.min)
             })
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
-            //print("myPageViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
+            // print("myPageViewModel.reservationproducts: \(myPageViewModel.reservationproducts)")
         }
     }
+
+    
+    
+    // 유저 예약 삭제
+    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
+            print("myPageViewModel.deleteReservationSuccess \(myPageViewModel.deleteReservationSuccess)")
+        }
+    }
+    
 
     
     // 유저 예약내역 단일 조회
@@ -225,14 +242,14 @@ struct ProfileHeaderView: View {
             
             
             // 💁 심사 이후 다시 구현
-//            NavigationLink(value: "MyProfileEdit"){
-//                Image("editicon")
-//                    .resizable()
-//                    .scaledToFit()
-//                    .frame(width: 24, height: 24)
-//                    .foregroundColor(.white)
-//            }
-//            .offset(x: 160, y: -30)
+            NavigationLink(value: "MyProfileEdit"){
+                Image("editicon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+            }
+            .offset(x: 160, y: -30)
         }
     }
 }

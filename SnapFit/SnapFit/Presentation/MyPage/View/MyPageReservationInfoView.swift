@@ -17,31 +17,13 @@ struct MyPageReservationInfoView: View {
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
-    
-//    enum Reason {
-//        case contactIssue, wrongSelection
-//    }
-    
-//    @State private var selectedReason: Reason? = nil
+    @State private var selectedReason: Reason? = nil
+    @State private var cancelMessage: String = "" // 추가된 상태 변수
     
     var body: some View {
         
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                
-//                Group {
-//                    
-//                    InfoRow(label: "연락처", value: "snap@naver.com")
-//                        .padding(.horizontal)
-//                    
-//                    
-//                    InfoRow(label: "이메일", value: "snap@naver.com")
-//                        .padding(.horizontal)
-//                    
-//                    CustomDividerView()
-//                        .padding(.bottom)
-//                }
-                
                 
                 Group {
                     SectionHeaderView(title: "주문상품")
@@ -67,7 +49,9 @@ struct MyPageReservationInfoView: View {
                             Group {
                                 InfoRow(label: "옵션", value: "30분 스냅") // Update as necessary
                                 InfoRow(label: "위치", value: details.reservationLocation)
-                                InfoRow(label: "예약일시", value: formatDate(details.reservationTime))
+                                //InfoRow(label: "예약일시", value: formatDate(details.reservationTime))
+                                InfoRow(label: "예약일시", value: details.reservationTime)
+                                    .fixedSize(horizontal: false, vertical: true) // 이 줄을 추가
                                 InfoRow(label: "인원", value: "성인 \(details.person)명")
                                 InfoRow(label: "이메일", value: "snap@naver.com") // Update as necessary
                             }
@@ -75,7 +59,6 @@ struct MyPageReservationInfoView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .background(Color(UIColor.systemGray5))
-                        //.cornerRadius(5)
                         .padding(.horizontal)
                         .padding(.bottom)
                         
@@ -104,7 +87,6 @@ struct MyPageReservationInfoView: View {
                 }
                 
                 Button(action: {
-                    // 버튼 액션
                     showSheet.toggle()
                 }) {
                     Text("예약취소")
@@ -118,21 +100,32 @@ struct MyPageReservationInfoView: View {
                 }
                 .padding(.horizontal)
             }
-            .onAppear(perform: {
+            .onAppear {
                 // 상품 상세 조회
                 if let selectedId = myPageViewModel.selectedReservationId {
                     mypageInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
                 }
-            })
-
+            }
             .padding(.vertical)
         }
         
-//        .sheet(isPresented: $showSheet) {
-//            ReservationSheetView(selectedReason: $selectedReason, showSheet: $showSheet, showAlert: $showAlert)
-//                .padding(.horizontal)
-//                .presentationDetents([.small, .large])
-//        }
+        .sheet(isPresented: $showSheet) {
+            DeleteReservationSheetView(
+                selectedReason: $selectedReason,
+                showSheet: $showSheet,
+                showAlert: $showAlert,
+                onConfirm: { reason in
+                    // 취소 이유를 받아서 메시지로 전송
+                    cancelMessage = reason
+                    if let selectedId = myPageViewModel.selectedReservationId {
+                        mypageInteractor?.deleteReservation(request: MainPromotion.DeleteReservationProduct.Request(selectedReservationId: selectedId, message: cancelMessage))
+                        showAlert = true // 알림 표시
+                    }
+                }
+            )
+            .padding(.horizontal)
+            .presentationDetents([.small, .large])
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
@@ -157,10 +150,13 @@ struct MyPageReservationInfoView: View {
                     
                     CustomAlertView(isPresented: $showAlert, message: "예약이 취소되었습니다.") {
                         showAlert = false
+                        if showAlert == false {
+                            // 확인 버튼을 누른 후 스택에서 제거하여 뒤로 가기
+                            stack.removeLast()
+                        }
                     }
                     .frame(width: 300)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-                    // 해당 View를 화면의 정중앙에 위치
+                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
                 }
             }
         )

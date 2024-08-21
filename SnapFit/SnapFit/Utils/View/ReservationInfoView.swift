@@ -13,15 +13,12 @@ struct ReservationInfoView: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     @Binding var stack: NavigationPath
     
-    @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
+    @Environment(\.dismiss) var dismiss
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
-    
-    enum Reason {
-        case contactIssue, wrongSelection
-    }
     @State private var selectedReason: Reason? = nil
+    @State private var cancelMessage: String = "" // 취소 메시지 저장
     
     var body: some View {
         
@@ -61,17 +58,17 @@ struct ReservationInfoView: View {
                     if let details = mainPromotionViewModel.reservationproductDetail {
                         VStack(alignment: .leading, spacing: 15) {
                             Group {
-                                InfoRow(label: "옵션", value: "30분 스냅") // Update as necessary
+                                InfoRow(label: "옵션", value: "30분 스냅")
                                 InfoRow(label: "위치", value: details.reservationLocation)
-                                InfoRow(label: "예약일시", value: formatDate(details.reservationTime))
+                                InfoRow(label: "예약일시", value: details.reservationTime)
+                                    .fixedSize(horizontal: false, vertical: true) // 긴 텍스트 처리
                                 InfoRow(label: "인원", value: "성인 \(details.person)명")
-                                InfoRow(label: "이메일", value: "snap@naver.com") // Update as necessary
+                                InfoRow(label: "이메일", value: "snap@naver.com")
                             }
                             .padding()
                         }
                         .frame(maxWidth: .infinity)
                         .background(Color(UIColor.systemGray5))
-                        //.cornerRadius(5)
                         .padding(.horizontal)
                         .padding(.bottom)
                         
@@ -100,7 +97,6 @@ struct ReservationInfoView: View {
                 }
                 
                 Button(action: {
-                    // 버튼 액션
                     showSheet.toggle()
                 }) {
                     Text("예약취소")
@@ -125,9 +121,20 @@ struct ReservationInfoView: View {
         }
         
         .sheet(isPresented: $showSheet) {
-            ReservationSheetView(selectedReason: $selectedReason, showSheet: $showSheet, showAlert: $showAlert)
-                .padding(.horizontal)
-                .presentationDetents([.small, .large])
+            DeleteReservationSheetView(
+                selectedReason: $selectedReason,
+                showSheet: $showSheet,
+                showAlert: $showAlert,
+                onConfirm: { reason in
+                    cancelMessage = reason
+                    if let selectedId = mainPromotionViewModel.selectedReservationId {
+                        productInteractor?.deleteReservation(request: MainPromotion.DeleteReservationProduct.Request(selectedReservationId: selectedId, message: cancelMessage))
+                        showAlert = true
+                    }
+                }
+            )
+            .padding(.horizontal)
+            .presentationDetents([.small, .large])
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -153,10 +160,12 @@ struct ReservationInfoView: View {
                     
                     CustomAlertView(isPresented: $showAlert, message: "예약이 취소되었습니다.") {
                         showAlert = false
+                        if !showAlert {
+                            stack.removeLast()
+                        }
                     }
                     .frame(width: 300)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-                    // 해당 View를 화면의 정중앙에 위치
+                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
                 }
             }
         )

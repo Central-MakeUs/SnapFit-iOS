@@ -47,7 +47,7 @@ struct ReservationView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                     
-            }
+                }
         }
         .onAppear {
             // 예약 내역 불러오기
@@ -88,21 +88,21 @@ struct ReservationCardView: View {
                         .scaledToFill()
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
-                 
+                    
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                 }
-
+                
                 VStack(alignment: .leading, spacing: 8) {
                     Text(productDetail.title ?? "제목 없음")
                         .lineLimit(2)
                         .font(.subheadline)
                         .foregroundColor(.black)
                         .frame(height: 40, alignment: .leading) // 높이 고정
-
+                    
                     if let locations = productDetail.locations, !locations.isEmpty {
                         Text(locations.joined(separator: " | "))
                             .font(.caption)
@@ -149,7 +149,7 @@ struct ReservationDetailCardView: View {
                         .scaledToFill()
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
-                        
+                    
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
@@ -178,9 +178,14 @@ struct ReservationDetailCardView: View {
                         .bold()
                         .foregroundColor(.black)
                     
-                    Text("예약일시: \(formatDate(reservationDetails.reservationTime))")
-                        .font(.caption)
-                        .foregroundColor(.black)
+                    Text("예약일시: \(reservationDetails.reservationTime ?? "") ")
+                                           .font(.caption)
+                                           .foregroundColor(.black)
+                                           .fixedSize(horizontal: false, vertical: true) // 이 줄을 추가
+                    
+//                    Text("예약일시: \(formatDate(reservationDetails.reservationTime))")
+//                        .font(.caption)
+//                        .foregroundColor(.black)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -213,7 +218,16 @@ struct ReservationInfoCardView: View {
                         .scaledToFill()
                         .frame(width: 130, height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
-                        
+                        .overlay(
+                            VStack {
+                                // cancelMessage가 nil이 아니고, 비어있지 않을 때만 CancelLabel 표시
+                                if let cancelMessage = productInfo.cancelMessage, !cancelMessage.isEmpty {
+                                    CancelLabel(text: "예약취소") // InOutLabel 사용
+                                }
+                                Spacer()
+                            },
+                            alignment: .topLeading // 왼쪽 상단 정렬
+                        )
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
@@ -242,9 +256,13 @@ struct ReservationInfoCardView: View {
                         .bold()
                         .foregroundColor(.black)
                     
-                    Text("예약일시: \(formatDate(productInfo.reservationTime ?? ""))")
-                        .font(.caption)
-                        .foregroundColor(.black)
+                    Text("예약일시: \(productInfo.reservationTime ?? "") ")
+                                           .font(.caption)
+                                           .foregroundColor(.black)
+                                           .fixedSize(horizontal: false, vertical: true) // 이 줄을 추가
+//                    Text("예약일시: \(formatDate(productInfo.reservationTime ?? ""))")
+//                        .font(.caption)
+//                        .foregroundColor(.black)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

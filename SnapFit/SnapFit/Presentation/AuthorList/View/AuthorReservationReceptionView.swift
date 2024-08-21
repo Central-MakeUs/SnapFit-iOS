@@ -46,7 +46,8 @@ struct AuthorReservationReceptionView: View {
                             Group {
                                 InfoRow(label: "옵션", value: "\(reservationRequest?.minutes ?? 0)분")
                                 InfoRow(label: "위치", value: reservationRequest?.reservationLocation ?? "정보 없음")
-                                InfoRow(label: "예약일시", value: formatDate(reservationRequest?.reservationTime))
+                                //InfoRow(label: "예약일시", value: formatDate(reservationRequest?.reservationTime))
+                                InfoRow(label: "예약일시", value: reservationRequest?.reservationTime ?? "정보 없음")
                                 InfoRow(label: "인원", value: "\(reservationRequest?.person ?? 0)명")
                                 InfoRow(label: "이메일", value: reservationRequest?.email ?? "정보 없음")
                             }

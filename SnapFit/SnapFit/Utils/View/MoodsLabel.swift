@@ -87,6 +87,22 @@ struct InOutLabel: View {
     }
 }
 
+// 취소된 상품 표시 라벨 (카드뷰)
+struct CancelLabel: View {
+    var text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .bold()
+            .foregroundColor(Color(.white)) // 폰트 색상
+            .padding(.vertical, 6) // 세로 패딩을 줄임
+            .padding(.horizontal, 10) // 가로 패딩을 줄임
+            .background(Color(.red)) // 배경색
+            .clipShape(RoundedCornersShape(radius: 5, corners: [.topLeft, .bottomRight])) // 특정 코너에만 반경 적용
+    }
+}
+
 struct StarImageLabel: View {
     var text: String
     
