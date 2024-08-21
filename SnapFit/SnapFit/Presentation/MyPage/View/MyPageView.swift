@@ -19,6 +19,8 @@ protocol MyPageDisplayLogic {
    
     // MARK: - 메이커 관련
     func displayFetchMakerProducts(viewModel: MakerUseCases.LoadProducts.ProductsForMakerViewModel)
+    func displayVibes(viewModel: MakerUseCases.LoadVibeAndLocation.VibesViewModel)
+    func displayLocations(viewModel: MakerUseCases.LoadVibeAndLocation.LocationsViewModel)
 }
 
 
@@ -46,8 +48,10 @@ extension MyPageView: MyPageDisplayLogic {
         if viewModel.logOut {
             print("로그아웃 성공")
             // 로그아웃 후 로그인 화면 표시
-            withAnimation {
+            DispatchQueue.main.async {
                 loginViewModel.showLoginModal = true
+                // 로그인 상태를 false로 변경하여 UI 갱신
+                isLoggedIn = false
             }
         }
     }
@@ -107,6 +111,22 @@ extension MyPageView: MyPageDisplayLogic {
         }
     }
     
+    func displayVibes(viewModel: MakerUseCases.LoadVibeAndLocation.VibesViewModel) {
+        DispatchQueue.main.async {
+            // 분위기 상태 업데이트
+            myPageViewModel.vibes = viewModel.vibes
+            print("myPageViewModel.vibes \(myPageViewModel.vibes)")
+        }
+    }
+    
+    func displayLocations(viewModel: MakerUseCases.LoadVibeAndLocation.LocationsViewModel) {
+        DispatchQueue.main.async {
+            // 분위기 상태 업데이트
+            myPageViewModel.locations = viewModel.locations
+            print("myPageViewModel.locations \(myPageViewModel.locations)")
+        }
+    }
+    
 }
 
 struct MyPageView: View {
@@ -114,8 +134,8 @@ struct MyPageView: View {
     var myPageInteractor: MyPageBusinessLogic?
     @State var stack = NavigationPath()
     
-    @StateObject var loginViewModel = LoginViewModel()
-    @StateObject var loginNaviModel = LoginNavigationModel()
+    @ObservedObject var loginViewModel: LoginViewModel
+    @ObservedObject var loginNaviModel: LoginNavigationModel
     @State private var isLoggedIn: Bool = false
     
     var body: some View {
@@ -197,7 +217,9 @@ struct MyPageView: View {
             }
             .onChange(of: isLoggedIn) { newValue in
                 if !newValue {
-                    loginViewModel.showLoginModal = true
+                    DispatchQueue.main.async {
+                        loginViewModel.showLoginModal = true
+                    }
                 }
             }
         }
@@ -211,7 +233,9 @@ struct MyPageView: View {
             loginViewModel.showLoginModal = false
         } else {
             isLoggedIn = false
-            loginViewModel.showLoginModal = true
+            DispatchQueue.main.async {
+                loginViewModel.showLoginModal = true
+            }
         }
     }
 }
@@ -363,8 +387,6 @@ struct NavigationButtonLabel: View {
 
 // 그룹 박스 뷰
 
-import SwiftUI
-
 struct GroupBoxViews: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic?
@@ -373,6 +395,7 @@ struct GroupBoxViews: View {
     
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var alertAction: () -> Void = {}
     
     var body: some View {
         VStack {
@@ -380,29 +403,29 @@ struct GroupBoxViews: View {
                 .padding(.bottom, 16)
             
             Group {
-                AppInfoContent(name: "사진작가로 전환", linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA")
+                AppInfoContent(
+                    name: "사진작가로 전환",
+                    linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA"
+                )
                 
                 // 상품관리 버튼
                 Button(action: {
-                    if myPageViewModel.userDetails?.maker == true {
-                        stack.append("ProductManagementView")
-                    } else {
-                        alertMessage = "메이커 권한이 없습니다."
-                        showAlert = true
-                    }
+                    handleButtonAction(
+                        userHasPermission: myPageViewModel.userDetails?.photographer == true,
+                        navigateTo: "ProductManagementView",
+                        alertMessage: "메이커 권한이 없습니다."
+                    )
                 }) {
                     MakerButtonContent(title: "상품관리")
                 }
               
-
                 // 예약관리 버튼
                 Button(action: {
-                    if myPageViewModel.userDetails?.maker == true {
-                        stack.append("ReservationManagementView")
-                    } else {
-                        alertMessage = "메이커 권한이 없습니다."
-                        showAlert = true
-                    }
+                    handleButtonAction(
+                        userHasPermission: myPageViewModel.userDetails?.photographer == true,
+                        navigateTo: "ReservationManagementView",
+                        alertMessage: "메이커 권한이 없습니다."
+                    )
                 }) {
                     MakerButtonContent(title: "예약관리")
                 }
@@ -411,27 +434,67 @@ struct GroupBoxViews: View {
             .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
             .padding(.horizontal, 16)
          
-            
             SectionHeaderView(title: "SnapFit 설정")
             
-            Group {
-                AppInfoContent(name: "고객센터", linkDestination: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform")
-                AppInfoContent(name: "이용약관", linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")
-                AppInfoContent(name: "로그아웃", interactor: myPageInteractor)
-                AppInfoContent(name: "탈퇴하기", interactor: myPageInteractor)
+            VStack {
+                AppInfoContent(
+                    name: "고객센터",
+                    linkDestination: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform"
+                )
+                AppInfoContent(
+                    name: "이용약관",
+                    linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4"
+                )
+                AppInfoContent(
+                    name: "로그아웃",
+                    interactor: myPageInteractor,
+                    onButtonPress: {
+                        prepareAlert(
+                            message: "로그아웃 하시겠습니까?",
+                            confirmAction: { myPageInteractor?.serviceLogout() }
+                        )
+                    }
+                )
+                AppInfoContent(
+                    name: "탈퇴하기",
+                    interactor: myPageInteractor,
+                    onButtonPress: {
+                        prepareAlert(
+                            message: "정말 탈퇴하시겠습니까?\n스냅핏과의 추억이 모두 사라집니다!",
+                            confirmAction: { myPageInteractor?.cancelmembership() }
+                        )
+                    }
+                )
             }
-            .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
+            .background(Color.white) // 배경색을 흰색으로 변경
             .padding(.horizontal, 16)
         }
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("알림"),
                 message: Text(alertMessage),
-                dismissButton: .default(Text("확인"))
+                primaryButton: .destructive(Text("확인"), action: alertAction),
+                secondaryButton: .cancel()
             )
         }
     }
+    
+    private func handleButtonAction(userHasPermission: Bool, navigateTo: String, alertMessage: String) {
+        if userHasPermission {
+            stack.append(navigateTo)
+        } else {
+            prepareAlert(message: alertMessage, confirmAction: {})
+        }
+    }
+    
+    private func prepareAlert(message: String, confirmAction: @escaping () -> Void) {
+        alertMessage = message
+        alertAction = confirmAction
+        showAlert = true
+    }
 }
+
+
 
 struct MakerButtonContent: View {
     var title: String

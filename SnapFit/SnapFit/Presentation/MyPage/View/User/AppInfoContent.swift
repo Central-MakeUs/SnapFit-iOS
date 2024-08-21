@@ -8,52 +8,31 @@
 import SwiftUI
 
 struct AppInfoContent: View {
-    // Properties
     var name: String
     var linkDestination: String? = nil
-    var interactor: MyPageBusinessLogic?
+    var interactor: MyPageBusinessLogic? = nil
     var canNavigate: Bool = true
+    var onButtonPress: () -> Void = {}
     
     @State private var showModal: Bool = false
     @State private var showConfirmationAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var confirmAction: () -> Void = {}
-    @State private var cancelAction: () -> Void = {}
-
+    
     var body: some View {
         VStack {
             Spacer()
             HStack {
-                  if name == "로그아웃" {
-                    Button {
-                        alertMessage = "로그아웃 하시겠습니까?"
-                        confirmAction = {
-                            interactor?.serviceLogout() // Kakao 로그아웃 처리
-                        }
-                        cancelAction = {
-                            // 취소 액션 처리
-                        }
-                        showConfirmationAlert = true
-                    } label: {
-                        content
-                    }
-                } else if name == "탈퇴하기" {
-                    Button {
-                        alertMessage = "정말 탈퇴하시겠습니까?\n스냅핏과의 추억이 모두 사라집니다!"
-                        confirmAction = {
-                            interactor?.cancelmembership() // Kakao 탈퇴 처리
-                        }
-                        cancelAction = {
-                            // 취소 액션 처리
-                        }
-                        showConfirmationAlert = true
-                    } label: {
+                if name == "로그아웃" || name == "탈퇴하기" {
+                    Button(action: {
+                        onButtonPress()
+                    }) {
                         content
                     }
                 } else if let linkDestination = linkDestination {
-                    Button {
+                    Button(action: {
                         showModal.toggle()
-                    } label: {
+                    }) {
                         content
                     }
                     .fullScreenCover(isPresented: $showModal) {
@@ -67,14 +46,6 @@ struct AppInfoContent: View {
             Divider()
         }
         .frame(height: 68)
-        .alert(isPresented: $showConfirmationAlert) {
-            Alert(
-                title: Text("알림"),
-                message: Text(alertMessage),
-                primaryButton: .destructive(Text("확인"), action: confirmAction),
-                secondaryButton: .default(Text("취소"), action: cancelAction) // "취소" 버튼으로 변경
-            )
-        }
     }
     
     private var content: some View {
@@ -86,9 +57,8 @@ struct AppInfoContent: View {
             Image(systemName: "chevron.right")
         }
     }
-    
-   
 }
+
 
 
 struct WebViewWithCustomBackButton: View {

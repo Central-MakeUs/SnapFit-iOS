@@ -11,7 +11,10 @@ struct SnapFitTabView: View {
     
     @StateObject var mainPromotionViewModel = MainPromotionViewModel()
     @StateObject var authorListViewModel = MainPromotionViewModel()
+    
     @StateObject var myPageViewModel = MyPageViewModel()
+    @StateObject var loginViewModel = LoginViewModel()
+    @StateObject var loginNaviModel = LoginNavigationModel()
     var body: some View {
         TabView(selection: $selectedTab) {
             MainPromotionView(mainPromotionViewModel: mainPromotionViewModel)
@@ -33,7 +36,7 @@ struct SnapFitTabView: View {
                 }
                 .tag(1)
 
-            MyPageView(myPageViewModel: myPageViewModel)
+            MyPageView(myPageViewModel: myPageViewModel, loginViewModel: loginViewModel, loginNaviModel: loginNaviModel)
                 .configureView()
                 .tabItem {
                     VStack {
