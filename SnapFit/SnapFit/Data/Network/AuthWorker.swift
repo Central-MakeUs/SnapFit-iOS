@@ -20,6 +20,8 @@ import Combine
 import CombineExt
 import MultipartForm
 
+
+
 // AuthWorker의 기능을 정의하는 프로토콜
 protocol AuthWorkingLogic {
     
@@ -204,8 +206,8 @@ class AuthWorker: AuthWorkingLogic {
         print("로그아웃 savedRefreshToken \(savedRefreshToken)")
         
         // URL 인코딩 추가
-        let encodedRefreshToken = savedRefreshToken.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? savedRefreshToken
-        let urlString = AuthWorker.baseURL + "/logout?refreshToken=\(encodedRefreshToken)"
+        //let encodedRefreshToken = savedRefreshToken.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? savedRefreshToken
+        let urlString = AuthWorker.baseURL + "/logout?refreshToken=\(savedRefreshToken)"
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -215,7 +217,7 @@ class AuthWorker: AuthWorkingLogic {
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("*/*", forHTTPHeaderField: "accept")
         urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        //urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
           
         // 빈 데이터 설정
         urlRequest.httpBody = Data()
@@ -372,6 +374,7 @@ class AuthWorker: AuthWorkingLogic {
         request.requestedScopes = [.fullName, .email]
     }
 
+ 
     // MARK: - 애플 로그인 완료 처리
     func completeAppleLogin(result: Result<ASAuthorization, Error>, completion: @escaping (Result<String, Error>) -> Void) {
         switch result {

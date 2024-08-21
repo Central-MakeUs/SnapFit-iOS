@@ -21,7 +21,7 @@ struct ReservationData: Codable, Identifiable {
     let cancelMessage: String?
 }
 
-struct PostDetail: Codable {
+struct PostDetail: Codable, Identifiable {
     let id: Int?
     let maker: MakerDetail?
     let title: String?

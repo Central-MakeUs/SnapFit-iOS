@@ -44,6 +44,10 @@ protocol MyPagePresentationLogic {
     
   
     
+    // MARK: - 메이커 관련
+    func presentFetchMakerProductsFailure(error: ApiError)
+    func presentFetchMakerProductsSuccess(response: MakerUseCases.LoadProducts.ProductsForMakerResponse)
+    
 }
 
 final class MyPagePresenter {
@@ -53,6 +57,7 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+
 
   
     // 사용자 탈퇴후 로그인뷰 보이게
@@ -160,6 +165,18 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("Error 유저 예약 내역 리스트 단일 조회: \(error)")
     }
     
-
+    
+    
+    // MARK: - 메이커 관련
+    func presentFetchMakerProductsFailure(error: ApiError) {
+        print("Error 메이커 상품 리스트 조회: \(error)")
+    }
+    
+    func presentFetchMakerProductsSuccess(response: MakerUseCases.LoadProducts.ProductsForMakerResponse) {
+        let viewModel = MakerUseCases.LoadProducts.ProductsForMakerViewModel(products: response.products)
+        // View에 전달
+        view?.displayFetchMakerProducts(viewModel: viewModel)
+    }
+    
     
 }

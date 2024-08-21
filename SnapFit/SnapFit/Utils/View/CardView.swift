@@ -198,6 +198,111 @@ struct MiddleCardView: View {
     }
 }
 
+
+
+// 메이커 상품 카드 뷰
+struct MakerMiddleCardView: View {
+    @State private var isLiked: Bool
+    var product: PostDetail
+    var mypageInteractor: MyPageBusinessLogic?
+    
+    init(product: PostDetail, mypageInteractor: MyPageBusinessLogic?) {
+        self.product = product
+        self.mypageInteractor = mypageInteractor
+        _isLiked = State(initialValue: product.like ?? false)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            if let imageUrl = product.thumbNail, let url = URL(string: imageUrl) {
+                KFImage(url)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 175, height: 170)
+                    .cornerRadius(5)
+                    .clipped()
+                    .overlay(
+                        VStack {
+                            if product.studio == true {
+                                InOutLabel(text:"실내스냅") // InOutLabel 사용
+                            }
+                            Spacer()
+                        },
+                        alignment: .topLeading // 왼쪽 상단 정렬
+                    )
+                    .overlay(
+                        Button(action: {
+                            isLiked.toggle()
+                            handleLikeAction()
+                        }) {
+                            Image(systemName: isLiked ? "heart.fill" : "heart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.white)
+                        }
+                        .offset(x: 62, y: -62)
+                    )
+                    .padding(.bottom, 5)
+            } else {
+                Color.gray
+                    .frame(width: 175, height: 170)
+            }
+
+            Group {
+                Text(product.locations?.first ?? "Unknown Location")
+                    .font(.subheadline)
+                    .foregroundColor(Color("LoginFontColor"))
+
+                Text(product.title ?? "Unknown")
+                    .font(.callout)
+                    .lineLimit(2)
+
+                HStack {
+                    MoodsLabel(text: "시크")
+                    MoodsLabel(text: "러블리")
+                }
+
+                if let price = product.price {
+                    Text("\(price)원")
+                        .font(.callout)
+                        .bold()
+                        .foregroundColor(.black)
+                } else {
+                    Text("가격 정보 없음")
+                        .font(.callout)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
+        }
+        .background(Color.white)
+        .frame(width: 175, height: 324) // 명시적으로 프레임 크기 설정
+    }
+
+    // 좋아요 또는 좋아요 취소를 처리하는 함수
+    private func handleLikeAction() {
+        guard let interactor = mypageInteractor else {
+            print("MainPromotionInteractor가 설정되지 않았습니다.")
+            return
+        }
+        
+        let request = MainPromotion.Like.Request(postId: product.id ?? 0)
+        
+        if isLiked {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
+    }
+}
+
+
+
+
+
+
+
 struct DibsMiddleCardView: View {
     @State private var isLiked: Bool
     let productInfo: ReservationData

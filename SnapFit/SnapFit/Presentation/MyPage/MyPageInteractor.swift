@@ -27,6 +27,10 @@ protocol MyPageBusinessLogic {
     // 상품 찜하기, 취소
     func likePost(request: MainPromotion.Like.Request)
     func unlikePost(request: MainPromotion.Like.Request)
+    
+    
+    // MARK: - 유저 상품 등록 관련
+    func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest)
 }
 
 
@@ -279,6 +283,28 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 .store(in: &cancellables)
         }
     
+   
+    
+    // MARK: - 메이커 관련 기능
+    
+    // 메이커 상품 조회
+    func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest) {
+        myPageWorker.fetchMakerPosts(userId: request.makerid, limit: request.limit, offset: request.offset)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("메이커 상품리스트 로드 실패: \(error.localizedDescription)")
+                    self?.presenter?.presentFetchMakerProductsFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("메이커 상품리스트 로드 성공: \(products)")
+                let response = MakerUseCases.LoadProducts.ProductsForMakerResponse(products: products)
+                self?.presenter?.presentFetchMakerProductsSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
    
 }
 

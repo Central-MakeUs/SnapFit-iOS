@@ -7,7 +7,12 @@
 import SwiftUI
 
 struct ProductRegistrationView: View {
-    @Environment(\.presentationMode) var presentationMode
+    
+    var mypageInteractor: MyPageBusinessLogic?
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @Binding var stack: NavigationPath
+    
+    
     @State private var inputText: String = ""
     @State private var priceText: String = ""
     @State private var additionalPriceText: String = ""
@@ -33,7 +38,7 @@ struct ProductRegistrationView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    stack.removeLast()
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
@@ -282,6 +287,6 @@ struct ProductRegistrationView: View {
     }
 }
 
-#Preview {
-    ProductRegistrationView()
-}
+//#Preview {
+//    ProductRegistrationView()
+//}

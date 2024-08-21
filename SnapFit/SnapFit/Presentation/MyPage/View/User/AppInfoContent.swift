@@ -24,25 +24,7 @@ struct AppInfoContent: View {
         VStack {
             Spacer()
             HStack {
-                if name == "상품관리" || name == "예약관리" {
-                    if canNavigate {
-                        NavigationLink(
-                            destination: destinationView(),
-                            isActive: .constant(true)
-                        ) {
-                            content
-                        }
-                    } else {
-                        Button(action: {
-                            alertMessage = "작가의 권한이 없습니다."
-                            confirmAction = {}
-                            cancelAction = {}
-                            showConfirmationAlert = true
-                        }) {
-                            content
-                        }
-                    }
-                } else if name == "로그아웃" {
+                  if name == "로그아웃" {
                     Button {
                         alertMessage = "로그아웃 하시겠습니까?"
                         confirmAction = {
@@ -105,16 +87,7 @@ struct AppInfoContent: View {
         }
     }
     
-    private func destinationView() -> some View {
-        switch name {
-        case "상품관리":
-            return AnyView(ProductManagementView().navigationBarBackButtonHidden(true))
-        case "예약관리":
-            return AnyView(ReservationManagementView().navigationBarBackButtonHidden(true))
-        default:
-            return AnyView(EmptyView())
-        }
-    }
+   
 }
 
 

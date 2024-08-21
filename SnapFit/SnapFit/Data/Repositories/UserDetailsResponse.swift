@@ -17,5 +17,6 @@ struct UserDetailsResponse: Codable {
     let marketingReceive: Bool?
     let photographer: Bool?
     let noti: Bool?
+    let maker: Bool? = true
 }
 

@@ -17,6 +17,8 @@ protocol MyPageDisplayLogic {
     func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
 
    
+    // MARK: - 메이커 관련
+    func displayFetchMakerProducts(viewModel: MakerUseCases.LoadProducts.ProductsForMakerViewModel)
 }
 
 
@@ -86,7 +88,22 @@ extension MyPageView: MyPageDisplayLogic {
             myPageViewModel.reservationproductDetail = viewModel.reservationDetail
 
             // 디버그 로그: 업데이트된 reservationproducts를 출력
-            print("authorListViewModel.reservationproductDetail: \(myPageViewModel.reservationproductDetail)")
+            print("myPageViewModel.reservationproductDetail: \(myPageViewModel.reservationproductDetail)")
+        }
+    }
+    
+    
+    
+    // MARK: - 메이커 관련
+    // 상품 조회
+    
+    func displayFetchMakerProducts(viewModel: MakerUseCases.LoadProducts.ProductsForMakerViewModel) {
+        DispatchQueue.main.async {
+            // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
+            myPageViewModel.makerProductlist = viewModel.products
+
+            // 디버그 로그: 업데이트된 reservationproducts를 출력
+            print("myPageViewModel.makerProductlist: \(myPageViewModel.makerProductlist)")
         }
     }
     
@@ -114,7 +131,7 @@ struct MyPageView: View {
                         NavigationButtonsView(viewModel: myPageViewModel, stack: $stack)
                             .padding(.bottom, 32)
                         
-                        GroupBoxViews(myPageInteractor: myPageInteractor)
+                        GroupBoxViews(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack)
                         
                         Spacer()
                             .frame(height: 40)
@@ -140,6 +157,15 @@ struct MyPageView: View {
                         DibsView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
+                        // maker가 true일 경우 추가적인 분기 처리
+                    case "ProductManagementView":
+                        ProductManagementView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                    case "ProductRegistrationView":
+                        ProductRegistrationView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
                     case "SnapFitTabView":
                         SnapFitTabView()
                             .navigationBarBackButtonHidden(true)
@@ -150,6 +176,8 @@ struct MyPageView: View {
                 .navigationBarHidden(true)
                 .ignoresSafeArea(.container, edges: .top)
                 .accentColor(.black)
+                
+               
             }
             .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
                 LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
@@ -280,7 +308,7 @@ struct UserInfoView: View {
 }
 
 
-// 네비게이션 버튼 뷰
+// 일반 사용자 네비게이션 버튼 뷰
 struct NavigationButtonsView: View {
     @ObservedObject var viewModel: MyPageViewModel
     @Binding var stack: NavigationPath // 바인딩을 통해 전달받음
@@ -310,6 +338,8 @@ struct NavigationButtonsView: View {
     }
 }
 
+
+
 struct NavigationButtonLabel: View {
     let title: String
     let count: String
@@ -332,36 +362,95 @@ struct NavigationButtonLabel: View {
 }
 
 // 그룹 박스 뷰
+
+import SwiftUI
+
 struct GroupBoxViews: View {
+    @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic?
     
+    @Binding var stack: NavigationPath
+    
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+    
     var body: some View {
-        
-        
-        SectionHeaderView(title: "메이커 관리")
-            .padding(.bottom, 16)
-        Group {
-            AppInfoContent(name: "사진작가로 전환", linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA")
+        VStack {
+            SectionHeaderView(title: "메이커 관리")
+                .padding(.bottom, 16)
             
-            AppInfoContent(name: "상품관리", canNavigate: false)  // Modify as needed
-            AppInfoContent(name: "예약관리", canNavigate: false)   // Modify as needed
-            
+            Group {
+                AppInfoContent(name: "사진작가로 전환", linkDestination: "https://forms.gle/n4yN5jRrz1cPycaJA")
+                
+                // 상품관리 버튼
+                Button(action: {
+                    if myPageViewModel.userDetails?.maker == true {
+                        stack.append("ProductManagementView")
+                    } else {
+                        alertMessage = "메이커 권한이 없습니다."
+                        showAlert = true
+                    }
+                }) {
+                    MakerButtonContent(title: "상품관리")
+                }
+              
+
+                // 예약관리 버튼
+                Button(action: {
+                    if myPageViewModel.userDetails?.maker == true {
+                        stack.append("ReservationManagementView")
+                    } else {
+                        alertMessage = "메이커 권한이 없습니다."
+                        showAlert = true
+                    }
+                }) {
+                    MakerButtonContent(title: "예약관리")
+                }
                 .padding(.bottom, 24)
+            }
+            .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
+            .padding(.horizontal, 16)
+         
             
+            SectionHeaderView(title: "SnapFit 설정")
+            
+            Group {
+                AppInfoContent(name: "고객센터", linkDestination: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform")
+                AppInfoContent(name: "이용약관", linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")
+                AppInfoContent(name: "로그아웃", interactor: myPageInteractor)
+                AppInfoContent(name: "탈퇴하기", interactor: myPageInteractor)
+            }
+            .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
+            .padding(.horizontal, 16)
         }
-        .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
-        .padding(.horizontal, 16)
-        
-        SectionHeaderView(title: "SnapFit 설정")
-        Group{
-            AppInfoContent(name: "고객센터", linkDestination: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform")
-            AppInfoContent(name: "이용약관", linkDestination: "https://mixolydian-beef-6a0.notion.site/04cb97bab76c40d68aa17475c6e53172?pvs=4")
-            AppInfoContent(name: "로그아웃", interactor: myPageInteractor)
-            AppInfoContent(name: "탈퇴하기", interactor: myPageInteractor)
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("알림"),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("확인"))
+            )
         }
-        .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
-        .padding(.horizontal, 16)
     }
 }
 
+struct MakerButtonContent: View {
+    var title: String
+    
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Text(title)
+                    .foregroundColor(.black)
+                    .font(.system(size: 14))
+                Spacer()
+                Image(systemName: "chevron.right")
+            }
+            Spacer()
+            Divider()
+        }
+        .frame(height: 68)
+    }
+
+}
 

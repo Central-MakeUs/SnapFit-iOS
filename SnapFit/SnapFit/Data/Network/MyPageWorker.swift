@@ -35,6 +35,12 @@ protocol MyPageWorkingLogic {
     // 상품 찜하기
     func likePost(postId: Int) -> AnyPublisher<Void, ApiError>
     func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> 
+    
+    
+    
+    // MARK: - 메이커 관련 기능
+    func fetchMakerPosts(userId: Int, limit: Int, offset: Int) -> AnyPublisher<MakerProductResponse, ApiError>
+    
 }
 
 class MyPageWorker: MyPageWorkingLogic {
@@ -531,4 +537,72 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    
+    
+    
+    
+    // MARK: - 메이커 관련 기능
+    
+    // 메이커 상품 조회
+    func fetchMakerPosts(userId: Int, limit: Int = 10, offset: Int = 0) -> AnyPublisher<MakerProductResponse, ApiError> {
+        // Access Token이 유효한지 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+
+        // API 호출을 위한 URL
+        let urlString = "http://34.47.94.218/snafit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
+        
+        // URL 문자열을 URL 객체로 변환
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+
+        // URL 요청 설정
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        // URLSession을 사용해 API 호출
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> MakerProductResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                // HTTP 응답 코드에 따라 처리
+                switch httpResponse.statusCode {
+                case 200...299:
+                    // 성공적으로 데이터 받아오기
+                    let response = try JSONDecoder().decode(MakerProductResponse.self, from: data)
+                    return response
+                case 400...404:
+                    // 오류 응답 처리
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 500:
+                    // 서버 에러 처리
+                    throw ApiError.serverError
+                default:
+                    // 기타 상태 코드 처리
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
 }
