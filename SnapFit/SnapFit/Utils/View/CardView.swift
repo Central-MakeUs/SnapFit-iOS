@@ -51,6 +51,7 @@ struct MiniCardView: View {
                                 .frame(width: 16, height: 15)
                                 .foregroundColor(.white)
                         }
+                        .hidden()
                         .offset(x: 42, y: -42)
                     )
                     .padding(.bottom, 5)
@@ -142,6 +143,7 @@ struct MiddleCardView: View {
                                 .frame(width: 16, height: 16)
                                 .foregroundColor(.white)
                         }
+                        .hidden()
                         .offset(x: 62, y: -62)
                     )
                     .padding(.bottom, 5)
@@ -241,6 +243,7 @@ struct MakerMiddleCardView: View {
                                 .frame(width: 16, height: 16)
                                 .foregroundColor(.white)
                         }
+                        .hidden()
                         .offset(x: 62, y: -62)
                     )
                     .padding(.bottom, 5)
@@ -348,6 +351,7 @@ struct DibsMiddleCardView: View {
                             .frame(width: 16, height: 16)
                             .foregroundColor(.white)
                     }
+                    .hidden()
                     .offset(x: 62, y: -62)
                 )
                 .padding(.bottom, 5)
@@ -531,6 +535,7 @@ struct MainPromotionRandomCardView: View {
                             .frame(width: 24, height: 24)
                             .foregroundColor(.white)
                     }
+                    .hidden()
                     .padding()
                 }
                 Spacer()
