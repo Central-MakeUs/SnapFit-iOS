@@ -108,6 +108,10 @@ class MyPageWorker: MyPageWorkingLogic {
     func fetchLikeCount() -> AnyPublisher<LikeCountResponse, ApiError> {
         let urlString = "http://34.47.94.218/snapfit/post/like/count"
         
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
@@ -115,6 +119,7 @@ class MyPageWorker: MyPageWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { (data: Data, urlResponse: URLResponse) -> LikeCountResponse in
@@ -155,6 +160,10 @@ class MyPageWorker: MyPageWorkingLogic {
     func fetchReservationCount() -> AnyPublisher<ReservationCountResponse, ApiError> {
         let urlString = "http://34.47.94.218/snapfit/reservation/count"
         
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
@@ -162,6 +171,7 @@ class MyPageWorker: MyPageWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
             .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationCountResponse in

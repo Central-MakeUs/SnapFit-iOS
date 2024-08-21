@@ -340,7 +340,7 @@ struct NavigationButtonsView: View {
     var body: some View {
         HStack(spacing: 0) {
             NavigationLink(value: "ReservationView") {
-                NavigationButtonLabel(title: "예약 내역", count: String(viewModel.userCounts?.likeCount ?? 0))
+                NavigationButtonLabel(title: "예약 내역", count: String(viewModel.userCounts?.reservationCount ?? 0))
             }
             
             Divider()
@@ -348,7 +348,7 @@ struct NavigationButtonsView: View {
                 .background(Color.gray.opacity(0.3))
             
             NavigationLink(value: "DibsView") {
-                NavigationButtonLabel(title: "찜한 내역", count: String(viewModel.userCounts?.reservationCount ?? 0))
+                NavigationButtonLabel(title: "찜한 내역", count: String(viewModel.userCounts?.likeCount ?? 0))
             }
             .hidden()
         }
