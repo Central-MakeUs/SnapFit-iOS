@@ -37,6 +37,7 @@ class MyPageViewModel: NSObject, ObservableObject {
     @Published var reservationproducts: [ReservationData] = [] // 예약 내역 확인하기
     @Published var reservationproductDetail : ReservationDetailsResponse? // 상세 조회 데이터
     @Published var deleteReservationSuccess: Bool?               // 예약 취소 유무
+    @Published var likeProducts: [ProductInfo] = []
     
     init(reservationproductDetails: ReservationDetailsResponse? = nil) {
         self.reservationproductDetail = reservationproductDetails

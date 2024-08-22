@@ -105,7 +105,6 @@ extension AuthorListView: AuthorListDisplayLogic {
 }
 
 
-import SwiftUI
 
 struct AuthorListView: View {
     @State private var selectedTab: Int = -1
@@ -138,11 +137,11 @@ struct AuthorListView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(authorListViewModel.products.sorted(by: { $0.id < $1.id })) { product in
+                        ForEach($authorListViewModel.products.sorted(by: { $0.id < $1.id })) { $product in
                             Button(action: {
                                 handleProductSelection(product)
                             }) {
-                                MiddleCardView(product: product, mainPromotionInteractor: authorListInteractor)
+                                MiddleCardView(isLiked: $product.like, product: product, mainPromotionInteractor: authorListInteractor)
                                     .frame(width: 175, height: 324)
                                     .padding(2)
                             }
@@ -172,7 +171,6 @@ struct AuthorListView: View {
 
     // 초기 데이터 로딩
     private func loadInitialData() {
-        // 초기 데이터 로딩 함수
         authorListInteractor?.fetchVibes()
     }
 
@@ -204,7 +202,6 @@ struct AuthorListView: View {
         }
     }
 }
-
 
 #Preview {
     AuthorListView(authorListViewModel: MainPromotionViewModel())

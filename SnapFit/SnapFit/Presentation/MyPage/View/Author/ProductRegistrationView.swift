@@ -313,6 +313,7 @@ struct ProductRegistrationView: View {
                 SectionHeaderView(title: "옵션")
                     .padding(.bottom, 16)
                 
+                // 분으로 나눠서처리
                 ForEach(timePriceOptions.indices, id: \.self) { index in
                     VStack(alignment: .leading, spacing: 10) {
                         PostAccordionView(

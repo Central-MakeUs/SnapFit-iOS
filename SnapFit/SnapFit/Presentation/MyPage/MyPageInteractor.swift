@@ -21,7 +21,6 @@ protocol MyPageBusinessLogic {
     // MARK: - 상품 예약관련
     func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
     func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
-    func fetchUserLikes(request: MainPromotion.LoadMainPromotion.Request)
     func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request)
     
     // 상품 찜하기, 취소
@@ -35,12 +34,15 @@ protocol MyPageBusinessLogic {
     func fetchLocations()
     func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest)
     func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest)
+    func fetchUserLikes(request: MainPromotion.Like.LikeListRequest)
 }
 
 
 
 
 final class MyPageInteractor: MyPageBusinessLogic {
+
+    
     
     typealias Request = MyPage.LoadMyPage.Request
     typealias Response = MyPage.LoadMyPage.Response
@@ -192,7 +194,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     // 유저 찜 리스트
-    func fetchUserLikes(request: MainPromotion.LoadMainPromotion.Request) {
+    func fetchUserLikes(request: MainPromotion.Like.LikeListRequest) {
         myPageWorker.fetchUserLikes(limit: request.limit, offset: request.offset)
             .sink { [weak self] completion in
                 switch completion {
@@ -204,7 +206,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] products in
                 print("유저 찜 내역 로드 성공: \(products)")
-                let response = MainPromotion.CheckReservationProducts.Response(reservationSuccess: true, reservationProducts: products)
+                let response = MainPromotion.Like.LikeListResponse(likeProducts: products)
                 self?.presenter?.presentFetchUserLikesSuccess(response: response)
             }
             .store(in: &cancellables)

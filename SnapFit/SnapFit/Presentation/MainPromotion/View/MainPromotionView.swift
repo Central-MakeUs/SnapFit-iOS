@@ -39,7 +39,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.products = viewModel.products.data
-            //print("viewModel.products.data \(viewModel.products.data)")
+            print("viewModel.products.data \(viewModel.products.data)")
             //print("mainPromotionViewModel.products \( mainPromotionViewModel.products)")
         }
     }
@@ -271,14 +271,14 @@ struct SectionMiniCardsView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
-                ForEach(mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { product in
+                ForEach($mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { $product in
                     Button(action: {
                         mainPromotionViewModel.selectedProductId = product.id
                         DispatchQueue.main.async {
                             stack.append("AuthorDetailView")
                         }
                     }) {
-                        MiniCardView(product: product, mainPromotionInteractor: mainPromotionInteractor)
+                        MiniCardView(isLiked: $product.like, product: product, mainPromotionInteractor: mainPromotionInteractor)
                             .frame(width: 130, height: 204)
                     }
                     .buttonStyle(PlainButtonStyle())

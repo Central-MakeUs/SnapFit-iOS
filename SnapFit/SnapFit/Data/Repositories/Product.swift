@@ -23,7 +23,7 @@ struct ProductInfo: Codable, Identifiable {
     let locations: [String]?
     let price: Int?
     let studio: Bool?
-    let like: Bool?
+    var like: Bool?
 }
 
 struct Maker: Codable {

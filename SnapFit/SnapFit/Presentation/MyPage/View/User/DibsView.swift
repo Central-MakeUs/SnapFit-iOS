@@ -33,9 +33,7 @@ struct DibsView: View {
             // 상품 탭의 내용
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 20) {
-        
-                    // 예약된 상품 리스트를 보여줍니다.
-                    ForEach(myPageViewModel.reservationproducts) { product in
+                    ForEach(myPageViewModel.likeProducts) { product in
                         Button(action: {
                             myPageViewModel.selectedReservationId = product.id
                             stack.append("ReservationInfoView")
@@ -44,13 +42,12 @@ struct DibsView: View {
                                 DibsMiddleCardView(product: product, mainPromotionInteractor: mypageInteractor)
                                     .frame(width: 174, height: 322)
                                     .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
-                                
                             }
                         }
                         .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
-                        // NavigationLink를 사용할 때 텍스트 색상이 파란색으로 바뀌는 것을 방지
                     }
                 }
+            
                 
                 
             }
@@ -60,7 +57,7 @@ struct DibsView: View {
         }
         .onAppear(perform: {
             // 예약 내역 불러오기
-            mypageInteractor?.fetchUserLikes(request: MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+            mypageInteractor?.fetchUserLikes(request: MainPromotion.Like.LikeListRequest(limit: 30, offset: 0))
         })
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

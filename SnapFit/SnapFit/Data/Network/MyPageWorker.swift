@@ -29,7 +29,7 @@ protocol MyPageWorkingLogic {
     func deleteReservation(id: Int, message: String) -> AnyPublisher<Bool, ApiError>
     
     // MARK: - 상품 찜 관련
-    func fetchUserLikes(limit: Int, offset: Int) -> AnyPublisher<ReservationResponse, ApiError>
+    func fetchUserLikes(limit: Int, offset: Int) -> AnyPublisher<Product, ApiError>
     
     
     // 상품 찜하기
@@ -329,7 +329,7 @@ class MyPageWorker: MyPageWorkingLogic {
     }
     
     
-    func fetchUserLikes(limit: Int = 10, offset: Int = 0) -> AnyPublisher<ReservationResponse, ApiError> {
+    func fetchUserLikes(limit: Int = 10, offset: Int = 0) -> AnyPublisher<Product, ApiError> {
         // Access Token이 유효한지 확인
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
@@ -351,7 +351,7 @@ class MyPageWorker: MyPageWorkingLogic {
         
         // URLSession을 사용해 API 호출
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationResponse in
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Product in
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
                     throw ApiError.invalidResponse
                 }
@@ -360,7 +360,7 @@ class MyPageWorker: MyPageWorkingLogic {
                 switch httpResponse.statusCode {
                 case 200...299:
                     // 성공적으로 데이터 받아오기
-                    let response = try JSONDecoder().decode(ReservationResponse.self, from: data)
+                    let response = try JSONDecoder().decode(Product.self, from: data)
                     return response
                 case 400...404:
                     // 오류 응답 처리
@@ -793,6 +793,7 @@ class MyPageWorker: MyPageWorkingLogic {
 
     
     // MARK: - 이미지 경로 가져오는 함수
+    // 해당 경로 바디에 .png 바이리
     func getImages(exts: [Data]) -> AnyPublisher<[String], ApiError> {
         // Data 배열을 Base64 인코딩 후 확장자를 붙여 쿼리 파라미터로 변환
         let extQuery = exts.map { data in

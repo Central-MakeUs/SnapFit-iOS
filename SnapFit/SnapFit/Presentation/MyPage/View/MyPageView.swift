@@ -23,11 +23,14 @@ protocol MyPageDisplayLogic {
     func displayLocations(viewModel: MakerUseCases.LoadVibeAndLocation.LocationsViewModel)
     func displayPostImages(viewModel: MakerUseCases.RequestMakerImage.ImageURLViewModel)
  
+    // 좋아요
+    func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel)
 }
 
 
 
 extension MyPageView: MyPageDisplayLogic {
+    
 
     
     func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
@@ -98,7 +101,13 @@ extension MyPageView: MyPageDisplayLogic {
         }
     }
     
-    
+    // 찜관련
+    func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.likeProducts = viewModel.likeProducts.data
+            print("찜 리스트 \(myPageViewModel.likeProducts)")
+        }
+    }
     
     // MARK: - 메이커 관련
     // 상품 조회
@@ -361,7 +370,7 @@ struct NavigationButtonsView: View {
             NavigationLink(value: "DibsView") {
                 NavigationButtonLabel(title: "찜한 내역", count: String(viewModel.userCounts?.likeCount ?? 0))
             }
-            .hidden()
+
         }
         .frame(height: 108)
         .background(Color.white)

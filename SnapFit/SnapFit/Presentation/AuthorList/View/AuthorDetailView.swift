@@ -80,7 +80,6 @@ struct AuthorDetailView: View {
                             Image(systemName: isLiked ? "heart.fill" : "heart")
                                 .foregroundColor(.black)
                         }
-                        .hidden()
                         
                         Menu {
                             Button(action: {
@@ -197,7 +196,7 @@ struct MainContentView: View {
             if let studio = productDetail.studio, studio == true {
                 DeteailInOutLabel(text: "실내스냅")
             }
-
+            
             
             if let vibes = productDetail.vibes {
                 ForEach(vibes, id: \.self) { vibe in
@@ -278,13 +277,22 @@ struct MainContentView: View {
         } else {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: layout, spacing: 8) {
-                    ForEach(mainPromotionViewModel.productDetailAuthorProducts, id: \.id) { product in
+                    ForEach(mainPromotionViewModel.productDetailAuthorProducts) { product in
                         Button(action: {
                             mainPromotionViewModel.selectedProductId = product.id
                             stack.append("AuthorDetailView")
                         }) {
-                            MiddleCardView(product: product, mainPromotionInteractor: productInteractor)
-                                .frame(width: 175, height: 324) // 적절한 크기 설정
+                            MiddleCardView(isLiked: Binding(
+                                get: {
+                                    mainPromotionViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
+                                },
+                                set: { newValue in
+                                    if let index = mainPromotionViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
+                                        mainPromotionViewModel.productDetailAuthorProducts[index].like = newValue
+                                    }
+                                }
+                            ), product: product, mainPromotionInteractor: productInteractor)
+                            .frame(width: 175, height: 324)
                         }
                     }
                 }
@@ -395,14 +403,14 @@ struct PriceView: View {
 //        prices: [Price(min: 10000, price: 20000)],
 //        personPrice: 50000
 //    )
-//    
+//
 //    static let sampleViewModel = MainPromotionViewModel(productDetail: sampleDetail)
 //}
 //
 //// 프리뷰
 //#Preview {
 //    let path = NavigationPath()
-//    
+//
 //    return AuthorDetailView(stack: .constant(path))
 //        .environmentObject(AuthorDetailView.sampleViewModel)
 //}

@@ -98,6 +98,9 @@ enum MainPromotion {
         }
     }
     
+    
+
+    
     // 예약 내역 리스트 디테일(단일) 조회
     enum CheckReservationDetailProduct {
         struct Request {
@@ -134,6 +137,23 @@ enum MainPromotion {
     enum Like{
         struct Request {
             let postId: Int
+        }
+        
+        struct LikeListRequest {
+            var limit: Int
+            var offset: Int
+        }
+        
+        struct Response {
+            var likeSuccess : Bool
+        }
+        
+        struct LikeListResponse{
+            var likeProducts : Product
+        }
+        
+        struct LikeListViewModel {
+            var likeProducts : Product
         }
     }
 }

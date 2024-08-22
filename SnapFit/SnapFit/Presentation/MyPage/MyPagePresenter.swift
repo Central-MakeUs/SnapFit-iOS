@@ -40,7 +40,7 @@ protocol MyPagePresentationLogic {
     
     // 유저 찜 내역 리스트 조회
     func presentFetchUserLikesFailure(error: ApiError)
-    func presentFetchUserLikesSuccess(response: MainPromotion.CheckReservationProducts.Response)
+    func presentFetchUserLikesSuccess(response: MainPromotion.Like.LikeListResponse)
     
   
     
@@ -153,11 +153,11 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("Error occurred: \(error)")
     }
 
-    func presentFetchUserLikesSuccess(response: MainPromotion.CheckReservationProducts.Response) {
+    func presentFetchUserLikesSuccess(response: MainPromotion.Like.LikeListResponse) {
       
-        let viewModel = MainPromotion.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
+        let viewModel = MainPromotion.Like.LikeListViewModel(likeProducts: response.likeProducts)
         // View에 전달
-        view?.displayFetchUserReservation(viewModel: viewModel)
+        view?.displayFetchUserLikeProduct(viewModel: viewModel)
     }
     
     
