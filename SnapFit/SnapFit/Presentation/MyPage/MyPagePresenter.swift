@@ -54,6 +54,11 @@ protocol MyPagePresentationLogic {
     func presentLocations(response : MakerUseCases.LoadVibeAndLocation.LocationsResponse)
     func presentLocationsFetchFailure(_ error: ApiError)
     
+    func presentImageFetchFailure(error: ApiError)
+    func presentImageURLs(response: MakerUseCases.RequestMakerImage.ImageURLResponse)
+    func presentProductPostFailure(error: ApiError)
+    func presentProductPostSuccess(response: MakerUseCases.RequestMakerProduct.productResponse)
+    
 }
 
 final class MyPagePresenter {
@@ -63,8 +68,7 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
-
-  
+   
     // 사용자 탈퇴후 로그인뷰 보이게
     func presentCancelMembershipSuccess() {
         let viewModel = MyPage.LoadMyPage.ViewModel(logOut: true)
@@ -205,4 +209,22 @@ extension MyPagePresenter: MyPagePresentationLogic {
     }
     
  
+    func presentImageFetchFailure(error: ApiError) {
+        print("Error 이미지 업로드 실패 : \(error)")
+    }
+    
+    func presentImageURLs(response: MakerUseCases.RequestMakerImage.ImageURLResponse) {
+        print("이미지 업로드 성공")
+    }
+    
+    func presentProductPostFailure(error: ApiError) {
+        print("Error 상품 업로드 실패 : \(error)")
+    }
+    
+    func presentProductPostSuccess(response: MakerUseCases.RequestMakerProduct.productResponse) {
+        print("상품 업로드 성공")
+    }
+    
+
+  
 }

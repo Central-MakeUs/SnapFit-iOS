@@ -52,6 +52,44 @@ enum MakerUseCases {
         }
     }
     
+    enum RequestMakerImage {
+    
+        
+        struct ImageURLRequest {
+            let Images : [String]
+        }
+    
+        
+        struct ImageURLResponse {
+            let Images: [String]
+        }
+    
+        
+        struct ImageURLViewModel { //엔터티
+            let Images: [String]
+        }
+    }
+    
+    enum RequestMakerProduct {
+    
+        
+        struct productRequest {
+            let product : MakerProductRequest
+        }
+    
+        
+        struct productResponse {
+            let product: PostProductResponse
+        }
+    
+        
+        struct productViewModel { //엔터티
+            let product: PostProductResponse
+        }
+    }
+    
+    
+    
 //    // 예약 내역 리스트 조회
 //    enum CheckReservationProducts {
 //        struct Request {

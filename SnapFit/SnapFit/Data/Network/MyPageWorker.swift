@@ -42,6 +42,8 @@ protocol MyPageWorkingLogic {
     func fetchMakerPosts(userId: Int, limit: Int, offset: Int) -> AnyPublisher<MakerProductResponse, ApiError>
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
     func fetchLocations() -> AnyPublisher<MakerLocations, ApiError>
+    func getImages(exts: [String]) -> AnyPublisher<[String], ApiError>
+    func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError>
 }
 
 class MyPageWorker: MyPageWorkingLogic {
@@ -621,6 +623,11 @@ class MyPageWorker: MyPageWorkingLogic {
     func fetchVibes() -> AnyPublisher<Vibes, ApiError> {
         let urlString = AuthWorker.baseURL + "/vibes"
         
+        // Access Token이 유효한지 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
@@ -628,6 +635,7 @@ class MyPageWorker: MyPageWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         // API 호출 및 응답 처리
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
@@ -664,9 +672,14 @@ class MyPageWorker: MyPageWorkingLogic {
     }
     
     
-    // MARK: - 분위기 가져오기
+    // MARK: - 지역 가져오기
     func fetchLocations() -> AnyPublisher<MakerLocations, ApiError> {
         let urlString = AuthWorker.baseURL + "/locations"
+        
+        // Access Token이 유효한지 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -675,6 +688,7 @@ class MyPageWorker: MyPageWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         // API 호출 및 응답 처리
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
@@ -711,18 +725,25 @@ class MyPageWorker: MyPageWorkingLogic {
     }
     
     
-    // MARK: - API 호출 함수
+    // MARK: - 상품 등록
     func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError> {
+        print("상품 request \(request)")
         let urlString = "http://34.47.94.218/snapfit/post"
+        
+        // Access Token이 유효한지 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
         
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
-        urlRequest.addValue("Bearer YOUR_ACCESS_TOKEN", forHTTPHeaderField: "Authorization")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
         
         // POST할 데이터를 JSON으로 인코딩
@@ -772,8 +793,15 @@ class MyPageWorker: MyPageWorkingLogic {
 
     
     // MARK: - 이미지 경로 가져오는 함수
-    func getImages(ext: String) -> AnyPublisher<[String], ApiError> {
-        let urlString = "http://34.47.94.218/snapfit/image/paths?ext=\(ext)"
+    func getImages(exts: [String]) -> AnyPublisher<[String], ApiError> {
+        // ext 배열을 쿼리 파라미터로 변환
+        let extQuery = exts.map { "ext=\($0)" }.joined(separator: "&")
+        let urlString = "http://34.47.94.218/snapfit/image/paths?\(extQuery)"
+        
+        // Access Token이 유효한지 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
@@ -782,6 +810,7 @@ class MyPageWorker: MyPageWorkingLogic {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
         // API 호출 및 응답 처리
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
@@ -809,4 +838,5 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
 }

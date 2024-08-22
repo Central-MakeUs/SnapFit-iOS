@@ -33,7 +33,8 @@ protocol MyPageBusinessLogic {
     func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest)
     func fetchVibes()
     func fetchLocations()
-    
+    func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest)
+    func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest)
 }
 
 
@@ -339,6 +340,41 @@ final class MyPageInteractor: MyPageBusinessLogic {
             }, receiveValue: { locations in
                 let response = MakerUseCases.LoadVibeAndLocation.LocationsResponse(locations: locations)
                 self.presenter?.presentLocations(response: response)
+            })
+            .store(in: &cancellables)
+    }
+    
+    // 이미지 URL 가져오기
+    func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest) {
+        myPageWorker.getImages(exts: request.Images) // exts는 배열일 것으로 가정
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.presenter?.presentImageFetchFailure(error: error)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { imageURLs in
+                let response = MakerUseCases.RequestMakerImage.ImageURLResponse(Images: imageURLs)
+                self.presenter?.presentImageURLs(response: response)
+            })
+            .store(in: &cancellables)
+    }
+    
+    
+    // 상품 등록
+    func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest) {
+        myPageWorker.postProduct(request: request.product)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.presenter?.presentProductPostFailure(error: error)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { productResponse in
+                let response = MakerUseCases.RequestMakerProduct.productResponse(product: productResponse)
+                self.presenter?.presentProductPostSuccess(response: response)
             })
             .store(in: &cancellables)
     }

@@ -55,7 +55,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetailAuthorProducts = viewModel.products.data
-            //print("mainPromotionViewModel.productDetailAuthorProducts \( mainPromotionViewModel.productDetailAuthorProducts)")
+            print("작가가 등록한 상품 \( mainPromotionViewModel.productDetailAuthorProducts)")
         }
     }
     

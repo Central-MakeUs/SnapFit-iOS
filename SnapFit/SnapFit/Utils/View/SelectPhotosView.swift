@@ -11,7 +11,7 @@ import Photos
 
 struct SelectPhotosView: View {
     @State var selectedItems: [PhotosPickerItem] = []
-    @State var imageData: [Data?] = []
+    @Binding var imageData: [Data?] // 바인딩으로 데이터를 상위로 전달
     @State var selectImage: Bool = false
     @State var showPermissionAlert: Bool = false
     @State var selectedItemsCounts: Int = 0
@@ -19,7 +19,7 @@ struct SelectPhotosView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal) {
-                HStack(spacing: 10){
+                HStack(spacing: 10) {
                     PhotosPicker(
                         selection: $selectedItems,
                         maxSelectionCount: 8,
@@ -50,8 +50,7 @@ struct SelectPhotosView: View {
                     }
                     
                     if selectImage == true {
-                        
-                        HStack(spacing: 10){
+                        HStack(spacing: 10) {
                             ForEach(imageData.indices, id: \.self) { index in
                                 if let data = imageData[index], let uiimage = UIImage(data: data) {
                                     Image(uiImage: uiimage)
@@ -61,18 +60,14 @@ struct SelectPhotosView: View {
                                         .clipped() // 이미지를 프레임에 맞추어 잘라냄
                                         .cornerRadius(5)
                                         .padding(.leading, 10)
-                                       
                                 }
                             }
                         }
-                        
-                        
                     }
                     
                     Spacer()
                 }
             }
-            
         }
         .onChange(of: selectedItems) { newValue in
             DispatchQueue.main.async {
@@ -84,32 +79,35 @@ struct SelectPhotosView: View {
                     switch result {
                     case .success(let data):
                         DispatchQueue.main.async {
-                            imageData.append(data)
-                            print("사진 \(index+1) 업로드 완료, \(data)")
-                            selectedItemsCounts += 1
-                            selectImage = true
+                            if let data = data {
+                                imageData.append(data)
+                                print("사진 \(index+1) 업로드 완료")
+                                selectedItemsCounts += 1
+                                selectImage = true
+                            }
                         }
-                        
                     case .failure(let failure):
-                        print("에러")
-                        fatalError("\(failure)")
+                        print("에러: \(failure)")
                     }
-                    
                 }
             }
-            
         }
-        
     }
 }
-
-
-
-
-
 
 struct SelectPhotos_Previews: PreviewProvider {
     static var previews: some View {
-        SelectPhotosView()
+        SelectPhotosView(imageData: .constant([]))
     }
 }
+
+
+
+
+
+
+//struct SelectPhotos_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SelectPhotosView()
+//    }
+//}

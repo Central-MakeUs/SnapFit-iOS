@@ -30,3 +30,11 @@ struct Price: Codable {
     let price: Int? // 가격
 }
 
+
+//// 상품 등록
+
+// Assume Price is defined like this
+struct PostPrice: Identifiable {
+    let id = UUID() // Add an id for identifying each Price
+    let time: String
+}
