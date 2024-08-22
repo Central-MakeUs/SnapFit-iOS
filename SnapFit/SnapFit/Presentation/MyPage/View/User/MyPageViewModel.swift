@@ -49,4 +49,5 @@ class MyPageViewModel: NSObject, ObservableObject {
     @Published var selectedProductId: Int? // 어떤 상품을 조회 할건지
     @Published var vibes: [Vibe] = []
     @Published var locations: [MakerLocation] = []
+    @Published var postImages: [String] = []
 }

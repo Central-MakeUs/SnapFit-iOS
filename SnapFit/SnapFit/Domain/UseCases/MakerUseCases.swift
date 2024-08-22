@@ -56,7 +56,7 @@ enum MakerUseCases {
     
         
         struct ImageURLRequest {
-            let Images : [String]
+            let Images : [Data]
         }
     
         

@@ -43,7 +43,7 @@ struct ProductRegistrationView: View {
                 AdditionalCostSection(additionalPriceText: $additionalPriceText)
                 
                 ReserveButton(
-                    uploadedImageURLs: $uploadedImageURLs,
+                    selectedImageData: $selectedImageData,
                     mypageInteractor: mypageInteractor,
                     selectedMoods: selectedMoods,
                     selectedLocations: selectedLocations,
@@ -399,7 +399,7 @@ struct ProductRegistrationView: View {
     private struct ReserveButton: View {
         @EnvironmentObject var myPageViewModel: MyPageViewModel
         @State private var isUploading = false
-        @Binding var uploadedImageURLs: [String] // Bindings for uploaded image URLs
+        @Binding var selectedImageData: [Data?]  // Bindings for uploaded image URLs
         var mypageInteractor: MyPageBusinessLogic?
         
         var selectedMoods: [String]
@@ -416,10 +416,13 @@ struct ProductRegistrationView: View {
             Button(action: {
                 isUploading = true
                 
-                // Convert image URLs to empty if none
-                let emptyImageNames = uploadedImageURLs.isEmpty ? [""] : uploadedImageURLs
+           
+                let validImageData = selectedImageData.compactMap { $0 }
+           
+                mypageInteractor?.getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest(Images: validImageData))
                 
                 // Convert timePriceOptions to MakerProductRequest.Price format
+                /*
                 let prices = timePriceOptions.map { timePriceOption in
                     MakerProductRequest.Price(
                         min: Int(timePriceOption.selectedTime.components(separatedBy: " ")[0]) ?? 0,
@@ -445,6 +448,7 @@ struct ProductRegistrationView: View {
                 
                 // Post product request
                 mypageInteractor?.postProduct(request: MakerUseCases.RequestMakerProduct.productRequest(product: request))
+                 */
              
             }) {
                 HStack(spacing: 20) {

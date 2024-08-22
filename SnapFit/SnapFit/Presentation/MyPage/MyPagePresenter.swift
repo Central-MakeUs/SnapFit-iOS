@@ -215,6 +215,8 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     func presentImageURLs(response: MakerUseCases.RequestMakerImage.ImageURLResponse) {
         print("이미지 업로드 성공")
+        let viewModel = MakerUseCases.RequestMakerImage.ImageURLViewModel(Images: response.Images)
+        view?.displayPostImages(viewModel: viewModel)
     }
     
     func presentProductPostFailure(error: ApiError) {

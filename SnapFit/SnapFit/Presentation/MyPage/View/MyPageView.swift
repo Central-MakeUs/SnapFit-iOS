@@ -21,6 +21,8 @@ protocol MyPageDisplayLogic {
     func displayFetchMakerProducts(viewModel: MakerUseCases.LoadProducts.ProductsForMakerViewModel)
     func displayVibes(viewModel: MakerUseCases.LoadVibeAndLocation.VibesViewModel)
     func displayLocations(viewModel: MakerUseCases.LoadVibeAndLocation.LocationsViewModel)
+    func displayPostImages(viewModel: MakerUseCases.RequestMakerImage.ImageURLViewModel)
+ 
 }
 
 
@@ -126,6 +128,15 @@ extension MyPageView: MyPageDisplayLogic {
             print("myPageViewModel.locations \(myPageViewModel.locations)")
         }
     }
+    
+    
+    func displayPostImages(viewModel: MakerUseCases.RequestMakerImage.ImageURLViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.postImages = viewModel.Images
+            print("MyPage 뷰까지 전달 등록이미지 \(myPageViewModel.postImages)")
+        }
+    }
+    
     
 }
 

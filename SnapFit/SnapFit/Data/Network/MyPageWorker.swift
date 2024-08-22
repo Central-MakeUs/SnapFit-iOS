@@ -42,7 +42,7 @@ protocol MyPageWorkingLogic {
     func fetchMakerPosts(userId: Int, limit: Int, offset: Int) -> AnyPublisher<MakerProductResponse, ApiError>
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
     func fetchLocations() -> AnyPublisher<MakerLocations, ApiError>
-    func getImages(exts: [String]) -> AnyPublisher<[String], ApiError>
+    func getImages(exts: [Data]) -> AnyPublisher<[String], ApiError>
     func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError>
 }
 
@@ -793,9 +793,14 @@ class MyPageWorker: MyPageWorkingLogic {
 
     
     // MARK: - 이미지 경로 가져오는 함수
-    func getImages(exts: [String]) -> AnyPublisher<[String], ApiError> {
-        // ext 배열을 쿼리 파라미터로 변환
-        let extQuery = exts.map { "ext=\($0)" }.joined(separator: "&")
+    func getImages(exts: [Data]) -> AnyPublisher<[String], ApiError> {
+        // Data 배열을 Base64 인코딩 후 확장자를 붙여 쿼리 파라미터로 변환
+        let extQuery = exts.map { data in
+            print("이미지 데이터 값 \(data)")
+            let base64String = data.base64EncodedString()
+            return "ext=\(base64String).png"
+        }.joined(separator: "&")
+        
         let urlString = "http://34.47.94.218/snapfit/image/paths?\(extQuery)"
         
         // Access Token이 유효한지 확인
@@ -838,5 +843,7 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
+
 
 }
