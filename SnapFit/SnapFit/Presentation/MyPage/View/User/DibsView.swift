@@ -35,8 +35,8 @@ struct DibsView: View {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(myPageViewModel.likeProducts) { product in
                         Button(action: {
-                            myPageViewModel.selectedReservationId = product.id
-                            stack.append("ReservationInfoView")
+                            myPageViewModel.selectedProductId = product.id
+                            stack.append("MyPageAuthorDetailView")
                         }) {
                             VStack(spacing: 0) { // 카드뷰와 구분선 사이 간격 0
                                 DibsMiddleCardView(product: product, mainPromotionInteractor: mypageInteractor)

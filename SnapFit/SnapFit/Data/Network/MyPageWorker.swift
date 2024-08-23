@@ -35,7 +35,8 @@ protocol MyPageWorkingLogic {
     // 상품 찜하기
     func likePost(postId: Int) -> AnyPublisher<Void, ApiError>
     func unlikePost(postId: Int) -> AnyPublisher<Void, ApiError> 
-    
+    func fetchProductsForMaker(userId: Int, limit: Int, offset: Int) -> AnyPublisher<Product, ApiError>
+    func fetchPostDetailById(postId: Int) -> AnyPublisher<PostDetailResponse, ApiError>
     
     
     // MARK: - 메이커 관련 기능
@@ -376,6 +377,124 @@ class MyPageWorker: MyPageWorkingLogic {
                     throw ApiError.badStatus(code: httpResponse.statusCode)
                 }
             }
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    // 메이커가 등록한 상품 가져오기
+    func fetchProductsForMaker(userId: Int, limit: Int = 10, offset: Int = 0) -> AnyPublisher<Product, ApiError> {
+        print("fetchProductsForMaker 함수 진입")
+        
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        // 요청할 URL 생성
+        let urlString = "http://34.47.94.218/snafit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        print("Fetching maker's products with accessToken: \(accessToken)")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case 400...404:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 401:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Unauthorized"
+                    throw ApiError.invalidRefreshToken
+                default:
+                    if !(200...299).contains(httpResponse.statusCode) {
+                        throw ApiError.badStatus(code: httpResponse.statusCode)
+                    }
+                }
+                
+                return data
+            }
+            .decode(type: Product.self, decoder: JSONDecoder())
+            .mapError { error in
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
+
+    // 각상품별 디테일 정보 가져오기
+    func fetchPostDetailById(postId: Int) -> AnyPublisher<PostDetailResponse, ApiError> {
+        print("fetchPostDetailById 함수 진입")
+        
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        // 요청할 URL 생성
+        let urlString = "http://34.47.94.218/snapfit/post?id=\(postId)"
+        
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        print("Fetching post details with accessToken: \(accessToken)")
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.unknown(nil)
+                }
+                
+                switch httpResponse.statusCode {
+                case 400...404:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 401:
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Unauthorized"
+                    throw ApiError.invalidRefreshToken
+                default:
+                    if !(200...299).contains(httpResponse.statusCode) {
+                        throw ApiError.badStatus(code: httpResponse.statusCode)
+                    }
+                }
+                
+                return data
+            }
+            .decode(type: PostDetailResponse.self, decoder: JSONDecoder())
             .mapError { error in
                 if let apiError = error as? ApiError {
                     return apiError

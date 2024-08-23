@@ -118,6 +118,7 @@ struct MainPromotionView: View {
     @State var stack = NavigationPath()
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
+    @State private var isLiked: Bool = false // 좋아요 상태를 관리할 변수 추가
 
     var randomProduct: ProductInfo? {
         guard !mainPromotionViewModel.products.isEmpty else { return nil }
@@ -136,11 +137,13 @@ struct MainPromotionView: View {
                     if let randomProduct = randomProduct {
                         Button(action: {
                             mainPromotionViewModel.selectedProductId = randomProduct.id
+                            isLiked = randomProduct.like ?? false // 좋아요 상태 업데이트
                             DispatchQueue.main.async {
                                 stack.append("AuthorDetailView")
                             }
                         }) {
-                            MainPromotionRandomCardView(product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
+                            MainPromotionRandomCardView(isLiked: Binding($isLiked), product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
+
                                 .padding(.vertical, 16)
                         }
                         .buttonStyle(PlainButtonStyle())

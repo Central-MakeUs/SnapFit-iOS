@@ -26,7 +26,8 @@ protocol MyPageBusinessLogic {
     // 상품 찜하기, 취소
     func likePost(request: MainPromotion.Like.Request)
     func unlikePost(request: MainPromotion.Like.Request)
-    
+    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
+    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
     
     // MARK: - 메이커 관련
     func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest)
@@ -210,6 +211,47 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 self?.presenter?.presentFetchUserLikesSuccess(response: response)
             }
             .store(in: &cancellables)
+    }
+    
+    // 찜 상품 보기
+    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request) {
+        myPageWorker.fetchPostDetailById(postId: request.id)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("상품 디테일 조회 실패")
+                    self?.presenter?.presentFetchPostDetailByIdFailure(error: error)
+                }
+            } receiveValue: { [weak self] productDetail in
+                print("상품 조회 성공")
+                // Response 객체 생성
+                let response = MainPromotion.LoadDetailProduct.Response(productDetail: productDetail)
+                // Presenter에 전달
+                self?.presenter?.presentFetchPostDetailByIdSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
+    }
+    
+    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest) {
+        myPageWorker.fetchProductsForMaker(userId: request.makerid, limit: request.limit, offset: request.offset)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break // 성공적으로 완료됨
+                case .failure(let error):
+                    print("작가 등록한 상품 조회 실패")
+                    self?.presenter?.presentFetchProductsForMakerFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("작가 등록한 상품 조회 성공")
+                // Response 객체 생성
+                let response = MainPromotion.LoadDetailProduct.ProductsForMakerResponse(products: products)
+                // Presenter에 전달
+                self?.presenter?.presentFetchProductsForMakerSuccess(response: response)
+            }
+            .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
     
     

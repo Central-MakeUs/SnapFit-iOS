@@ -25,6 +25,8 @@ protocol MyPageDisplayLogic {
  
     // 좋아요
     func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel)
+    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
 }
 
 
@@ -109,6 +111,20 @@ extension MyPageView: MyPageDisplayLogic {
         }
     }
     
+    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.productDetail = viewModel.productDetail
+            print("찜 상품 상세 \( myPageViewModel.productDetail)")
+        }
+    }
+    
+    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.productDetailAuthorProducts = viewModel.products.data
+            print("찜 상품 작가 사진 \( myPageViewModel.productDetailAuthorProducts)")
+        }
+    }
+    
     // MARK: - 메이커 관련
     // 상품 조회
     
@@ -189,14 +205,21 @@ struct MyPageView: View {
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
                     
-                    case "ReservationInfoView" :
-                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                    
                     case "DibsView":
                         DibsView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
+                    case "MyPageAuthorDetailView":
+                        MyPageAuthorDetailView(myPageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+    
+//                    case "MyPageAuthorReservationReceptionView" :
+//                        MyPageAuthorReservationReceptionView(stack: $stack)
+//                            .navigationBarBackButtonHidden(true)
+//                            .environmentObject(myPageViewModel)
+                        
                         // maker가 true일 경우 추가적인 분기 처리
                     case "ProductManagementView":
                         ProductManagementView(mypageInteractor: myPageInteractor, stack: $stack)

@@ -187,6 +187,98 @@ struct MiddleCardView: View {
    
 }
 
+struct MyMiddleCardView: View {
+    @Binding var isLiked: Bool?
+    var product: ProductInfo
+    var mainPromotionInteractor: MyPageBusinessLogic?
+    
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            if let imageUrl = product.thumbNail, let url = URL(string: imageUrl) {
+                KFImage(url)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 175, height: 170)
+                    .cornerRadius(5)
+                    .clipped()
+                    .overlay(
+                        VStack {
+                            if product.studio == true {
+                                InOutLabel(text: "실내스냅")
+                            }
+                            Spacer()
+                        },
+                        alignment: .topLeading
+                    )
+                    .overlay(
+                        Button(action: {
+                            isLiked?.toggle()
+                            handleLikeAction()
+                        }) {
+                            Image(systemName: (isLiked ?? false) ? "heart.fill" : "heart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 15)
+                                .foregroundColor(.white)
+                        }
+                        .offset(x: 62, y: -62)
+                    )
+                    .padding(.bottom, 5)
+            } else {
+                Color.gray
+                    .frame(width: 175, height: 170)
+            }
+
+            Group {
+                Text(product.locations?.first ?? "Unknown Location")
+                    .font(.subheadline)
+                    .foregroundColor(Color("LoginFontColor"))
+
+                Text(product.title ?? "Unknown")
+                    .font(.callout)
+                    .lineLimit(2)
+
+                HStack {
+                    MoodsLabel(text: "시크")
+                    MoodsLabel(text: "러블리")
+                }
+
+                if let price = product.price {
+                    Text("\(price)원")
+                        .font(.callout)
+                        .bold()
+                        .foregroundColor(.black)
+                } else {
+                    Text("가격 정보 없음")
+                        .font(.callout)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 10))
+        }
+        .background(Color.white)
+        .frame(width: 175, height: 324)
+    }
+
+    private func handleLikeAction() {
+        guard let interactor = mainPromotionInteractor else {
+            print("ProductBusinessLogic이 설정되지 않았습니다.")
+            return
+        }
+
+        let request = MainPromotion.Like.Request(postId: product.id)
+
+      
+        if isLiked ?? false {
+            interactor.likePost(request: request)
+        } else {
+            interactor.unlikePost(request: request)
+        }
+    }
+    
+   
+}
 
 
 // 메이커 상품 카드 뷰
@@ -468,15 +560,11 @@ struct BigCardView: View {
 
 
 struct MainPromotionRandomCardView: View {
-    @State private var isLiked: Bool
+    @Binding var isLiked: Bool?
     var product: ProductInfo
     var mainPromotionInteractor: MainPromotionBusinessLogic?
 
-    init(product: ProductInfo, mainPromotionInteractor: MainPromotionBusinessLogic? = nil) {
-        self.product = product
-        self.mainPromotionInteractor = mainPromotionInteractor
-        _isLiked = State(initialValue: product.like ?? false)
-    }
+
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -502,10 +590,10 @@ struct MainPromotionRandomCardView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        isLiked.toggle()
+                        isLiked?.toggle()
                         handleLikeAction()
                     }) {
-                        Image(systemName: isLiked ? "heart.fill" : "heart")
+                        Image(systemName: (isLiked ?? false) ? "heart.fill" : "heart")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 24, height: 24)
@@ -573,7 +661,7 @@ struct MainPromotionRandomCardView: View {
         
         let request = MainPromotion.Like.Request(postId: product.id)
         
-        if isLiked {
+        if isLiked ?? false {
             interactor.likePost(request: request)
         } else {
             interactor.unlikePost(request: request)

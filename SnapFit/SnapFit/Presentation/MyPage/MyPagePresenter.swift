@@ -42,7 +42,13 @@ protocol MyPagePresentationLogic {
     func presentFetchUserLikesFailure(error: ApiError)
     func presentFetchUserLikesSuccess(response: MainPromotion.Like.LikeListResponse)
     
-  
+    // 유저 찜한 상품 보기
+    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
+    func presentFetchPostDetailByIdFailure(error: ApiError)
+    
+    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse)
+    func presentFetchProductsForMakerFailure(error: ApiError)
+    
     
     // MARK: - 메이커 관련
     func presentFetchMakerProductsFailure(error: ApiError)
@@ -158,6 +164,28 @@ extension MyPagePresenter: MyPagePresentationLogic {
         let viewModel = MainPromotion.Like.LikeListViewModel(likeProducts: response.likeProducts)
         // View에 전달
         view?.displayFetchUserLikeProduct(viewModel: viewModel)
+    }
+    
+    
+    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response) {
+        let viewModel = MainPromotion.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
+        // View에 전달
+        view?.displayDetail(viewModel: viewModel)
+    }
+    
+    func presentFetchPostDetailByIdFailure(error: ApiError) {
+        print("Error occurred: \(error)")
+    }
+    
+    
+    
+    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse) {
+        let viewModel = MainPromotion.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
+        view?.displayDetailProductsForMaker(viewModel: viewModel)
+    }
+    
+    func presentFetchProductsForMakerFailure(error: ApiError) {
+        print("작가 등록한 상품 Error occurred: \(error)")
     }
     
     

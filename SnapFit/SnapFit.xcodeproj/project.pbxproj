@@ -11,6 +11,7 @@
 		64095D9E2C762CD400D1C697 /* PostProductResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095D9D2C762CD300D1C697 /* PostProductResponse.swift */; };
 		64095DA02C772ABC00D1C697 /* ReusableGridSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095D9F2C772ABC00D1C697 /* ReusableGridSelectionView.swift */; };
 		64095DA22C77339E00D1C697 /* PostAccordionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095DA12C77339E00D1C697 /* PostAccordionView.swift */; };
+		64095DA42C78475800D1C697 /* MyPageAuthorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64095DA32C78475800D1C697 /* MyPageAuthorDetailView.swift */; };
 		6416BCDC2C6CC88200E55367 /* PostDetailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */; };
 		6416BCDE2C6CCA8100E55367 /* MainPromotionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */; };
 		641D140C2C7340FF005752F4 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 641D140B2C7340FF005752F4 /* Kingfisher */; };
@@ -121,6 +122,7 @@
 		64095D9D2C762CD300D1C697 /* PostProductResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProductResponse.swift; sourceTree = "<group>"; };
 		64095D9F2C772ABC00D1C697 /* ReusableGridSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableGridSelectionView.swift; sourceTree = "<group>"; };
 		64095DA12C77339E00D1C697 /* PostAccordionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostAccordionView.swift; sourceTree = "<group>"; };
+		64095DA32C78475800D1C697 /* MyPageAuthorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageAuthorDetailView.swift; sourceTree = "<group>"; };
 		6416BCDB2C6CC88100E55367 /* PostDetailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailResponse.swift; sourceTree = "<group>"; };
 		6416BCDD2C6CCA8100E55367 /* MainPromotionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPromotionViewModel.swift; sourceTree = "<group>"; };
 		6428A4892C3D20C600C47990 /* SnapFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -470,6 +472,7 @@
 				64795A5A2C5A2A6A0018BE0D /* DibsView.swift */,
 				64795A5B2C5A2A6A0018BE0D /* MyProfileEdit.swift */,
 				64A0631C2C72203800CAF9F4 /* MyPageViewModel.swift */,
+				64095DA32C78475800D1C697 /* MyPageAuthorDetailView.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -689,6 +692,7 @@
 				64ED72DB2C72460200DE6C8E /* LoadUserModel.swift in Sources */,
 				64095D9E2C762CD400D1C697 /* PostProductResponse.swift in Sources */,
 				64795A7B2C5A68FB0018BE0D /* SplashAndTabView.swift in Sources */,
+				64095DA42C78475800D1C697 /* MyPageAuthorDetailView.swift in Sources */,
 				6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */,
 				642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */,
 				6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */,

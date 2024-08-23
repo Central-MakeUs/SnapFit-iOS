@@ -84,17 +84,18 @@ struct LoginView: View, LoginDisplayLogic {
         NavigationStack(path: $navigationModel.navigationPath) {
             GeometryReader { geometry in
                 ZStack {
-                    Image("LoginBack")  // 배경 이미지
+                    Image("LoginBack")
                         .resizable()
-                        .scaledToFill()  // 화면 전체에 채우기
-                        .frame(width: geometry.size.width, height: geometry.size.height)  // GeometryReader 크기로 설정
-                        .ignoresSafeArea()  // Safe area 무시하여 전체 화면 채우기
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .ignoresSafeArea()
                     
                     VStack(alignment: .leading) {
-                        Spacer().frame(height: 148)
+                        // 화면 크기에 따른 Spacer 높이 조정
+                        Spacer().frame(height: geometry.size.height * 0.14)
                         
                         Group {
-                            Image("appLogo")  // 앱 로고
+                            Image("appLogo")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 155, height: 63)
@@ -108,24 +109,15 @@ struct LoginView: View, LoginDisplayLogic {
                         
                         Spacer()
                         
-                        // 로그인 버튼 그룹
                         LoginViewGroup(interactor: interactor)
                         
-                        Spacer().frame(height: 32)
+                        // 화면 크기에 따른 Spacer 높이 조정
+                        Spacer().frame(height: geometry.size.height * 0.03)
                     }
                     .padding(.horizontal, 16)
                 }
                 .padding(.horizontal, 16)
                 .frame(width: geometry.size.width, height: geometry.size.height)
-//                .background(
-//                    ZStack {
-//                        //Color.black.ignoresSafeArea()  // 배경 색상
-//                        Image("LoginBack")  // 배경 이미지
-//                            .resizable()
-//                            .scaledToFit()
-//                        
-//                    }
-//                )
             }
             .navigationDestination(for: String.self) { destination in
                 // 네비게이션 목적지에 따라 View를 설정

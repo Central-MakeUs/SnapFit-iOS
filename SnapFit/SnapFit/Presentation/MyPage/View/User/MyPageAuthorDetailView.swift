@@ -1,18 +1,19 @@
 //
-//  AuthorDetailView.swift
+//  MyPageAuthorDetailView.swift
 //  SnapFit
 //
-//  Created by 정정욱 on 8/2/24.
+//  Created by 정정욱 on 8/23/24.
 //
+
 import SwiftUI
 import MessageUI
 import Kingfisher
 
-struct AuthorDetailView: View {
+struct MyPageAuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
-    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
     @State private var isShowingMailView = false
@@ -22,6 +23,7 @@ struct AuthorDetailView: View {
     @State private var isLiked: Bool = false // 좋아요 상태 초기화
     
     var body: some View {
+        
         GeometryReader { geometry in
             ZStack {
                 if isLoadingProducts {
@@ -37,8 +39,8 @@ struct AuthorDetailView: View {
                     // 데이터 로딩이 완료되면 실제 콘텐츠를 표시
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
-                            if let detail = mainPromotionViewModel.productDetail {
-                                MainContentView(productInteractor: productInteractor, productDetail: detail, stack: $stack)
+                            if let detail = myPageViewModel.productDetail {
+                                MyMainContentView(myPageInteractor: myPageInteractor, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -52,13 +54,13 @@ struct AuthorDetailView: View {
                     // 고정된 NextButton
                     VStack {
                         Spacer()
-                        NextButton(stack: $stack)
+                        MyNextButton(stack: $stack)
                     }
                 }
             }
             .onAppear {
                 loadProductDetails() // 데이터 로드 함수 호출
-                if let likeStatus = mainPromotionViewModel.productDetail?.like {
+                if let likeStatus = myPageViewModel.productDetail?.like {
                     isLiked = likeStatus // 좋아요 상태 초기화
                 }
             }
@@ -106,7 +108,7 @@ struct AuthorDetailView: View {
     }
     
     private func loadProductDetails() {
-        guard let productId = mainPromotionViewModel.selectedProductId else { return }
+        guard let productId = myPageViewModel.selectedProductId else { return }
         
         Task {
             isLoadingProducts = true
@@ -118,7 +120,7 @@ struct AuthorDetailView: View {
     @MainActor
     private func fetchProductDetails(productId: Int) async {
         // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
-        await productInteractor?.fetchPostDetailById(
+        await myPageInteractor?.fetchPostDetailById(
             request: MainPromotion.LoadDetailProduct.Request(id: productId)
         )
         
@@ -127,7 +129,7 @@ struct AuthorDetailView: View {
         let startTime = Date()
         
         // 제품 상세 정보가 로드될 때까지 대기합니다.
-        while mainPromotionViewModel.productDetail == nil {
+        while myPageViewModel.productDetail == nil {
             await Task.yield()
             
             if Date().timeIntervalSince(startTime) > timeout {
@@ -137,8 +139,8 @@ struct AuthorDetailView: View {
         }
         
         // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
-        if let makerId = mainPromotionViewModel.productDetail?.maker?.id {
-            await productInteractor?.fetchProductsForMaker(
+        if let makerId = myPageViewModel.productDetail?.maker?.id {
+            await myPageInteractor?.fetchProductsForMaker(
                 request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
                     makerid: makerId,
                     limit: 30,
@@ -150,12 +152,12 @@ struct AuthorDetailView: View {
     
     // 좋아요 또는 좋아요 취소를 처리하는 함수
     private func handleLikeAction() {
-        guard let interactor = productInteractor else {
+        guard let interactor = myPageInteractor else {
             print("ProductInteractor가 설정되지 않았습니다.")
             return
         }
         
-        guard let productId = mainPromotionViewModel.productDetail?.id else {
+        guard let productId = myPageViewModel.productDetail?.id else {
             print("상품 ID가 없습니다.")
             return
         }
@@ -171,9 +173,9 @@ struct AuthorDetailView: View {
 }
 
 // 주요 콘텐츠 뷰
-struct MainContentView: View {
-    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+struct MyMainContentView: View {
+    var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
     @Binding var stack: NavigationPath
@@ -267,7 +269,7 @@ struct MainContentView: View {
             .bold()
             .padding(.horizontal)
         
-        if mainPromotionViewModel.productDetailAuthorProducts.isEmpty {
+        if myPageViewModel.productDetailAuthorProducts.isEmpty {
             HStack {
                 Spacer()
                 ProductEmptyView()
@@ -278,21 +280,21 @@ struct MainContentView: View {
         } else {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: layout, spacing: 8) {
-                    ForEach(mainPromotionViewModel.productDetailAuthorProducts) { product in
+                    ForEach(myPageViewModel.productDetailAuthorProducts) { product in
                         Button(action: {
-                            mainPromotionViewModel.selectedProductId = product.id
-                            stack.append("AuthorDetailView")
+                            myPageViewModel.selectedProductId = product.id
+                            stack.append("MyPageAuthorDetailView")
                         }) {
-                            MiddleCardView(isLiked: Binding(
+                            MyMiddleCardView(isLiked: Binding(
                                 get: {
-                                    mainPromotionViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
+                                    myPageViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
                                 },
                                 set: { newValue in
-                                    if let index = mainPromotionViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
-                                        mainPromotionViewModel.productDetailAuthorProducts[index].like = newValue
+                                    if let index = myPageViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
+                                        myPageViewModel.productDetailAuthorProducts[index].like = newValue
                                     }
                                 }
-                            ), product: product, mainPromotionInteractor: productInteractor)
+                            ), product: product, mainPromotionInteractor: myPageInteractor)
                             .frame(width: 175, height: 324)
                         }
                     }
@@ -325,32 +327,13 @@ struct MainContentView: View {
     }
 }
 
-// 하단의 로고와 규정 뷰
-struct DividerAndRegulationView: View {
-    var body: some View {
-        Group {
-            CustomDividerView()
-            
-            HStack(spacing: 8) {
-                Image("starMidleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 27, height: 27)
-                
-                Text("추카랜드")
-            }
-            .padding(16)
-            
-            CustomDividerView()
-        }
-    }
-}
+
 
 // 다음 버튼 뷰
-struct NextButton: View {
+struct MyNextButton: View {
     @Binding var stack : NavigationPath
     var body: some View {
-        NavigationLink(value: "AuthorReservationView"){
+        NavigationLink(value: "ReservationView"){
             HStack(spacing: 20) {
                 Spacer()
                 Text("예약하기")
@@ -367,51 +350,3 @@ struct NextButton: View {
         }
     }
 }
-
-// 가격 뷰
-struct PriceView: View {
-    let price: String
-    
-    var body: some View {
-        HStack {
-            Text(price)
-                .foregroundColor(.black)
-                .padding(.leading, 10)
-            Spacer()
-        }
-        .frame(height: 52)
-        .background(Color(.systemGray5))
-        .cornerRadius(8)
-        .padding()
-    }
-}
-
-
-
-//
-//extension AuthorDetailView {
-//    // PostDetailResponse 구조체에 맞는 더미 데이터
-//    static let sampleDetail = PostDetailResponse(
-//        id: 1,
-//        maker: Maker(id: 1, nickName: "작가 닉네임"),
-//        createAt: "2024-08-15",
-//        thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg",
-//        images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg/250px-HAN_SO_HEE_%28%ED%95%9C%EC%86%8C%ED%9D%AC%29_%E2%80%94_BOUCHERON_from_HIGH_JEWELRY_%E2%80%94_MARIE_CLAIRE_KOREA_%E2%80%94_2023.07.06.jpg"],
-//        desc: "사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다. 사진에서는 빛과 색감의 조화가 돋보이며, 피사체에 대한 깊이 있는 관찰력이 드러납니다.",
-//        title: "스냅사진｜넘치지 않는 아름다움을 담아드려요 - 개인, 커플, 우정스냅사진",
-//        vibes: ["러블리", "유니크"],
-//        locations: ["서울", "부산"],
-//        prices: [Price(min: 10000, price: 20000)],
-//        personPrice: 50000
-//    )
-//
-//    static let sampleViewModel = MainPromotionViewModel(productDetail: sampleDetail)
-//}
-//
-//// 프리뷰
-//#Preview {
-//    let path = NavigationPath()
-//
-//    return AuthorDetailView(stack: .constant(path))
-//        .environmentObject(AuthorDetailView.sampleViewModel)
-//}
