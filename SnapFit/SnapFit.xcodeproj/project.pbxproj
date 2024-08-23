@@ -90,6 +90,7 @@
 		6496CB462C42CECA00381F0F /* LoginConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB402C42CECA00381F0F /* LoginConfigurator.swift */; };
 		6496CB492C43B81B00381F0F /* AuthWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB482C43B81B00381F0F /* AuthWorker.swift */; };
 		6496CB4C2C43F85C00381F0F /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6496CB4B2C43F85C00381F0F /* TermsView.swift */; };
+		649A1D962C7859B000D6ACAE /* FreelookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A1D952C7859B000D6ACAE /* FreelookView.swift */; };
 		64A063192C71F14100CAF9F4 /* ReservationDetailsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */; };
 		64A0631B2C721D7900CAF9F4 /* MyPageWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A0631A2C721D7900CAF9F4 /* MyPageWorker.swift */; };
 		64A0631D2C72203800CAF9F4 /* MyPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A0631C2C72203800CAF9F4 /* MyPageViewModel.swift */; };
@@ -198,6 +199,7 @@
 		6496CB402C42CECA00381F0F /* LoginConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginConfigurator.swift; sourceTree = "<group>"; };
 		6496CB482C43B81B00381F0F /* AuthWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthWorker.swift; sourceTree = "<group>"; };
 		6496CB4B2C43F85C00381F0F /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
+		649A1D952C7859B000D6ACAE /* FreelookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreelookView.swift; sourceTree = "<group>"; };
 		64A063182C71F14100CAF9F4 /* ReservationDetailsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationDetailsResponse.swift; sourceTree = "<group>"; };
 		64A0631A2C721D7900CAF9F4 /* MyPageWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageWorker.swift; sourceTree = "<group>"; };
 		64A0631C2C72203800CAF9F4 /* MyPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewModel.swift; sourceTree = "<group>"; };
@@ -367,6 +369,7 @@
 				6435493D2C6DF93400486EBE /* MailView.swift */,
 				64095D9F2C772ABC00D1C697 /* ReusableGridSelectionView.swift */,
 				64095DA12C77339E00D1C697 /* PostAccordionView.swift */,
+				649A1D952C7859B000D6ACAE /* FreelookView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -696,6 +699,7 @@
 				6496CB412C42CECA00381F0F /* LoginPresenter.swift in Sources */,
 				642D9E9E2C4D458500B31B51 /* Tokens.swift in Sources */,
 				6496CB432C42CECA00381F0F /* LoginInteractor.swift in Sources */,
+				649A1D962C7859B000D6ACAE /* FreelookView.swift in Sources */,
 				64425DE42C61155800491FBC /* AuthorReservationReceptionView.swift in Sources */,
 				64ACDAEC2C4642A200A4C169 /* GridSelectionView.swift in Sources */,
 				6496CB442C42CECA00381F0F /* LoginView.swift in Sources */,
