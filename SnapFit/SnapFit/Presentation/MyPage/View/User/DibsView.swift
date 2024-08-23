@@ -13,52 +13,40 @@ struct DibsView: View {
     @EnvironmentObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
-    
-    
-    // columns 의 갯수를 2개로 설정
-    let columns: [GridItem] = [
-        //GridItem을 담을 수 있는 배열 생성
-        // .flexible : 크기를 화면 프레임에 유연하게 늘렸다 줄었다 할 수 있게 설정
-        GridItem(.flexible(), spacing: 6, alignment: nil),
-        GridItem(.flexible(), spacing: 6, alignment: nil),
-    ]
-    
     @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
     
     var body: some View {
-        VStack{
-            
-            
-            
+        VStack {
             // 상품 탭의 내용
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(myPageViewModel.likeProducts) { product in
-                        Button(action: {
-                            myPageViewModel.selectedProductId = product.id
-                            stack.append("MyPageAuthorDetailView")
-                        }) {
-                            VStack(spacing: 0) { // 카드뷰와 구분선 사이 간격 0
-                                DibsMiddleCardView(product: product, mainPromotionInteractor: mypageInteractor)
-                                    .frame(width: 174, height: 322)
-                                    .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+            GeometryReader { geometry in
+                let spacing: CGFloat = geometry.size.width * 0.02 // 화면 크기에 따른 간격 계산
+                let itemWidth: CGFloat = (geometry.size.width - (spacing * 3)) / 2 // 그리드의 카드 너비 계산
+
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: spacing),
+                        GridItem(.flexible(), spacing: spacing)
+                    ], spacing: spacing) {
+                        ForEach(myPageViewModel.likeProducts) { product in
+                            Button(action: {
+                                myPageViewModel.selectedProductId = product.id
+                                stack.append("MyPageAuthorDetailView")
+                            }) {
+                                VStack(spacing: 0) {
+                                    DibsMiddleCardView(product: product, mainPromotionInteractor: mypageInteractor)
+                                        .frame(width: itemWidth, height: itemWidth * 1.85) // 카드의 비율 조정
+                                        .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+                                }
                             }
+                            .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
                         }
-                        .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
                     }
+                    .padding(.horizontal, spacing) // 좌우 패딩을 간격과 맞춰 조정
+                    .padding(.bottom)
                 }
-            
-                
-                
             }
-            .padding(.horizontal)
-            .padding(.bottom)
-            
         }
-        .onAppear(perform: {
-            // 예약 내역 불러오기
-            mypageInteractor?.fetchUserLikes(request: MainPromotion.Like.LikeListRequest(limit: 30, offset: 0))
-        })
+    
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -78,6 +66,7 @@ struct DibsView: View {
         }
     }
 }
+
 
 struct DibsEmptyView: View {
     var body: some View {

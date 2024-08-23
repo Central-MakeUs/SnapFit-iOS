@@ -204,8 +204,11 @@ struct MyPageView: View {
                         MyPageReservationView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
-                    
-                    
+                    case "ReservationInfoView" :
+                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                        
                     case "DibsView":
                         DibsView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
@@ -255,9 +258,12 @@ struct MyPageView: View {
                 DispatchQueue.main.async {
                     myPageInteractor?.fetchUserDetails()
                     myPageInteractor?.fetchCounts()
+                    // 예약 내역 불러오기
+                    myPageInteractor?.fetchUserLikes(request: MainPromotion.Like.LikeListRequest(limit: 50, offset: 0))
                 }
                 checkForSavedTokens()
             }
+    
             .onChange(of: isLoggedIn) { newValue in
                 if !newValue {
                     DispatchQueue.main.async {

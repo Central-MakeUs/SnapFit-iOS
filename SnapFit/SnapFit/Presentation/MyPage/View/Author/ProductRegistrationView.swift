@@ -464,7 +464,7 @@ struct ProductRegistrationView: View {
                 .frame(height: 48)
                 .background(isUploading ? Color.gray : Color.black)
                 .cornerRadius(5)
-                .padding(EdgeInsets(top: 0, leading: 16, bottom: 16, trailing: 20))
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 16, trailing: 16))
             }
             .disabled(isUploading)
         }

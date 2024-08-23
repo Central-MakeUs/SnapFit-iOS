@@ -337,7 +337,7 @@ class MyPageWorker: MyPageWorkingLogic {
         }
 
         // API 호출을 위한 URL
-        let urlString = "http://34.47.94.218/snafit/post/like?limit=\(limit)&offset=\(offset)"
+        let urlString = "http://34.47.94.218/snapfit/post/like?limit=\(limit)&offset=\(offset)"
         
         // URL 문자열을 URL 객체로 변환
         guard let url = URL(string: urlString) else {
@@ -361,14 +361,24 @@ class MyPageWorker: MyPageWorkingLogic {
                 switch httpResponse.statusCode {
                 case 200...299:
                     // 성공적으로 데이터 받아오기
-                    let response = try JSONDecoder().decode(Product.self, from: data)
-                    return response
+                    do {
+                        let response = try JSONDecoder().decode(Product.self, from: data)
+                        return response
+                    } catch {
+                        print("Decoding error: \(error)")
+                        throw ApiError.decodingError
+                    }
                 case 400...404:
                     // 오류 응답 처리
-                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
-                    let message = errorResponse?.message ?? "Bad Request"
-                    let errorCode = errorResponse?.errorCode ?? 0
-                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                    do {
+                        let errorResponse = try JSONDecoder().decode(ErrorResponse.self, from: data)
+                        let message = errorResponse.message ?? "Bad Request"
+                        let errorCode = errorResponse.errorCode ?? 0
+                        throw ApiError.badRequest(message: message, errorCode: errorCode)
+                    } catch {
+                        print("Decoding error response error: \(error)")
+                        throw ApiError.decodingError
+                    }
                 case 500:
                     // 서버 에러 처리
                     throw ApiError.serverError
@@ -388,6 +398,7 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+
     
     // 메이커가 등록한 상품 가져오기
     func fetchProductsForMaker(userId: Int, limit: Int = 10, offset: Int = 0) -> AnyPublisher<Product, ApiError> {
@@ -398,7 +409,7 @@ class MyPageWorker: MyPageWorkingLogic {
         }
         
         // 요청할 URL 생성
-        let urlString = "http://34.47.94.218/snafit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
+        let urlString = "http://34.47.94.218/snapfit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()

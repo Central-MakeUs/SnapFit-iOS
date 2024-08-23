@@ -4,6 +4,7 @@
 //
 //  Created by 정정욱 on 8/3/24.
 //
+import SwiftUI
 
 import SwiftUI
 
@@ -23,11 +24,13 @@ struct AuthorReservationView: View {
     var productInteractor: ProductBusinessLogic?
     @Binding var stack: NavigationPath
     
+    private let horizontalPadding: CGFloat = 16
+
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 16) {
                         ProductSection()
                         OptionSection(selectedTime: $selectedTime, selectedPrice: $selectedPrice)
                         LocationSection(locationText: $locationText)
@@ -37,11 +40,12 @@ struct AuthorReservationView: View {
                         PhoneSection(phoneText: $phoneText)
                         SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete)
                     }
-                    .padding(.bottom)
-                    .frame(minHeight: geometry.size.height) // 스크롤뷰의 최소 높이를 설정합니다.
+                    .padding(.bottom, 32)
+                    .frame(maxWidth: .infinity) // 화면 폭에 맞게 조정
                 }
-                .padding(.bottom)
+                .padding(.horizontal, horizontalPadding) // ScrollView의 좌우 여백
             }
+            .frame(width: geometry.size.width) // 전체 프레임 폭 설정
             .contentShape(Rectangle())
             .onTapGesture {
                 hideKeyboard()
@@ -137,6 +141,7 @@ struct AuthorReservationView: View {
     }
 }
 
+
 struct ProductSection: View {
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
     
@@ -146,7 +151,7 @@ struct ProductSection: View {
                 .padding(.bottom, 16)
             
             if let productDetail = mainPromotionViewModel.productDetail {
-                    ReservationCardView(productDetail: productDetail)
+                ReservationCardView(productDetail: productDetail)
                     .padding(.horizontal)
                     .padding(.bottom, 32)
             } else {
@@ -179,7 +184,7 @@ struct OptionSection: View {
             } else {
                 Text("가격 정보가 없습니다.")
                     .font(.callout)
-                    .foregroundStyle(Color(.systemGray2))
+                    .foregroundColor(Color(.systemGray2))
                     .padding(.horizontal)
                     .padding(.bottom, 32)
             }
@@ -206,8 +211,6 @@ struct LocationSection: View {
         }
     }
 }
-
-
 struct DateTimeSection: View {
     @Binding var selectedDate: Date
     @State private var showingDatePicker = false // DatePicker 표시 여부
@@ -254,7 +257,6 @@ struct DateTimeSection: View {
     }
 }
 
-
 struct DatePickerView: View {
     @Binding var selectedDate: Date
     @Binding var isPresented: Bool
@@ -285,10 +287,10 @@ struct DatePickerView: View {
     }
 }
 
-
 struct PeopleSection: View {
     @Binding var counter: Int
     @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    
     var body: some View {
         VStack(alignment: .leading) {
             SectionHeaderView(title: "인원을 선택해주세요")
@@ -296,7 +298,7 @@ struct PeopleSection: View {
             VStack(alignment:.leading) {
                 Text("2인 이상 1인당 \(mainPromotionViewModel.productDetail?.personPrice ?? 0)원 추가") // 여기에서 personPrice를 사용합니다.
                     .font(.callout)
-                    .foregroundStyle(Color(.systemGray2))
+                    .foregroundColor(Color(.systemGray2))
                     .padding(.leading, 17.5)
                     .padding(.bottom, 24)
                 
@@ -320,8 +322,7 @@ struct PeopleSection: View {
                     .buttonStyle(PlainButtonStyle())
                     
                     Text("\(counter)")
-                        .padding(.horizontal, 20)
-                    
+    
                     Button(action: {
                         counter += 1
                     }) {
@@ -333,6 +334,7 @@ struct PeopleSection: View {
                     .buttonStyle(PlainButtonStyle())
                     .padding(.trailing, 17.5)
                 }
+                
             }
             .padding(.bottom, 32)
         }
@@ -360,7 +362,6 @@ struct PhoneSection: View {
 }
 
 struct SubmitButton: View {
-
     @Binding var stack: NavigationPath
     var productInteractor: ProductBusinessLogic?
     let isFormComplete: Bool
@@ -382,7 +383,8 @@ struct SubmitButton: View {
             .frame(height: 48)
             .background(isFormComplete ? Color.black : Color.gray)
             .cornerRadius(5)
-            .padding(EdgeInsets(top: 0, leading: 16, bottom: 32, trailing: 16))
+            .padding(.horizontal, 16) // 버튼의 좌우 여백
+            .padding(.bottom, 32)
         }
         .disabled(!isFormComplete || isSubmitting) // 버튼 비활성화
     }

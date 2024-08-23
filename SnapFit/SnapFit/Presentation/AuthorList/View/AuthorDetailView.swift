@@ -7,6 +7,7 @@
 import SwiftUI
 import MessageUI
 import Kingfisher
+import WebKit
 
 struct AuthorDetailView: View {
     
@@ -16,6 +17,7 @@ struct AuthorDetailView: View {
     
     @Binding var stack: NavigationPath
     @State private var isShowingMailView = false
+    @State private var isShowingWebView = false
     @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
     
     @State private var isLoadingProducts = true // 로딩 상태 추가
@@ -100,7 +102,32 @@ struct AuthorDetailView: View {
             if MFMailComposeViewController.canSendMail() {
                 MailView(result: $mailResult)
             } else {
-                Text("Mail services are not available")
+                VStack {
+                    Text("메일 서비스가 설정되어 있지 않습니다.")
+                        .font(.headline)
+                        .padding()
+                    Text("메일 앱을 설치하시면 바로 신고가 가능합니다.")
+                        .foregroundColor(.gray)
+                        .padding()
+                    WebView(url: URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSekyp-tBMhi2GDOX49X7DWpaXCu7MLNFGQ5scuL_en5AhBSnQ/viewform")!)
+                        .edgesIgnoringSafeArea(.all) // 웹뷰가 안전 영역을 넘어 확장되도록 설정
+                  
+                    Button {
+                        isShowingMailView = false
+                    } label: {
+                        Spacer()
+                        Text("확인")
+                            .font(.headline)
+                            .bold()
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding()
+                    .frame(height: 48)
+                    .background(Color.black)
+                    .cornerRadius(5)
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 40, trailing: 20))
+                }
             }
         }
     }
@@ -169,7 +196,6 @@ struct AuthorDetailView: View {
         }
     }
 }
-
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경

@@ -55,6 +55,7 @@ struct MyPageAuthorDetailView: View {
                     VStack {
                         Spacer()
                         MyNextButton(stack: $stack)
+                            .hidden()
                     }
                 }
             }

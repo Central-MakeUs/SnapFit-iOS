@@ -25,61 +25,68 @@ struct FreelookView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        VStack {
-            HStack {
-                Image("mainSnapFitLogo")
-                    .resizable()
-                    .frame(width: 91.18, height: 20)
-                Spacer()
-            }
-            .padding(.horizontal)
-            
-            
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(products.sorted(by: { $0.id < $1.id }), id: \.id) { product in
-                        Button(action: {
-                            handleProductSelection(product)
-                        }) {
-                            MiddleCardView(isLiked: .constant(product.like ?? false), product: product)
-                                .frame(width: 175, height: 324)
-                                .padding(2)
-                        }
-                        .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom)
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                }
-            }
-            
-            ToolbarItem(placement: .principal) {
-                Text("미리보기")
-                    .font(.headline)
-                    .foregroundColor(.black)
-            }
-        }
-        .onAppear {
-            loadInitialData()
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("로그인이 필요합니다"),
-                message: Text("이 기능을 사용하려면 로그인이 필요합니다."),
-                dismissButton: .default(Text("확인"))
-            )
-        }
-        
-    }
+        GeometryReader { geometry in
+                 let spacing: CGFloat = geometry.size.width * 0.02 // 화면 크기에 따라 간격을 조정
+                 let itemWidth: CGFloat = (geometry.size.width - (spacing * 3)) / 2 // 두 개의 열을 화면 너비에 맞춰 계산
+                 
+                 VStack {
+                     HStack {
+                         Image("mainSnapFitLogo")
+                             .resizable()
+                             .frame(width: 91.18, height: 20)
+                         Spacer()
+                     }
+                     .padding(.horizontal)
+                     
+                     ScrollView(.vertical, showsIndicators: false) {
+                         LazyVGrid(columns: [
+                             GridItem(.flexible(), spacing: spacing),
+                             GridItem(.flexible(), spacing: spacing)
+                         ], spacing: spacing) {
+                             ForEach(products.sorted(by: { $0.id < $1.id }), id: \.id) { product in
+                                 Button(action: {
+                                     handleProductSelection(product)
+                                 }) {
+                                     MiddleCardView(isLiked: .constant(product.like ?? false), product: product)
+                                         .frame(width: itemWidth, height: itemWidth * 1.85) // 카드 비율 조정
+                                         .padding(2)
+                                 }
+                                 .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
+                             }
+                         }
+                         .padding(.horizontal, spacing) // 좌우 패딩을 간격과 맞춰 조정
+                         .padding(.bottom)
+                     }
+                 }
+                 .toolbar {
+                     ToolbarItem(placement: .navigationBarLeading) {
+                         Button(action: {
+                             dismiss()
+                         }) {
+                             Image(systemName: "chevron.left")
+                                 .foregroundColor(.black)
+                         }
+                     }
+                     
+                     ToolbarItem(placement: .principal) {
+                         Text("미리보기")
+                             .font(.headline)
+                             .foregroundColor(.black)
+                     }
+                 }
+                 .onAppear {
+                     loadInitialData()
+                 }
+                 .alert(isPresented: $showAlert) {
+                     Alert(
+                         title: Text("로그인이 필요합니다"),
+                         message: Text("이 기능을 사용하려면 로그인이 필요합니다."),
+                         dismissButton: .default(Text("확인"))
+                     )
+                 }
+             }
+         }
+         
     
     // 상품을 선택했을 때 로그인 상태를 확인하고 알림을 띄우는 메서드
     func handleProductSelection(_ product: ProductInfo) {
