@@ -25,6 +25,8 @@ enum ApiError : Error {
     case invalidRefreshToken
     case encodingError
     case invalidResponse
+    case invalidData
+    case invalidImageCount
     
     var info : String {
         switch self {
@@ -45,6 +47,8 @@ enum ApiError : Error {
         case .serverError:         return "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
         case .encodingError:        return "encodingError 입니다."
         case .invalidResponse:      return "invalidResponse 입니다."
+        case .invalidData:          return "case invalidData 입니다."
+        case .invalidImageCount:    return "이미지 카운트가 없습니다."
             
         }
     }

@@ -253,6 +253,7 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     func presentProductPostSuccess(response: MakerUseCases.RequestMakerProduct.productResponse) {
         print("상품 업로드 성공")
+        print("response \(response.product)")
     }
     
 

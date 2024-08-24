@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PostAccordionView: View {
-    @Binding var selectedTime: String
+    @Binding var selectedTime: PostPrice // selectedTime을 PostPrice로 변경
     @State private var isExpanded = false
 
     let timeOptions: [PostPrice] // 시간 옵션
@@ -21,7 +21,7 @@ struct PostAccordionView: View {
                 }
             }) {
                 HStack {
-                    Text(selectedTime.isEmpty ? "시간을 선택해주세요" : selectedTime)
+                    Text(selectedTime.time.isEmpty ? "시간을 선택해주세요" : selectedTime.time)
                         .foregroundStyle(Color(.systemGray2))
                         .font(.callout)
 
@@ -38,11 +38,10 @@ struct PostAccordionView: View {
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(timeOptions, id: \.time) { option in
+                    ForEach(timeOptions) { option in
                         Button(action: {
                             withAnimation {
-                                selectedTime = option.time
-                                // 가격은 사용자가 직접 입력하도록 초기화
+                                selectedTime = option // 선택된 시간으로 업데이트
                                 isExpanded = false
                             }
                         }) {

@@ -388,9 +388,13 @@ final class MyPageInteractor: MyPageBusinessLogic {
             .store(in: &cancellables)
     }
     
-    // 이미지 URL 가져오기
+
+    // MARK: - 이미지 URL 가져오기
     func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest) {
-        myPageWorker.getImages(exts: request.Images) // exts는 배열일 것으로 가정
+        fetchAllImagePaths(count: request.Images.count, ext: "png", maxRetries: 3)
+            .flatMap { [self] fileInfos -> AnyPublisher<[String], ApiError> in
+                return myPageWorker.uploadImages(fileInfos: fileInfos, images: request.Images)
+            }
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
@@ -398,16 +402,50 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 case .finished:
                     break
                 }
-            }, receiveValue: { imageURLs in
-                let response = MakerUseCases.RequestMakerImage.ImageURLResponse(Images: imageURLs)
+            }, receiveValue: { filePaths in
+                let response = MakerUseCases.RequestMakerImage.ImageURLResponse(Images: filePaths)
                 self.presenter?.presentImageURLs(response: response)
             })
             .store(in: &cancellables)
     }
+
+
+    private func fetchAllImagePaths(count: Int, ext: String, maxRetries: Int) -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError> {
+        // 파일 경로 요청
+        let initialPublisher = myPageWorker.fetchImagePaths(ext: ext)
+        
+        return initialPublisher
+            .flatMap { fileInfos -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError> in
+                if fileInfos.count >= count {
+                    // 필요한 개수만큼 경로가 준비된 경우, 반환
+                    return Just(fileInfos.prefix(count).toArray())
+                        .setFailureType(to: ApiError.self)
+                        .eraseToAnyPublisher()
+                } else if maxRetries > 0 {
+                    // 부족한 파일 경로가 있을 경우, 추가로 호출하여 부족한 수만큼 재시도
+                    let remainingCount = count - fileInfos.count
+                    return self.fetchAllImagePaths(count: remainingCount, ext: ext, maxRetries: maxRetries - 1)
+                        .map { additionalFileInfos in
+                            return fileInfos + additionalFileInfos
+                        }
+                        .eraseToAnyPublisher()
+                } else {
+                    // 재시도 횟수 초과 시 에러 반환
+                    return Fail(error: ApiError.invalidImageCount).eraseToAnyPublisher()
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+
+
+
+
+
     
     
     // 상품 등록
     func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest) {
+        print("상품 \(request)")
         myPageWorker.postProduct(request: request.product)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -426,3 +464,9 @@ final class MyPageInteractor: MyPageBusinessLogic {
     
 }
 
+// Helper extension to convert ArraySlice to Array
+extension ArraySlice {
+    func toArray() -> [Element] {
+        return Array(self)
+    }
+}

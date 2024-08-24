@@ -7,7 +7,7 @@
 import SwiftUI
 import Combine
 
-// ProductRegistrationView 수정
+
 struct ProductRegistrationView: View {
     var mypageInteractor: MyPageBusinessLogic?
     @EnvironmentObject var myPageViewModel: MyPageViewModel
@@ -19,28 +19,27 @@ struct ProductRegistrationView: View {
     @State private var isConfirmButtonEnabled = false
     @State private var selectedSnap: String = "indoor"
     @State private var descriptionText: String = ""
-    @State private var selectedImageData: [Data?] = []   // 선택된 이미지 데이터를 저장할 배열 (Data?)
+    @State private var selectedImageData: [Data?] = []
     @State private var selectedMoods: [String] = []
     @State private var selectedLocations: [String] = []
-    @State private var timePriceOptions: [(selectedTime: String, selectedPrice: Int)] = []
-    
+    @State private var timePriceOptions: [(selectedTime: PostPrice, selectedPrice: Int)] = []
     private let maxCharacterLimit = 500
     
-    @State private var isUploading: Bool = false // 업로드 중인지 상태 체크
-    @State private var cancellables = Set<AnyCancellable>() // Combine 구독을 관리하기 위한 cancellables
-    @State private var uploadedImageURLs: [String] = [] // 업로드된 이미지 URL 저장
+    @State private var isUploading: Bool = false
+    @State private var cancellables = Set<AnyCancellable>()
+    @State private var uploadedImageURLs: [String] = []
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading) {
-                TitleSection(inputText: $inputText, isConfirmButtonEnabled: $isConfirmButtonEnabled)
-                PhotosSection(selectedImageData: $selectedImageData) // 이미지 데이터를 전달
-                DescriptionSection(descriptionText: $descriptionText, maxCharacterLimit: maxCharacterLimit)
-                SnapSelectionSection(selectedSnap: $selectedSnap)
-                MoodSection(selectedMoods: $selectedMoods)
-                LocationSection(selectedLocations: $selectedLocations)
-                OptionSection(timePriceOptions: $timePriceOptions)
-                AdditionalCostSection(additionalPriceText: $additionalPriceText)
+                TitleSection(inputText: $inputText, isConfirmButtonEnabled: $isConfirmButtonEnabled, validateForm: validateForm)
+                PhotosSection(selectedImageData: $selectedImageData, validateForm: validateForm)
+                DescriptionSection(descriptionText: $descriptionText, maxCharacterLimit: maxCharacterLimit, validateForm: validateForm)
+                SnapSelectionSection(selectedSnap: $selectedSnap, validateForm: validateForm)
+                MoodSection(selectedMoods: $selectedMoods, validateForm: validateForm)
+                LocationSection(selectedLocations: $selectedLocations, validateForm: validateForm)
+                OptionSection(timePriceOptions: $timePriceOptions, validateForm: validateForm)
+                AdditionalCostSection(additionalPriceText: $additionalPriceText, validateForm: validateForm)
                 
                 ReserveButton(
                     selectedImageData: $selectedImageData,
@@ -53,14 +52,17 @@ struct ProductRegistrationView: View {
                     additionalPriceText: additionalPriceText,
                     selectedSnap: selectedSnap,
                     timePriceOptions: timePriceOptions,
-                    studio: selectedSnap == "indoor"
+                    studio: selectedSnap == "indoor",
+                    isUploading: $isUploading,
+                    cancellables: $cancellables,
+                    isConfirmButtonEnabled: $isConfirmButtonEnabled
                 )
-
             }
         }
         .onAppear {
             mypageInteractor?.fetchVibes()
             mypageInteractor?.fetchLocations()
+            validateForm() // 초기 로드 시 폼 유효성 검사
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -83,10 +85,23 @@ struct ProductRegistrationView: View {
         }
     }
     
+    private func validateForm() {
+        isConfirmButtonEnabled = !inputText.isEmpty &&
+                                 inputText.count <= 18 &&
+                                 !descriptionText.isEmpty &&
+                                 descriptionText.count <= maxCharacterLimit &&
+                                 !selectedImageData.isEmpty &&
+                                 !selectedMoods.isEmpty &&
+                                 !selectedLocations.isEmpty &&
+                                 !timePriceOptions.isEmpty &&
+                                 timePriceOptions.allSatisfy { $0.selectedPrice > 0 } &&
+                                 (Int(additionalPriceText) ?? 0) >= 0
+    }
     
     private struct TitleSection: View {
         @Binding var inputText: String
         @Binding var isConfirmButtonEnabled: Bool
+        var validateForm: () -> Void
         
         var body: some View {
             SectionHeaderView(title: "제목")
@@ -102,8 +117,8 @@ struct ProductRegistrationView: View {
                         RoundedRectangle(cornerRadius: 5)
                             .stroke(Color.gray, lineWidth: 1)
                     )
-                    .onChange(of: inputText) { newValue in
-                        isConfirmButtonEnabled = newValue.count >= 18
+                    .onChange(of: inputText) { _ in
+                        validateForm()
                     }
                     .frame(height: 48)
                     .padding(.bottom, 8)
@@ -120,20 +135,25 @@ struct ProductRegistrationView: View {
     }
     
     private struct PhotosSection: View {
-        @Binding var selectedImageData: [Data?] // 상위에서 전달받은 이미지 데이터
+        @Binding var selectedImageData: [Data?]
+        var validateForm: () -> Void
         
         var body: some View {
             SectionHeaderView(title: "사진")
                 .padding(.bottom, 20)
-            SelectPhotosView(imageData: $selectedImageData) // 이미지 데이터 바인딩
+            SelectPhotosView(imageData: $selectedImageData)
                 .padding(.bottom, 24)
                 .padding(.horizontal, 16)
+                .onChange(of: selectedImageData) { _ in
+                    validateForm()
+                }
         }
     }
     
     private struct DescriptionSection: View {
         @Binding var descriptionText: String
         let maxCharacterLimit: Int
+        var validateForm: () -> Void
         
         var body: some View {
             SectionHeaderView(title: "설명")
@@ -143,10 +163,11 @@ struct ProductRegistrationView: View {
                     .frame(height: 214)
                     .colorMultiply(Color("MainBoxbBackColor"))
                     .cornerRadius(10)
-                    .onChange(of: descriptionText) { newValue in
+                    .onChange(of: descriptionText) { _ in
                         if descriptionText.count > maxCharacterLimit {
                             descriptionText = String(descriptionText.prefix(maxCharacterLimit))
                         }
+                        validateForm()
                     }
                     .foregroundColor(.black)
                 
@@ -163,6 +184,7 @@ struct ProductRegistrationView: View {
     
     private struct SnapSelectionSection: View {
         @Binding var selectedSnap: String
+        var validateForm: () -> Void
         
         var body: some View {
             SectionHeaderView(title: "스튜디오 유무")
@@ -170,6 +192,7 @@ struct ProductRegistrationView: View {
             HStack {
                 Button(action: {
                     selectedSnap = "indoor"
+                    validateForm()
                 }) {
                     Text("실내스냅")
                         .font(.callout)
@@ -181,6 +204,7 @@ struct ProductRegistrationView: View {
                 
                 Button(action: {
                     selectedSnap = "outdoor"
+                    validateForm()
                 }) {
                     Text("야외스냅")
                         .font(.callout)
@@ -195,11 +219,12 @@ struct ProductRegistrationView: View {
         }
     }
     
-    
-    struct MoodSection: View {
+    private struct MoodSection: View {
         @State private var showMoodSelection = false
         @Binding var selectedMoods: [String]
-        @EnvironmentObject var myPageViewModel: MyPageViewModel // Mood 리스트 가져오기 위해 사용
+        var validateForm: () -> Void
+        
+        @EnvironmentObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "분위기")
@@ -218,7 +243,6 @@ struct ProductRegistrationView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(5)
                 
-                // 선택된 분위기들 표시
                 if !selectedMoods.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
@@ -233,7 +257,6 @@ struct ProductRegistrationView: View {
                         }
                     }
                 }
-                
             }
             .padding(.bottom, 24)
             .padding(.horizontal, 16)
@@ -245,15 +268,17 @@ struct ProductRegistrationView: View {
                     items: myPageViewModel.vibes.map { $0.name ?? "" }, // 분위기 리스트 전달
                     columnsCount: 2
                 )
+
             }
         }
     }
     
-    
-    struct LocationSection: View {
+    private struct LocationSection: View {
         @State private var showLocationSelection = false
         @Binding var selectedLocations: [String]
-        @EnvironmentObject var myPageViewModel: MyPageViewModel // Location 리스트 가져오기 위해 사용
+        var validateForm: () -> Void
+        
+        @EnvironmentObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "위치")
@@ -272,12 +297,11 @@ struct ProductRegistrationView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(5)
                 
-                // 현재 선택된 장소 표시
                 if !selectedLocations.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            ForEach(selectedLocations, id: \.self) { mood in
-                                Text(mood)
+                            ForEach(selectedLocations, id: \.self) { location in
+                                Text(location)
                                     .font(.callout)
                                     .frame(width: 114, height: 53)
                                     .foregroundColor(Color.white)
@@ -287,8 +311,6 @@ struct ProductRegistrationView: View {
                         }
                     }
                 }
-                
-                
             }
             .padding(.bottom, 24)
             .padding(.horizontal, 16)
@@ -297,39 +319,42 @@ struct ProductRegistrationView: View {
                     isPresented: $showLocationSelection,
                     selectedItems: $selectedLocations,
                     title: "어디에서 촬영을 원하시나요?",
-                    items: myPageViewModel.locations.map { $0.adminName ?? "" }, // 위치 리스트 전달
+                    items: myPageViewModel.locations.map { $0.adminName ?? "" },
                     columnsCount: 3
                 )
+            }
+            .onChange(of: selectedLocations) { _ in
+                validateForm()
             }
         }
     }
     
-    
     private struct OptionSection: View {
-        @Binding var timePriceOptions: [(selectedTime: String, selectedPrice: Int)]
+        @Binding var timePriceOptions: [(selectedTime: PostPrice, selectedPrice: Int)]
+        var validateForm: () -> Void
         
         var body: some View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeaderView(title: "옵션")
                     .padding(.bottom, 16)
                 
-                // 분으로 나눠서처리
                 ForEach(timePriceOptions.indices, id: \.self) { index in
                     VStack(alignment: .leading, spacing: 10) {
                         PostAccordionView(
                             selectedTime: $timePriceOptions[index].selectedTime,
                             timeOptions: [
-                                PostPrice(time: "30분"),
-                                PostPrice(time: "1시간"),
-                                PostPrice(time: "2시간"),
-                                PostPrice(time: "3시간")
+                                PostPrice(minutes: 30, price: 0),
+                                PostPrice(minutes: 60, price: 0),
+                                PostPrice(minutes: 90, price: 0),
+                                PostPrice(minutes: 120, price: 0),
+                                PostPrice(minutes: 150, price: 0),
+                                PostPrice(minutes: 180, price: 0)
                             ]
                         )
                         
-                        // 가격 입력 필드
                         HStack {
                             TextField(
-                                "가격 입력", // 항상 표시되는 플레이스홀더
+                                "가격 입력",
                                 value: $timePriceOptions[index].selectedPrice,
                                 format: .number
                             )
@@ -342,6 +367,9 @@ struct ProductRegistrationView: View {
                                     .stroke(Color.gray, lineWidth: 1)
                             )
                             .padding(.top, 10)
+                            .onChange(of: timePriceOptions[index].selectedPrice) { _ in
+                                validateForm()
+                            }
                             
                             if timePriceOptions[index].selectedPrice == 0 {
                                 Text("가격을 입력하세요")
@@ -353,7 +381,7 @@ struct ProductRegistrationView: View {
                 }
                 
                 Button(action: {
-                    timePriceOptions.append((selectedTime: "", selectedPrice: 0))
+                    timePriceOptions.append((selectedTime: PostPrice(minutes: 0, price: 0), selectedPrice: 0))
                 }) {
                     Text("옵션 추가")
                         .font(.headline)
@@ -364,19 +392,19 @@ struct ProductRegistrationView: View {
                         .background(Color.black)
                         .cornerRadius(5)
                         .padding(.horizontal)
-                        .padding(.bottom, 20) // 추가 여백
+                        .padding(.bottom, 20)
                 }
-                .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(.bottom, 20)
             .padding(.horizontal, 16)
+ 
         }
     }
     
-    
-    
     private struct AdditionalCostSection: View {
         @Binding var additionalPriceText: String
+        var validateForm: () -> Void
         
         var body: some View {
             SectionHeaderView(title: "인원 추가 비용")
@@ -394,13 +422,15 @@ struct ProductRegistrationView: View {
                 .frame(height: 48)
                 .padding(.horizontal)
                 .padding(.bottom, 24)
+                .onChange(of: additionalPriceText) { _ in
+                    validateForm()
+                }
         }
     }
     
     private struct ReserveButton: View {
         @EnvironmentObject var myPageViewModel: MyPageViewModel
-        @State private var isUploading = false
-        @Binding var selectedImageData: [Data?]  // Bindings for uploaded image URLs
+        @Binding var selectedImageData: [Data?]
         var mypageInteractor: MyPageBusinessLogic?
         
         var selectedMoods: [String]
@@ -410,51 +440,60 @@ struct ProductRegistrationView: View {
         var priceText: String
         var additionalPriceText: String
         var selectedSnap: String
-        var timePriceOptions: [(selectedTime: String, selectedPrice: Int)]
+        var timePriceOptions: [(selectedTime: PostPrice, selectedPrice: Int)]
         var studio: Bool
+        
+        @Binding var isUploading: Bool
+        @Binding var cancellables: Set<AnyCancellable>
+        @Binding var isConfirmButtonEnabled: Bool
         
         var body: some View {
             Button(action: {
-                isUploading = true
-                
-           
-                let validImageData = selectedImageData.compactMap { $0 }
-           
-                mypageInteractor?.getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest(Images: validImageData))
-                
-                // Convert timePriceOptions to MakerProductRequest.Price format
-                /*
-                let prices = timePriceOptions.map { timePriceOption in
-                    MakerProductRequest.Price(
-                        min: Int(timePriceOption.selectedTime.components(separatedBy: " ")[0]) ?? 0,
-                        price: timePriceOption.selectedPrice
-                    )
+                if isConfirmButtonEnabled {
+                    isUploading = true
+                    
+                    let validImageData = selectedImageData.compactMap { $0 }
+                    
+                    mypageInteractor?.getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest(Images: validImageData))
+                    
+                    myPageViewModel.$postImages
+                        .sink { imageURLs in
+                            if !imageURLs.isEmpty {
+                                let thumbnail = imageURLs.first ?? "example-thumbnail-url"
+                                let imageNames = imageURLs
+                                
+                                let prices = timePriceOptions.map { timePriceOption in
+                                    let minutes = timePriceOption.selectedTime.minutes
+                                    let price = timePriceOption.selectedPrice
+                                    return MakerProductRequest.Price(
+                                        min: minutes,
+                                        price: price
+                                    )
+                                }
+                                
+                                let request = MakerProductRequest(
+                                    vibes: selectedMoods,
+                                    locations: selectedLocations,
+                                    imageNames: imageNames,
+                                    thumbnail: thumbnail,
+                                    title: titleText,
+                                    desc: descriptionText,
+                                    prices: prices,
+                                    personPrice: Int(additionalPriceText) ?? 0,
+                                    studio: selectedSnap == "indoor"
+                                )
+                                
+                                mypageInteractor?.postProduct(request: MakerUseCases.RequestMakerProduct.productRequest(product: request))
+                                
+                                isUploading = false
+                            }
+                        }
+                        .store(in: &cancellables)
                 }
-                
-                // Create MakerProductRequest
-                let request = MakerProductRequest(
-                    vibes: selectedMoods,
-                    locations: selectedLocations,
-                    imageNames: ["example-image-url"],  // Use a valid URL or placeholder
-                    thumbnail: "example-thumbnail-url", // Use a valid URL or placeholder
-                    title: titleText,
-                    desc: descriptionText,
-                    prices: [
-                           SnapFit.MakerProductRequest.Price(min: 0, price: 30),
-                           SnapFit.MakerProductRequest.Price(min: 0, price: 10000)
-                       ],
-                    personPrice: Int(additionalPriceText) ?? 0,
-                    studio: selectedSnap == "indoor" // Check for indoor studio
-                )
-                
-                // Post product request
-                mypageInteractor?.postProduct(request: MakerUseCases.RequestMakerProduct.productRequest(product: request))
-                 */
-             
             }) {
                 HStack(spacing: 20) {
                     Spacer()
-                    Text("예약하기")
+                    Text("등록하기")
                         .font(.headline)
                         .bold()
                         .foregroundColor(.white)
@@ -462,19 +501,15 @@ struct ProductRegistrationView: View {
                 }
                 .padding()
                 .frame(height: 48)
-                .background(isUploading ? Color.gray : Color.black)
+                .background(isConfirmButtonEnabled ? (isUploading ? Color.gray : Color.black) : Color.gray)
                 .cornerRadius(5)
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 16, trailing: 16))
             }
-            .disabled(isUploading)
+            .disabled(!isConfirmButtonEnabled || isUploading)
         }
     }
-    
-    
 }
 
-
-// Preview
 struct ProductRegistrationView_Previews: PreviewProvider {
     static var previews: some View {
         ProductRegistrationView(
@@ -483,8 +518,3 @@ struct ProductRegistrationView_Previews: PreviewProvider {
         .environmentObject(MyPageViewModel())
     }
 }
-
-
-//#Preview {
-//    ProductRegistrationView()
-//}

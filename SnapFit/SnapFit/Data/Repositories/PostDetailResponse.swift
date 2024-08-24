@@ -33,8 +33,24 @@ struct Price: Codable {
 
 //// 상품 등록
 
-// Assume Price is defined like this
 struct PostPrice: Identifiable {
-    let id = UUID() // Add an id for identifying each Price
-    let time: String
+    let id = UUID() // Identifiable 프로토콜 준수를 위해 ID 추가
+    let minutes: Int
+    let price: Int
+    
+    // 분을 문자열로 변환하는 계산 프로퍼티
+    var time: String {
+        let hours = minutes / 60
+        let minutesPart = minutes % 60
+        
+        var timeString = ""
+        if hours > 0 {
+            timeString += "\(hours)시간 "
+        }
+        if minutesPart > 0 || hours == 0 { // 분이 0이 아니거나 시간도 없을 경우 표시
+            timeString += "\(minutesPart)분"
+        }
+        
+        return timeString
+    }
 }

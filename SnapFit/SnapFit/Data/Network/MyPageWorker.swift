@@ -43,7 +43,8 @@ protocol MyPageWorkingLogic {
     func fetchMakerPosts(userId: Int, limit: Int, offset: Int) -> AnyPublisher<MakerProductResponse, ApiError>
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
     func fetchLocations() -> AnyPublisher<MakerLocations, ApiError>
-    func getImages(exts: [Data]) -> AnyPublisher<[String], ApiError>
+    func uploadImages(fileInfos: [ImageInfoResponse.FileInfo], images: [Data]) -> AnyPublisher<[String], ApiError> 
+    func fetchImagePaths(ext: String) -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError>
     func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError>
 }
 
@@ -922,47 +923,37 @@ class MyPageWorker: MyPageWorkingLogic {
     }
 
     
-    // MARK: - 이미지 경로 가져오는 함수
-    // 해당 경로 바디에 .png 바이리
-    func getImages(exts: [Data]) -> AnyPublisher<[String], ApiError> {
-        // Data 배열을 Base64 인코딩 후 확장자를 붙여 쿼리 파라미터로 변환
-        let extQuery = exts.map { data in
-            print("이미지 데이터 값 \(data)")
-            let base64String = data.base64EncodedString()
-            return "ext=\(base64String).png"
-        }.joined(separator: "&")
-        
-        let urlString = "http://34.47.94.218/snapfit/image/paths?\(extQuery)"
-        
-        // Access Token이 유효한지 확인
+  
+    // MARK: - 이미지 경로 가져오기 (GET)
+    func fetchImagePaths(ext: String = "png") -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError> {
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
         }
+
+        let urlString = "http://34.47.94.218/snapfit/image/paths?ext=\(ext)"
         
         guard let url = URL(string: urlString) else {
             return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
         }
-        
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "GET"
         urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
         urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
-        // API 호출 및 응답 처리
+
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .tryMap { (data: Data, urlResponse: URLResponse) -> Data in
+            .tryMap { (data: Data, urlResponse: URLResponse) -> [ImageInfoResponse.FileInfo] in
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
                     throw ApiError.unknown(nil)
                 }
-                
+
                 if !(200...299).contains(httpResponse.statusCode) {
                     throw ApiError.badStatus(code: httpResponse.statusCode)
                 }
-                
-                return data
+
+                let decodedResponse = try JSONDecoder().decode(ImageInfoResponse.self, from: data)
+                return decodedResponse.fileInfos
             }
-            .decode(type: ImageInfoResponse.self, decoder: JSONDecoder())
-            .map { $0.fileInfos.map { $0.fileName } }  // fileName만 추출
             .mapError { err in
                 if let apiError = err as? ApiError {
                     return apiError
@@ -975,6 +966,61 @@ class MyPageWorker: MyPageWorkingLogic {
             .eraseToAnyPublisher()
     }
 
+
+
+
+    // MARK: - 이미지 업로드 함수 (PUT)
+    // get통해 pngpngpng 파일 페스가 올거임 구글 파일 페스에 직접 넣는덧임
+    // 등록시는       "fileName": "307cf766-6145-4e33-8157-88911e43a6a1.png"
+    
+    func uploadImages(fileInfos: [ImageInfoResponse.FileInfo], images: [Data]) -> AnyPublisher<[String], ApiError> {
+        // Access Token 확인
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        // 파일 정보와 이미지 데이터를 매칭하여 PUT 요청을 생성
+        let imageUploadRequests = zip(fileInfos, images).map { fileInfo, imageData -> AnyPublisher<Void, ApiError> in
+            guard let url = URL(string: fileInfo.filePath) else {
+                return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            request.addValue("image/png", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            request.httpBody = imageData
+            
+            return URLSession.shared.dataTaskPublisher(for: request)
+                .tryMap { (_, urlResponse: URLResponse) -> Void in
+                    guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                        throw ApiError.unknown(nil)
+                    }
+                    
+                    if !(200...299).contains(httpResponse.statusCode) {
+                        throw ApiError.badStatus(code: httpResponse.statusCode)
+                    }
+                    print("Upload successful for: \(fileInfo.fileName)") // 로그 추가
+                }
+                .mapError { err in
+                    if let apiError = err as? ApiError {
+                        return apiError
+                    }
+                    return ApiError.unknown(nil)
+                }
+                .eraseToAnyPublisher()
+        }
+        
+        // 모든 이미지 업로드 요청을 병렬로 실행하고 완료된 후 fileName를 반환
+        return Publishers.MergeMany(imageUploadRequests)
+            .collect()
+            .map { _ in
+                let filenames = fileInfos.map { $0.fileName }
+                print("File names: \(filenames)") // 로그 추가
+                return filenames
+            }
+            .eraseToAnyPublisher()
+    }
 
 
 }
