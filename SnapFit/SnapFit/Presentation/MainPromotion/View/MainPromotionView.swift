@@ -152,6 +152,11 @@ struct MainPromotionView: View {
                     
                     SectionMiniCardsView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .padding(.bottom, 40)
+                    
+                    SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
+                    
+                    SectionBigCardsView(stack: $stack)
+                        .padding(.bottom, 40)
                 }
                 .environmentObject(mainPromotionViewModel)
             }
@@ -293,22 +298,29 @@ struct SectionMiniCardsView: View {
 }
 
 
+
+
 struct SectionBigCardsView: View {
-    //@EnvironmentObject var navigationModel: NavigationModel // NavigationModel을 환경 객체로 사용
-    @Binding var stack : NavigationPath
-    
+    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    var mainPromotionInteractor: MainPromotionBusinessLogic?
+    @Binding var stack: NavigationPath
+
     let columns: [GridItem] = [
         GridItem(.fixed(175), spacing: 10), // 고정된 크기 설정
         GridItem(.fixed(175), spacing: 10)
     ]
-    
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 8) {
-                ForEach(0..<10, id: \.self) { item in
-                    NavigationLink(value: "AuthorDetailView"){
-                    
-                        BigCardView()
+                ForEach($mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { $product in
+                    Button(action: {
+                        mainPromotionViewModel.selectedProductId = product.id
+                        DispatchQueue.main.async {
+                            stack.append("AuthorDetailView")
+                        }
+                    }) {
+                        BigCardView(isLiked: $product.like, product: product, mainPromotionInteractor: mainPromotionInteractor)
                             .frame(width: 175, height: 288)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -318,6 +330,7 @@ struct SectionBigCardsView: View {
         }
     }
 }
+
 
 #Preview {
     // Preview를 위한 NavigationPath 초기화

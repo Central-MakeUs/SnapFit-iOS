@@ -552,39 +552,64 @@ struct DibsMiddleCardView: View {
 
 
 
+
+
 struct BigCardView: View {
-    @State private var isLiked = false
+    @Binding var isLiked: Bool?
+     var product: ProductInfo
+     var mainPromotionInteractor: MainPromotionBusinessLogic?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Image("demo1")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 175, height: 200)
-                .clipped()
-//                .overlay {
-//                    Button(action: {
-//                        isLiked.toggle()
-//                    }) {
-//                        Image(systemName: isLiked ? "heart.fill" : "heart")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 16, height: 16)
-//                            .foregroundColor(.white)
-//                    }
-//                    .offset(x: 70, y: -70)
-//                }
-//                .padding(.bottom, 5)
-
+            if let imageUrl = product.thumbNail, let url = URL(string: imageUrl) {
+                KFImage(url)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 175, height: 200)
+                    .clipped()
+                    .overlay(
+                        Button(action: {
+                            isLiked?.toggle()
+                            handleLikeAction()
+                        }) {
+                            Image(systemName: (isLiked ?? false) ? "heart.fill" : "heart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 15)
+                                .foregroundColor(.white)
+                        }
+                            .offset(x: 42, y: -42)
+                    )
+                    .padding(.bottom, 5)
+            } else {
+                Color.gray
+                    .frame(width: 175, height: 200)
+            }
+                
             VStack(alignment:.leading) {
-                Text("추카랜드")
+                Text(product.title ?? "Unknown")
                     .font(.subheadline)
-                    .lineLimit(2)
+                    .bold()
+                    .lineLimit(1)
 
-                HStack(spacing: 9) {
-                    MoodsLabel(text: "시크")
-                    MoodsLabel(text: "러블리")
+                HStack {
+                    if let vibes = product.vibes {
+                        if vibes.isEmpty {
+                            Text("No vibes available")
+                                .font(.callout)
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(vibes, id: \.self) { vibe in
+                                MoodsLabel(text: vibe)
+                            }
+                        }
+                    } else {
+                        Text("No vibes available")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
                 }
+
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10))
         }
@@ -593,6 +618,21 @@ struct BigCardView: View {
         //.shadow(radius: 4)
         .frame(width: 175, height: 258) // Explicitly set frame size
     }
+    
+    private func handleLikeAction() {
+            guard let interactor = mainPromotionInteractor else {
+                print("MainPromotionInteractor가 설정되지 않았습니다.")
+                return
+            }
+
+            let request = MainPromotion.Like.Request(postId: product.id)
+
+            if isLiked ?? false {
+                interactor.likePost(request: request)
+            } else {
+                interactor.unlikePost(request: request)
+            }
+        }
 }
 
 
