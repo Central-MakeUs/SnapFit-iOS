@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import SwiftUI
+
 struct ProductManagementView: View {
     var mypageInteractor: MyPageBusinessLogic?
     @EnvironmentObject var myPageViewModel: MyPageViewModel
@@ -27,26 +29,31 @@ struct ProductManagementView: View {
                         .padding(.bottom)
                     
                     // 상품 목록을 그리드로 표시
-//                    LazyVGrid(columns: columns, spacing: 20) {
-//                        if let products = myPageViewModel.makerProductlist?.data {
-//                            ForEach($myPageViewModel.makerProductlist!.data.sorted(by: { $0.id ?? 0 < $1.id ?? 0 })) { $product in
-//                                Button(action: {
-//                                    handleProductSelection(product)
-//                                }) {
-//                                    MakerMiddleCardView(isLiked: $product.like, product: product, mypageInteractor: mypageInteractor)
-//                                        .frame(width: 175, height: 324)
-//                                        .padding(2)
-//                                }
-//                                .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
-//                            }
-//                        } else {
-//                            // 데이터를 로딩 중일 때나 빈 데이터일 때의 Placeholder
-//                            Text("등록된 상품이 없습니다.")
-//                                .font(.body)
-//                                .foregroundColor(.gray)
-//                        }
-//                    }
-//                    .padding(.bottom)
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        if let products = myPageViewModel.makerProductlist?.data {
+                            ForEach(products.sorted(by: { $0.id ?? 0 < $1.id ?? 0 })) { product in
+                                Button(action: {
+                                    handleProductSelection(product)
+                                }) {
+                                    MakerMiddleCardView(isLiked: Binding(
+                                        get: { product.like ?? false },
+                                        set: { newValue in
+                                            // 데이터 변경 처리 로직 필요
+                                        }
+                                    ), product: product, mypageInteractor: mypageInteractor)
+                                        .frame(width: 175, height: 324)
+                                        .padding(2)
+                                }
+                                .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
+                            }
+                        } else {
+                            // 데이터를 로딩 중일 때나 빈 데이터일 때의 Placeholder
+                            Text("등록된 상품이 없습니다.")
+                                .font(.body)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.bottom)
                 }
                 .padding(.horizontal) // 좌우 여백을 추가하여 전체 뷰의 여백을 조정
             }
@@ -69,7 +76,6 @@ struct ProductManagementView: View {
             .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
         }
         .onAppear {
-            // 예약 내역 불러오기
             DispatchQueue.main.async {
                 mypageInteractor?.fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest(makerid: myPageViewModel.userDetails?.id ?? 0, limit: 30, offset: 0))
             }
@@ -90,7 +96,6 @@ struct ProductManagementView: View {
                     .foregroundColor(.black)
             }
         }
-        
     }
     
     // 상품 선택 처리
@@ -100,6 +105,7 @@ struct ProductManagementView: View {
         }
     }
 }
+
 //#Preview {
 //    ProductManagementView()
 //}

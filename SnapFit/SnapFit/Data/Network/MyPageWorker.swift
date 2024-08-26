@@ -698,7 +698,7 @@ class MyPageWorker: MyPageWorkingLogic {
         }
 
         // API 호출을 위한 URL
-        let urlString = "http://34.47.94.218/snafit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
+        let urlString = "http://34.47.94.218/snapfit/posts/maker?limit=\(limit)&offset=\(offset)&userId=\(userId)"
         
         // URL 문자열을 URL 객체로 변환
         guard let url = URL(string: urlString) else {

@@ -53,9 +53,9 @@ struct ReservationManagementView: View {
         .onAppear(perform: {
             // 예약 내역 불러오기
           
-            //mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: myPageViewModel.userDetails?.id ?? 0))
+            mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: myPageViewModel.userDetails?.id ?? 0))
             
-            mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: 5))
+            //mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: 5))
         })
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
