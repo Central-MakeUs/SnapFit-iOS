@@ -335,7 +335,7 @@ struct ProductRegistrationView: View {
         
         var body: some View {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeaderView(title: "옵션")
+                SectionHeaderView(title: "가격 옵션")
                     .padding(.bottom, 16)
                 
                 ForEach(timePriceOptions.indices, id: \.self) { index in
@@ -379,6 +379,7 @@ struct ProductRegistrationView: View {
                         }
                     }
                 }
+                .padding(.horizontal, 16)
                 
                 Button(action: {
                     timePriceOptions.append((selectedTime: PostPrice(minutes: 0, price: 0), selectedPrice: 0))
@@ -394,10 +395,11 @@ struct ProductRegistrationView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 20)
                 }
+                .padding(.horizontal, 16)
                 .buttonStyle(PlainButtonStyle())
             }
             .padding(.bottom, 20)
-            .padding(.horizontal, 16)
+      
  
         }
     }

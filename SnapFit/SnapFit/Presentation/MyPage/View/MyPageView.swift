@@ -27,6 +27,7 @@ protocol MyPageDisplayLogic {
     func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel)
     func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
     func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
+    func displayFetchMakerReservations(viewModel: MakerUseCases.LoadReservation.ViewModel)
 }
 
 
@@ -162,8 +163,17 @@ extension MyPageView: MyPageDisplayLogic {
         }
     }
     
+    func displayFetchMakerReservations(viewModel: MakerUseCases.LoadReservation.ViewModel) {
+        DispatchQueue.main.async {
+            myPageViewModel.makerReservationproducts = viewModel.products.data ?? []
+            
+            print("MyPage 메이커 예약 리스트 \(myPageViewModel.makerReservationproducts)")
+        }
+    }
     
 }
+
+
 
 struct MyPageView: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
@@ -173,21 +183,27 @@ struct MyPageView: View {
     @ObservedObject var loginViewModel: LoginViewModel
     @ObservedObject var loginNaviModel: LoginNavigationModel
     @State private var isLoggedIn: Bool = false
-    
+
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+    @State private var confirmAction: () -> Void = {}
+    @State private var cancelAction: () -> Void = {}
+
     var body: some View {
         ZStack {
+
             NavigationStack(path: $stack) {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading) {
                         ProfileHeaderView(viewModel: myPageViewModel)
-                                       
+                        
                         UserInfoView(viewModel: myPageViewModel)
                             .padding(.horizontal)
                         
                         NavigationButtonsView(viewModel: myPageViewModel, stack: $stack)
                             .padding(.bottom, 32)
                         
-                        GroupBoxViews(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack)
+                        GroupBoxViews(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack, showAlert: $showAlert, alertMessage: $alertMessage, confirmAction: $confirmAction, cancelAction: $cancelAction)
                         
                         Spacer()
                             .frame(height: 40)
@@ -204,6 +220,11 @@ struct MyPageView: View {
                         MyPageReservationView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
+                    case "ReservationManagementView" :
+                        ReservationManagementView(mypageInteractor: myPageInteractor, stack: $stack)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(myPageViewModel)
+                        
                     case "ReservationInfoView" :
                         MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
@@ -218,12 +239,6 @@ struct MyPageView: View {
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(myPageViewModel)
     
-//                    case "MyPageAuthorReservationReceptionView" :
-//                        MyPageAuthorReservationReceptionView(stack: $stack)
-//                            .navigationBarBackButtonHidden(true)
-//                            .environmentObject(myPageViewModel)
-                        
-                        // maker가 true일 경우 추가적인 분기 처리
                     case "ProductManagementView":
                         ProductManagementView(mypageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
@@ -242,8 +257,6 @@ struct MyPageView: View {
                 .navigationBarHidden(true)
                 .ignoresSafeArea(.container, edges: .top)
                 .accentColor(.black)
-                
-               
             }
             .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
                 LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
@@ -263,7 +276,6 @@ struct MyPageView: View {
                 }
                 checkForSavedTokens()
             }
-    
             .onChange(of: isLoggedIn) { newValue in
                 if !newValue {
                     DispatchQueue.main.async {
@@ -271,6 +283,33 @@ struct MyPageView: View {
                     }
                 }
             }
+
+            // Alert overlay
+            Group {
+                if showAlert {
+                    ZStack {
+                        // Blurred Background for alert
+                        Color.black.opacity(0.4)
+                            .edgesIgnoringSafeArea(.all)
+                            .onTapGesture {
+                                showAlert = false
+                            }
+                        
+                        MyPageCustomAlertView(
+                            isPresented: $showAlert,
+                            message: alertMessage,
+                            confirmAction: confirmAction,
+                            cancelAction: cancelAction
+                        )
+                        .frame(width: 300)
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .transition(.opacity)
+                        .zIndex(1)
+                    }
+                }
+            }
+            .animation(.easeInOut, value: showAlert)
         }
     }
     
@@ -288,6 +327,8 @@ struct MyPageView: View {
         }
     }
 }
+
+
 
 // 프로필 헤더 뷰
 struct ProfileHeaderView: View {
@@ -439,12 +480,12 @@ struct NavigationButtonLabel: View {
 struct GroupBoxViews: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic?
-    
     @Binding var stack: NavigationPath
     
-    @State private var showAlert: Bool = false
-    @State private var alertMessage: String = ""
-    @State private var alertAction: () -> Void = {}
+    @Binding var showAlert: Bool
+    @Binding var alertMessage: String
+    @Binding var confirmAction: () -> Void
+    @Binding var cancelAction: () -> Void
     
     var body: some View {
         VStack {
@@ -480,7 +521,7 @@ struct GroupBoxViews: View {
                 }
                 .padding(.bottom, 24)
             }
-            .backgroundStyle(Color.white) // 배경색을 흰색으로 변경
+            .backgroundStyle(Color.white)
             .padding(.horizontal, 16)
          
             SectionHeaderView(title: "SnapFit 설정")
@@ -500,7 +541,8 @@ struct GroupBoxViews: View {
                     onButtonPress: {
                         prepareAlert(
                             message: "로그아웃 하시겠습니까?",
-                            confirmAction: { myPageInteractor?.serviceLogout() }
+                            confirmAction: { myPageInteractor?.serviceLogout() },
+                            cancelAction: { showAlert = false }
                         )
                     }
                 )
@@ -510,21 +552,14 @@ struct GroupBoxViews: View {
                     onButtonPress: {
                         prepareAlert(
                             message: "정말 탈퇴하시겠습니까?\n스냅핏과의 추억이 모두 사라집니다!",
-                            confirmAction: { myPageInteractor?.cancelmembership() }
+                            confirmAction: { myPageInteractor?.cancelmembership() },
+                            cancelAction: { showAlert = false }
                         )
                     }
                 )
             }
-            .background(Color.white) // 배경색을 흰색으로 변경
+            .background(Color.white)
             .padding(.horizontal, 16)
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("알림"),
-                message: Text(alertMessage),
-                primaryButton: .destructive(Text("확인"), action: alertAction),
-                secondaryButton: .cancel()
-            )
         }
     }
     
@@ -532,16 +567,18 @@ struct GroupBoxViews: View {
         if userHasPermission {
             stack.append(navigateTo)
         } else {
-            prepareAlert(message: alertMessage, confirmAction: {})
+            prepareAlert(message: alertMessage, confirmAction: {}, cancelAction: { showAlert = false })
         }
     }
     
-    private func prepareAlert(message: String, confirmAction: @escaping () -> Void) {
-        alertMessage = message
-        alertAction = confirmAction
-        showAlert = true
+    private func prepareAlert(message: String, confirmAction: @escaping () -> Void, cancelAction: @escaping () -> Void) {
+        self.alertMessage = message
+        self.confirmAction = confirmAction
+        self.cancelAction = cancelAction
+        self.showAlert = true
     }
 }
+
 
 
 

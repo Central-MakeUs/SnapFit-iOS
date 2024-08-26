@@ -62,7 +62,7 @@ struct ReusableGridSelectionView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding()
             }
             
             Spacer()

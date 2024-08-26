@@ -41,6 +41,66 @@ struct CustomAlertView: View {
 }
 
 
+struct MyPageCustomAlertView: View {
+    @Binding var isPresented: Bool
+    let message: String
+    let confirmAction: () -> Void
+    let cancelAction: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // Dark background for the entire screen
+    
+            // Alert box
+            VStack(spacing: 20) {
+                Text("알림")
+                    .font(.headline)
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundColor(Color(.systemGray))
+                    .multilineTextAlignment(.center)
+                
+                HStack {
+                    Button(action: {
+                        cancelAction()
+                        isPresented = false
+                    }) {
+                        Text("취소")
+                            .bold()
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        confirmAction()
+                        isPresented = false
+                    }) {
+                        Text("확인")
+                            .bold()
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(10)
+                    }
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 10)
+            .frame(maxWidth: 300)
+        }
+    }
+}
+
+
+
 
 struct CustomAlertTwoOptionView: View {
     @Binding var isPresented: Bool

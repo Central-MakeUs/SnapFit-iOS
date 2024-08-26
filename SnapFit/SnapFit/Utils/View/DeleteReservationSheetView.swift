@@ -22,7 +22,7 @@ struct DeleteReservationSheetView: View {
     @Binding var selectedReason: Reason?
     @Binding var showSheet: Bool
     @Binding var showAlert: Bool
-    
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
     // 취소 버튼 클릭 시 호출할 클로저
     var onConfirm: (String) -> Void = { _ in }
     
@@ -34,16 +34,30 @@ struct DeleteReservationSheetView: View {
             Text("정말로 예약을 취소하실건가요?\n이유를 알려주세요")
                 .font(.title3)
                 .bold()
-            
-            CheckButton(title: "사진작가와 연락이 안돼요", isSelected: selectedReason == .contactIssue) {
-                selectedReason = selectedReason == .contactIssue ? nil : .contactIssue
+            if myPageViewModel.userDetails?.photographer ?? false {
+                
+                CheckButton(title: "예약자가 입력한 시간이 불가능해요", isSelected: selectedReason == .contactIssue) {
+                    selectedReason = selectedReason == .contactIssue ? nil : .contactIssue
+                }
+                
+                CheckButton(title: "예약자가 입력한 위치에 갈 수 없어요", isSelected: selectedReason == .wrongSelection) {
+                    selectedReason = selectedReason == .wrongSelection ? nil : .wrongSelection
+                }
+                .padding(.bottom)
+             
+                
+            } else {
+             
+                CheckButton(title: "사진작가와 연락이 안돼요", isSelected: selectedReason == .contactIssue) {
+                    selectedReason = selectedReason == .contactIssue ? nil : .contactIssue
+                }
+                
+                CheckButton(title: "잘못 눌렀어요", isSelected: selectedReason == .wrongSelection) {
+                    selectedReason = selectedReason == .wrongSelection ? nil : .wrongSelection
+                }
+                .padding(.bottom)
             }
-        
-            CheckButton(title: "잘못 눌렀어요", isSelected: selectedReason == .wrongSelection) {
-                selectedReason = selectedReason == .wrongSelection ? nil : .wrongSelection
-            }
-            .padding(.bottom)
-            
+    
             Button(action: {
                 showSheet = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

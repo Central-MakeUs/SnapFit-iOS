@@ -58,4 +58,5 @@ class MyPageViewModel: NSObject, ObservableObject {
     @Published var vibes: [Vibe] = []
     @Published var locations: [MakerLocation] = []
     @Published var postImages: [String] = []
+    @Published var makerReservationproducts: [ReservationData] = [] // 예약 내역 확인하기
 }

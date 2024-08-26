@@ -17,6 +17,7 @@ struct ReservationInfoView: View {
     
     @State private var showSheet: Bool = false
     @State private var showAlert: Bool = false
+    @State private var isMaker: Bool = false
     @State private var selectedReason: Reason? = nil
     @State private var cancelMessage: String = "" // 취소 메시지 저장
     

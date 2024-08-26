@@ -136,7 +136,7 @@ struct AuthorListView: View {
                     }
                     .padding(.horizontal)
                     
-                    CustomTopTabbar(selectedTab: $selectedTab, authorListInteractor: authorListInteractor, vibes: authorListViewModel.vibes)
+                    CustomTopTabbar(selectedTab: $selectedTab, authorListInteractor: authorListInteractor, vibes:  Array(authorListViewModel.vibes.reversed()))
                         .padding(.bottom)
                     
                     ScrollView(.vertical, showsIndicators: false) {

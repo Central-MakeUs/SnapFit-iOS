@@ -46,6 +46,7 @@ protocol MyPageWorkingLogic {
     func uploadImages(fileInfos: [ImageInfoResponse.FileInfo], images: [Data]) -> AnyPublisher<[String], ApiError> 
     func fetchImagePaths(ext: String) -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError>
     func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError>
+    func fetchMakerReservations(limit: Int, offset: Int, makerId: Int) -> AnyPublisher<ReservationResponse, ApiError>
 }
 
 class MyPageWorker: MyPageWorkingLogic {
@@ -1021,6 +1022,66 @@ class MyPageWorker: MyPageWorkingLogic {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    // MARK: - 메이커 예약내역 조회
 
-
+    func fetchMakerReservations(limit: Int = 10, offset: Int = 0, makerId: Int) -> AnyPublisher<ReservationResponse, ApiError> {
+        // AccessToken을 가져옴
+        guard let accessToken = getAccessToken() else {
+            return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
+        }
+        
+        // URL 문자열 생성
+        let urlString = "http://34.47.94.218/snapfit/reservation/maker?limit=\(limit)&offset=\(offset)&makerId=\(makerId)"
+        
+        // URL 객체 생성
+        guard let url = URL(string: urlString) else {
+            return Fail(error: ApiError.notAllowedUrl).eraseToAnyPublisher()
+        }
+        
+        // URL 요청 생성
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("application/json;charset=UTF-8", forHTTPHeaderField: "accept")
+        urlRequest.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        // URLSession 데이터 태스크 퍼블리셔 사용
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { (data: Data, urlResponse: URLResponse) -> ReservationResponse in
+                guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    throw ApiError.invalidResponse
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    // 응답이 성공적인 경우
+                    let response = try JSONDecoder().decode(ReservationResponse.self, from: data)
+                    return response
+                case 400...404:
+                    // 클라이언트 오류 (400-404)
+                    let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+                    let message = errorResponse?.message ?? "Bad Request"
+                    let errorCode = errorResponse?.errorCode ?? 0
+                    throw ApiError.badRequest(message: message, errorCode: errorCode)
+                case 500:
+                    // 서버 오류
+                    throw ApiError.serverError
+                default:
+                    // 기타 상태 코드 오류
+                    throw ApiError.badStatus(code: httpResponse.statusCode)
+                }
+            }
+            .mapError { error in
+                // 에러 매핑
+                if let apiError = error as? ApiError {
+                    return apiError
+                }
+                if let _ = error as? DecodingError {
+                    return ApiError.decodingError
+                }
+                return ApiError.unknown(error)
+            }
+            .eraseToAnyPublisher()
+    }
 }

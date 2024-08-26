@@ -10,36 +10,57 @@ import _PhotosUI_SwiftUI
 
 struct ReservationManagementView: View {
     
-    @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
     let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 6, alignment: nil),
     ]
     
+    @Environment(\.dismiss) var dismiss
+    var mypageInteractor: MyPageBusinessLogic?
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @Binding var stack: NavigationPath
     
     var body: some View {
-        
         ScrollView {
             LazyVGrid(
-                columns: columns, // 3열
+                columns: columns,
                 alignment: .center,
-                spacing: 6){
-                    ForEach(0..<2) { index in
-                        NavigationLink(destination: ReservationConfirmView().navigationBarBackButtonHidden(true)) {
-                            //ReservationInfoCardView()
-                            //    .frame(width: 390, height: 163)
+                spacing: 16) {
+                    
+                    // 예약된 상품 리스트를 id로 정렬하여 보여줍니다.
+                    ForEach(myPageViewModel.makerReservationproducts.sorted(by: {
+                        ($0.id ?? Int.min) < ($1.id ?? Int.min)
+                    })) { product in
+                        Button(action: {
+                            myPageViewModel.selectedReservationId = product.id
+                            stack.append("ReservationInfoView")
+                        }) {
+                            VStack(spacing: 0) { // 카드뷰와 구분선 사이 간격 0
+                                ReservationInfoCardView(productInfo: product)
+                                    .frame(width: 358, height: 130)
+                                    .padding(.bottom, 22)
+                                
+                                Divider() // 카드뷰 아래에 구분선 추가
+                                    .background(Color.gray.opacity(0.3)) // 구분선 색상
+                            }
                         }
-                        Divider()
+                        .buttonStyle(PlainButtonStyle())  // 기본 스타일 제거
                     }
-                }
-        } // :1번
-        .padding(.horizontal)
-        
-        
+                    
+                
+            }
+        }
+        .onAppear(perform: {
+            // 예약 내역 불러오기
+          
+            //mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: myPageViewModel.userDetails?.id ?? 0))
+            
+            mypageInteractor?.fetchMakerReservations(request: MakerUseCases.LoadReservation.Request(limit: 30, offset: 0, makerId: 5))
+        })
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
@@ -47,7 +68,7 @@ struct ReservationManagementView: View {
             }
             
             ToolbarItem(placement: .principal) {
-                Text("예약관리")
+                Text("예약내역")
                     .font(.headline)
                     .foregroundColor(.black)
             }
@@ -56,6 +77,6 @@ struct ReservationManagementView: View {
     
 }
 
-#Preview {
-    ReservationManagementView()
-}
+//#Preview {
+//    ReservationManagementView()
+//}

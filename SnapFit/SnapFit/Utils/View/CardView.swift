@@ -55,9 +55,12 @@ struct MiniCardView: View {
                     .bold()
                     .lineLimit(1)
 
-                Text(product.locations?.first ?? "Unknown Location")
-                    .font(.caption)
-                    .foregroundColor(.black)
+                if let locations = product.locations {
+                    Text(locations.joined(separator: " | "))
+                        .font(.footnote)
+                        .foregroundColor(Color("LoginFontColor"))
+                }
+
 
                 if let price = product.price {
                     Text("\(price)원")
@@ -138,17 +141,33 @@ struct MiddleCardView: View {
             }
 
             Group {
-                Text(product.locations?.first ?? "Unknown Location")
-                    .font(.subheadline)
-                    .foregroundColor(Color("LoginFontColor"))
+                if let locations = product.locations {
+                    Text(locations.joined(separator: " | "))
+                        .font(.footnote)
+                        .foregroundColor(Color("LoginFontColor"))
+                }
 
                 Text(product.title ?? "Unknown")
                     .font(.callout)
                     .lineLimit(2)
 
+        
                 HStack {
-                    MoodsLabel(text: "시크")
-                    MoodsLabel(text: "러블리")
+                    if let vibes = product.vibes {
+                        if vibes.isEmpty {
+                            Text("No vibes available")
+                                .font(.callout)
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(vibes, id: \.self) { vibe in
+                                MoodsLabel(text: vibe)
+                            }
+                        }
+                    } else {
+                        Text("No vibes available")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
                 }
 
                 if let price = product.price {
@@ -231,18 +250,34 @@ struct MyMiddleCardView: View {
             }
 
             Group {
-                Text(product.locations?.first ?? "Unknown Location")
-                    .font(.subheadline)
-                    .foregroundColor(Color("LoginFontColor"))
+                if let locations = product.locations {
+                    Text(locations.joined(separator: " | "))
+                        .font(.footnote)
+                        .foregroundColor(Color("LoginFontColor"))
+                }
 
                 Text(product.title ?? "Unknown")
                     .font(.callout)
                     .lineLimit(2)
 
                 HStack {
-                    MoodsLabel(text: "시크")
-                    MoodsLabel(text: "러블리")
+                    if let vibes = product.vibes {
+                        if vibes.isEmpty {
+                            Text("No vibes available")
+                                .font(.callout)
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(vibes, id: \.self) { vibe in
+                                MoodsLabel(text: vibe)
+                            }
+                        }
+                    } else {
+                        Text("No vibes available")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
                 }
+
 
                 if let price = product.price {
                     Text("\(price)원")
@@ -325,18 +360,35 @@ struct MakerMiddleCardView: View {
             }
 
             Group {
-                Text(product.locations?.first ?? "Unknown Location")
-                    .font(.subheadline)
-                    .foregroundColor(Color("LoginFontColor"))
-
+                
+                if let locations = product.locations {
+                    Text(locations.joined(separator: " | "))
+                        .font(.footnote)
+                        .foregroundColor(Color("LoginFontColor"))
+                }
+                
                 Text(product.title ?? "Unknown")
                     .font(.callout)
                     .lineLimit(2)
 
                 HStack {
-                    MoodsLabel(text: "시크")
-                    MoodsLabel(text: "러블리")
+                    if let vibes = product.vibes {
+                        if vibes.isEmpty {
+                            Text("No vibes available")
+                                .font(.callout)
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(vibes, id: \.self) { vibe in
+                                MoodsLabel(text: vibe)
+                            }
+                        }
+                    } else {
+                        Text("No vibes available")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
                 }
+
 
                 if let price = product.price {
                     Text("\(price)원")
@@ -434,22 +486,8 @@ struct DibsMiddleCardView: View {
             Group {
                 // locations 배열이 존재하는 경우
                 if let locations = productInfo.locations {
-                    VStack(alignment: .leading, spacing: 5) {
-                        if locations.isEmpty {
-                            Text("Unknown Location")
-                                .font(.subheadline)
-                                .foregroundColor(Color("LoginFontColor"))
-                        } else {
-                            ForEach(locations, id: \.self) { location in
-                                Text(location)
-                                    .font(.subheadline)
-                                    .foregroundColor(Color("LoginFontColor"))
-                            }
-                        }
-                    }
-                } else {
-                    Text("Unknown Location")
-                        .font(.subheadline)
+                    Text(locations.joined(separator: " | "))
+                        .font(.footnote)
                         .foregroundColor(Color("LoginFontColor"))
                 }
 

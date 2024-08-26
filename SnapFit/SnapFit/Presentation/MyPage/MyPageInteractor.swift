@@ -36,6 +36,7 @@ protocol MyPageBusinessLogic {
     func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest)
     func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest)
     func fetchUserLikes(request: MainPromotion.Like.LikeListRequest)
+    func fetchMakerReservations(request: MakerUseCases.LoadReservation.Request)
 }
 
 
@@ -391,7 +392,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
 
     // MARK: - 이미지 URL 가져오기
     func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest) {
-        fetchAllImagePaths(count: request.Images.count, ext: "png", maxRetries: 3)
+        fetchAllImagePaths(count: request.Images.count, ext: "png", maxRetries: 8)
             .flatMap { [self] fileInfos -> AnyPublisher<[String], ApiError> in
                 return myPageWorker.uploadImages(fileInfos: fileInfos, images: request.Images)
             }
@@ -462,6 +463,26 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     
+    // 메이커 예약내역 리스트
+    func fetchMakerReservations(request: MakerUseCases.LoadReservation.Request) {
+        myPageWorker.fetchMakerReservations(limit: request.limit, offset: request.offset, makerId: request.makerId)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("메이커 예약 내역 로드 실패: \(error.localizedDescription)")
+                    self?.presenter?.presentFetchMakerReservationsFailure(error: error)
+                }
+            } receiveValue: { [weak self] products in
+                print("메이커 예약 내역 로드 성공: \(products)")
+                let response = MakerUseCases.LoadReservation.Response(products: products)
+                self?.presenter?.presentFetchMakerReservationsSuccess(response: response)
+            }
+            .store(in: &cancellables)
+    }
+    
+  
 }
 
 // Helper extension to convert ArraySlice to Array

@@ -65,6 +65,9 @@ protocol MyPagePresentationLogic {
     func presentProductPostFailure(error: ApiError)
     func presentProductPostSuccess(response: MakerUseCases.RequestMakerProduct.productResponse)
     
+    func presentFetchMakerReservationsSuccess(response: MakerUseCases.LoadReservation.Response)
+    func presentFetchMakerReservationsFailure(error: ApiError)
+    
 }
 
 final class MyPagePresenter {
@@ -74,6 +77,8 @@ final class MyPagePresenter {
 }
 
 extension MyPagePresenter: MyPagePresentationLogic {
+
+    
    
     // 사용자 탈퇴후 로그인뷰 보이게
     func presentCancelMembershipSuccess() {
@@ -256,6 +261,16 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("response \(response.product)")
     }
     
-
+    
+    func presentFetchMakerReservationsSuccess(response: MakerUseCases.LoadReservation.Response) {
+        let viewModel = MakerUseCases.LoadReservation.ViewModel(products: response.products)
+        // View에 전달
+        view?.displayFetchMakerReservations(viewModel: viewModel)
+    }
+    
+    func presentFetchMakerReservationsFailure(error: ApiError) {
+      
+        print("Error 메이커 예약내역 조회 실패 : \(error)")
+    }
   
 }

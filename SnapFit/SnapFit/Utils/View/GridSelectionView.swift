@@ -81,7 +81,7 @@ struct GridSelectionView: View {
                             }
                         }
                     }
-                    .padding(.horizontal)
+                    .padding()
             }
             Spacer()
             

@@ -88,7 +88,23 @@ enum MakerUseCases {
         }
     }
     
-    
+    enum LoadReservation {
+        
+        struct Request {
+            var limit: Int
+            var offset: Int
+            var makerId: Int
+        }
+        
+        struct Response {
+            var products : ReservationResponse
+        }
+        
+        struct ViewModel {
+            var products : ReservationResponse
+        }
+        
+    }
     
 //    // 예약 내역 리스트 조회
 //    enum CheckReservationProducts {

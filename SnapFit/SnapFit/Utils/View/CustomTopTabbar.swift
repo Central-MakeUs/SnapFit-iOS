@@ -16,9 +16,6 @@ struct CustomTopTabbar: View {
         _selectedTab = selectedTab
         self.authorListInteractor = authorListInteractor
         self.vibes = vibes
-        
-        // 기본적으로 "전체" 버튼이 선택되도록 초기화
-        _selectedTab.wrappedValue = -1
     }
     
     var body: some View {
@@ -26,10 +23,7 @@ struct CustomTopTabbar: View {
             HStack(spacing: 0) {
                 // "전체" 버튼 추가
                 Button(action: {
-                    withAnimation {
-                        selectedTab = -1 // "전체" 버튼의 인덱스를 -1로 설정
-                        fetchAllProducts()
-                    }
+                    handleTabChange(to: -1)
                 }) {
                     VStack(spacing: 0) {
                         Text("전체")
@@ -43,18 +37,13 @@ struct CustomTopTabbar: View {
                         Rectangle()
                             .frame(height: 8)
                             .foregroundColor(selectedTab == -1 ? .black : Color(.systemGray6))
-                            .animation(.easeInOut(duration: 0.4), value: selectedTab)
                     }
                     .frame(width: 78, height: 49)
                 }
                 
                 ForEach(vibes.indices, id: \.self) { index in
                     Button(action: {
-                        withAnimation {
-                            selectedTab = index
-                            let selectedVibe = vibes[index].name ?? ""
-                            fetchProducts(for: selectedVibe)
-                        }
+                        handleTabChange(to: index)
                     }) {
                         VStack(spacing: 0) {
                             Text(vibes[index].name ?? "")
@@ -68,7 +57,6 @@ struct CustomTopTabbar: View {
                             Rectangle()
                                 .frame(height: 8)
                                 .foregroundColor(selectedTab == index ? .black : Color(.systemGray6))
-                                .animation(.easeInOut(duration: 0.4), value: selectedTab)
                         }
                         .frame(width: 78, height: 49)
                     }
@@ -85,16 +73,27 @@ struct CustomTopTabbar: View {
         }
     }
     
+    private func handleTabChange(to index: Int) {
+        withAnimation {
+            selectedTab = index
+            if index == -1 {
+                fetchAllProducts()
+            } else {
+                let selectedVibe = vibes[index].name ?? ""
+                fetchProducts(for: selectedVibe)
+            }
+        }
+    }
+    
     private func fetchProducts(for vibe: String) {
-        // Assuming the request requires the vibe to be a comma-separated string
         authorListInteractor?.fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest(vibes: vibe))
     }
     
     private func fetchAllProducts() {
-        // 호출할 메서드
-        authorListInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 10, offset: 0))
+        authorListInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
     }
 }
+
 
 #Preview {
     CustomTopTabbar(selectedTab: .constant(-1), authorListInteractor: nil, vibes: [
