@@ -154,6 +154,7 @@ struct MainPromotionView: View {
                         .padding(.bottom, 40)
                     
                     SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
+                        .padding(.bottom, 16)
                     
                     SectionBigCardsView(stack: $stack)
                         .padding(.bottom, 40)
@@ -279,14 +280,22 @@ struct SectionMiniCardsView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
-                ForEach($mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { $product in
+                // 처음 10개의 상품만 가져오기
+                ForEach(Array(mainPromotionViewModel.products.prefix(10))) { product in
                     Button(action: {
                         mainPromotionViewModel.selectedProductId = product.id
                         DispatchQueue.main.async {
                             stack.append("AuthorDetailView")
                         }
                     }) {
-                        MiniCardView(isLiked: $product.like, product: product, mainPromotionInteractor: mainPromotionInteractor)
+                        MiniCardView(isLiked: Binding(
+                            get: { product.like ?? false },
+                            set: { newValue in
+                                if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                    mainPromotionViewModel.products[index].like = newValue
+                                }
+                            }
+                        ), product: product, mainPromotionInteractor: mainPromotionInteractor)
                             .frame(width: 130, height: 204)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -313,14 +322,22 @@ struct SectionBigCardsView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 8) {
-                ForEach($mainPromotionViewModel.products.sorted(by: { $0.id < $1.id })) { $product in
+                // 10번째 이후의 상품만 가져오기
+                ForEach(Array(mainPromotionViewModel.products.dropFirst(10))) { product in
                     Button(action: {
                         mainPromotionViewModel.selectedProductId = product.id
                         DispatchQueue.main.async {
                             stack.append("AuthorDetailView")
                         }
                     }) {
-                        BigCardView(isLiked: $product.like, product: product, mainPromotionInteractor: mainPromotionInteractor)
+                        BigCardView(isLiked: Binding(
+                            get: { product.like ?? false },
+                            set: { newValue in
+                                if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                    mainPromotionViewModel.products[index].like = newValue
+                                }
+                            }
+                        ), product: product, mainPromotionInteractor: mainPromotionInteractor)
                             .frame(width: 175, height: 288)
                     }
                     .buttonStyle(PlainButtonStyle())

@@ -614,7 +614,7 @@ struct BigCardView: View {
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10))
         }
         .background(Color.white)
-        //.cornerRadius(10)
+        .cornerRadius(5)
         //.shadow(radius: 4)
         .frame(width: 175, height: 258) // Explicitly set frame size
     }
