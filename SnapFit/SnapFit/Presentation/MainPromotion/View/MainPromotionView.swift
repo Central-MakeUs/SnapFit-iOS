@@ -119,7 +119,8 @@ struct MainPromotionView: View {
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     @State private var isLiked: Bool = false // 좋아요 상태를 관리할 변수 추가
-
+    @State private var hasDataLoaded: Bool = false // 데이터 로드 여부를 추적하는 변수 추가
+    
     var randomProduct: ProductInfo? {
         guard !mainPromotionViewModel.products.isEmpty else { return nil }
         return mainPromotionViewModel.products.randomElement()
@@ -143,7 +144,6 @@ struct MainPromotionView: View {
                             }
                         }) {
                             MainPromotionRandomCardView(isLiked: Binding($isLiked), product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
-
                                 .padding(.vertical, 16)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -161,6 +161,17 @@ struct MainPromotionView: View {
                 }
                 .environmentObject(mainPromotionViewModel)
             }
+            .onAppear {
+                // 데이터를 한 번만 로드하도록 방어
+                if !hasDataLoaded {
+                    performDataFetch()
+                    hasDataLoaded = true
+                }
+            }
+            .refreshable {
+                // 스크롤 당겨서 새로고침 시 호출되는 메서드
+                performDataFetch()
+            }
             .navigationBarBackButtonHidden(true)
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
@@ -172,16 +183,15 @@ struct MainPromotionView: View {
                     AuthorReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
-                case "AuthorReservationReceptionView" :
+                case "AuthorReservationReceptionView":
                     AuthorReservationReceptionView(stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
-                case "ReservationView" :
+                case "ReservationView":
                     ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
-                    
-                case "ReservationInfoView" :
+                case "ReservationInfoView":
                     ReservationInfoView(productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
                         .environmentObject(mainPromotionViewModel)
@@ -189,20 +199,22 @@ struct MainPromotionView: View {
                     SnapFitTabView()
                 }
             }
-            .onAppear {
-                // 뷰가 나타난 후 비동기적으로 호출
-                DispatchQueue.main.async {
-                    mainPromotionInteractor?.fetchUserDetails()
-                    mainPromotionInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
-                    mainPromotionViewModel.resetAllDetails() // 예약하고 돌아온 사용자 데이터 초기화
-                    if stack.isEmpty {
-                        stack = NavigationPath()
-                    }
-                }
+            
+        }
+    }
+
+    func performDataFetch() {
+        DispatchQueue.main.async {
+            mainPromotionInteractor?.fetchUserDetails()
+            mainPromotionInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
+            mainPromotionViewModel.resetAllDetails() // 예약하고 돌아온 사용자 데이터 초기화
+            if stack.isEmpty {
+                stack = NavigationPath()
             }
         }
     }
 }
+
 
 
 struct HeaderView: View {
@@ -338,7 +350,8 @@ struct SectionBigCardsView: View {
                                 }
                             }
                         ), product: product, mainPromotionInteractor: mainPromotionInteractor)
-                            .frame(width: 175, height: 288)
+                            .frame(width: 175, height: 256)
+                            .padding(.bottom, 32)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
