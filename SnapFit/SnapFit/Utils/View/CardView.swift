@@ -149,7 +149,9 @@ struct MiddleCardView: View {
 
                 Text(product.title ?? "Unknown")
                     .font(.callout)
-                    .lineLimit(2)
+                    .lineLimit(1) // 한 줄로 제한
+                    .truncationMode(.tail) // 넘치는 텍스트를 "..."으로 표시
+                    .frame(width: 175, alignment: .leading) // 고정 너비를 설정하여 레이아웃 조정
 
         
                 HStack {
@@ -258,7 +260,9 @@ struct MyMiddleCardView: View {
 
                 Text(product.title ?? "Unknown")
                     .font(.callout)
-                    .lineLimit(2)
+                    .lineLimit(1) // 한 줄로 제한
+                    .truncationMode(.tail) // 넘치는 텍스트를 "..."으로 표시
+                    .frame(width: 175, alignment: .leading) // 고정 너비를 설정하여 레이아웃 조정
 
                 HStack {
                     if let vibes = product.vibes {
@@ -340,19 +344,19 @@ struct MakerMiddleCardView: View {
                         },
                         alignment: .topLeading // 왼쪽 상단 정렬
                     )
-                    .overlay(
-                        Button(action: {
-                            isLiked?.toggle()
-                            handleLikeAction()
-                        }) {
-                            Image(systemName: (isLiked ?? false) ? "heart.fill" : "heart")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(.white)
-                        }
-                        .offset(x: 62, y: -62)
-                    )
+//                    .overlay(
+//                        Button(action: {
+//                            isLiked?.toggle()
+//                            handleLikeAction()
+//                        }) {
+//                            Image(systemName: (isLiked ?? false) ? "heart.fill" : "heart")
+//                                .resizable()
+//                                .scaledToFit()
+//                                .frame(width: 16, height: 16)
+//                                .foregroundColor(.white)
+//                        }
+//                        .offset(x: 62, y: -62)
+//                    )
                     .padding(.bottom, 5)
             } else {
                 Color.gray
@@ -578,8 +582,9 @@ struct BigCardView: View {
                                 .frame(width: 16, height: 15)
                                 .foregroundColor(.white)
                         }
-                            .offset(x: 42, y: -42)
+                            .offset(x: 62, y: -68)
                     )
+                
                     .padding(.bottom, 5)
             } else {
                 Color.gray
@@ -616,7 +621,7 @@ struct BigCardView: View {
         .background(Color.white)
         .cornerRadius(5)
         //.shadow(radius: 4)
-        .frame(width: 175, height: 258) // Explicitly set frame size
+        .frame(width: 175, height: 256) // Explicitly set frame size
     }
     
     private func handleLikeAction() {

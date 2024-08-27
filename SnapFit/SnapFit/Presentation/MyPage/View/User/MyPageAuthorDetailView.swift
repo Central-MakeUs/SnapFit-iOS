@@ -255,7 +255,7 @@ struct MyMainContentView: View {
                 .padding(.horizontal)
             
             Text(productDetail.desc ?? "설명이 없습니다.")
-                .font(.caption)
+                .font(.subheadline)
                 .foregroundColor(Color(.systemGray))
                 .padding(.horizontal)
                 .padding(.bottom, 40)
@@ -316,14 +316,15 @@ struct MyMainContentView: View {
             
             Text("""
                 가. 기본 환불 규정
-                1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.
-                2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.
+                1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.\n
+                2. 섭외, 대여 등 사전 준비 도중 청약 철회 시, 해당 비용을 공제한 금액을 환불 가능합니다.\n
                 3. 촬영 또는 편집 작업 착수 이후 청약 철회 시, 진행된 작업량 또는 작업 일수를 산정한 금액을 공제한 금액을 환불 가능합니다.
                 """)
             .font(.subheadline)
             .foregroundColor(Color(.systemGray))
             .padding(.horizontal)
             .padding(.bottom, 16)
+            
         }
     }
 }

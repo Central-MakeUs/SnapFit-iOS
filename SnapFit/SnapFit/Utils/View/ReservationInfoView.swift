@@ -27,12 +27,15 @@ struct ReservationInfoView: View {
             VStack(alignment: .leading, spacing: 16) {
                 
                 Group {
-                    SectionHeaderView(title: "연락처")
+                    SectionHeaderView(title: "고객 연락처")
                         .padding(.bottom, 32)
-                    
-                    InfoRow(label: "이메일", value: "snap@naver.com")
-                        .padding(.horizontal)
-                    
+
+                    if let details = mainPromotionViewModel.reservationproductDetail {
+                        InfoRow(label: "이메일", value: details.email)
+                            .padding(.horizontal)
+                        InfoRow(label: "휴대폰 번호", value: details.phoneNumber)
+                            .padding(.horizontal)
+                    }
                     CustomDividerView()
                         .padding(.bottom)
                 }
@@ -64,7 +67,6 @@ struct ReservationInfoView: View {
                                 InfoRow(label: "예약일시", value: details.reservationTime)
                                     .fixedSize(horizontal: false, vertical: true) // 긴 텍스트 처리
                                 InfoRow(label: "인원", value: "성인 \(details.person)명")
-                                InfoRow(label: "이메일", value: "snap@naver.com")
                             }
                             .padding()
                         }
@@ -118,11 +120,12 @@ struct ReservationInfoView: View {
                     }
                 }
             }
-            .padding(.vertical)
+            .padding(.bottom, 20)
         }
         
         .sheet(isPresented: $showSheet) {
             DeleteReservationSheetView(
+                isPhotographer: false, 
                 selectedReason: $selectedReason,
                 showSheet: $showSheet,
                 showAlert: $showAlert,

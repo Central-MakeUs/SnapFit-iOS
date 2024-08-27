@@ -465,7 +465,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     
     // 메이커 예약내역 리스트
     func fetchMakerReservations(request: MakerUseCases.LoadReservation.Request) {
-        myPageWorker.fetchMakerReservations(limit: request.limit, offset: request.offset, makerId: request.makerId)
+        myPageWorker.fetchMakerReservations(limit: request.limit, offset: request.offset)
             .sink { [weak self] completion in
                 switch completion {
                 case .finished:

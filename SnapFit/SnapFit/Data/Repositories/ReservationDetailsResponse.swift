@@ -20,6 +20,8 @@ struct ReservationDetailsResponse: Codable {
     let basePrice: Int
     let totalPrice: Int
     let cancelMessage: String?
+    let email : String
+    let phoneNumber : String
     
     struct User: Codable {
         let id: Int

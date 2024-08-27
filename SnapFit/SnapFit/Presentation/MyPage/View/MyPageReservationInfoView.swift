@@ -25,6 +25,23 @@ struct MyPageReservationInfoView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 
+                
+                Group {
+                    SectionHeaderView(title: "고객 연락처")
+                        .padding(.bottom, 32)
+
+                    if let reservationDetails = myPageViewModel.reservationproductDetail {
+                        InfoRow(label: "이메일", value: reservationDetails.email)
+                            .padding(.horizontal)
+                        InfoRow(label: "휴대폰 번호", value: reservationDetails.phoneNumber)
+                            .padding(.horizontal)
+                    }
+                    
+                    CustomDividerView()
+                        .padding(.bottom)
+                }
+                
+                
                 Group {
                     SectionHeaderView(title: "주문상품")
                         .padding(.bottom, 20)
@@ -40,6 +57,7 @@ struct MyPageReservationInfoView: View {
                         .padding(.bottom)
                 }
                 
+                
                 Group {
                     SectionHeaderView(title: "예약내역")
                         .padding(.bottom, 20)
@@ -53,7 +71,7 @@ struct MyPageReservationInfoView: View {
                                 InfoRow(label: "예약일시", value: details.reservationTime)
                                     .fixedSize(horizontal: false, vertical: true) // 이 줄을 추가
                                 InfoRow(label: "인원", value: "성인 \(details.person)명")
-                                InfoRow(label: "이메일", value: "snap@naver.com") // Update as necessary
+        
                             }
                             .padding()
                         }
@@ -106,11 +124,12 @@ struct MyPageReservationInfoView: View {
                     mypageInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
                 }
             }
-            .padding(.vertical)
+            .padding(.bottom, 20)
         }
         
         .sheet(isPresented: $showSheet) {
             DeleteReservationSheetView(
+                isPhotographer: myPageViewModel.userDetails?.photographer ?? false, 
                 selectedReason: $selectedReason,
                 showSheet: $showSheet,
                 showAlert: $showAlert,
@@ -156,7 +175,7 @@ struct MyPageReservationInfoView: View {
                         }
                     }
                     .frame(width: 300)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
+                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2.5)
                 }
             }
         )

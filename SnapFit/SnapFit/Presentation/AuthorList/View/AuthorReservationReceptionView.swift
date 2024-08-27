@@ -47,6 +47,7 @@ struct AuthorReservationReceptionView: View {
                             InfoRow(label: "예약일시", value: formatDate(reservationRequest?.reservationTime))
                             InfoRow(label: "인원", value: "\(reservationRequest?.person ?? 0)명")
                             InfoRow(label: "이메일", value: reservationRequest?.email ?? "정보 없음")
+                            InfoRow(label: "휴대폰 번호", value: reservationRequest?.phoneNumber ?? "정보 없음")
                         }
                         .padding(.horizontal, 16)
                         

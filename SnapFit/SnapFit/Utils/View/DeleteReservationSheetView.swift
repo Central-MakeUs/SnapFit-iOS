@@ -19,10 +19,17 @@ enum Reason: String {
 }
 
 struct DeleteReservationSheetView: View {
+    
+    // 기본값으로 사용할 변수 (뷰모델이 없을 때)
+    var isPhotographer: Bool = false
+    
     @Binding var selectedReason: Reason?
     @Binding var showSheet: Bool
     @Binding var showAlert: Bool
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    
+    
+
+    
     // 취소 버튼 클릭 시 호출할 클로저
     var onConfirm: (String) -> Void = { _ in }
     
@@ -34,7 +41,9 @@ struct DeleteReservationSheetView: View {
             Text("정말로 예약을 취소하실건가요?\n이유를 알려주세요")
                 .font(.title3)
                 .bold()
-            if myPageViewModel.userDetails?.photographer ?? false {
+            
+            // myPageViewModel이 있으면 photographer 상태를 사용, 없으면 기본값 사용
+            if isPhotographer {
                 
                 CheckButton(title: "예약자가 입력한 시간이 불가능해요", isSelected: selectedReason == .contactIssue) {
                     selectedReason = selectedReason == .contactIssue ? nil : .contactIssue
@@ -44,10 +53,8 @@ struct DeleteReservationSheetView: View {
                     selectedReason = selectedReason == .wrongSelection ? nil : .wrongSelection
                 }
                 .padding(.bottom)
-             
-                
             } else {
-             
+                // 일반 사용자일 때
                 CheckButton(title: "사진작가와 연락이 안돼요", isSelected: selectedReason == .contactIssue) {
                     selectedReason = selectedReason == .contactIssue ? nil : .contactIssue
                 }
@@ -57,7 +64,7 @@ struct DeleteReservationSheetView: View {
                 }
                 .padding(.bottom)
             }
-    
+            
             Button(action: {
                 showSheet = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -74,7 +81,7 @@ struct DeleteReservationSheetView: View {
                     .background(selectedReason != nil ? Color.black : Color.gray)  // 선택 여부에 따라 배경색 변경
                     .cornerRadius(5)
             }
-            .disabled(selectedReason == nil)  // 이유가 선택되지 않았을 경우 비활성화
+            .disabled(selectedReason == nil)
             
             Spacer()
         }
@@ -102,21 +109,21 @@ struct CheckButton: View {
 
 
 //struct ReservationConfirmSheetView : View {
-//    
+//
 //    @Binding var selectedReason: ReservationConfirmView.Reason?
 //    @Binding var showSheet: Bool
 //    @Binding var showAlert: Bool
-//    
+//
 //    var body: some View {
 //        VStack(alignment: .leading, spacing: 20) {
-//            
+//
 //            Spacer()
-//            
+//
 //            Text("예약을 취소하려는\n이유를 알려주세요")
 //                .font(.title3)
 //                .bold()
-//                
-//            
+//
+//
 //            CheckButton(title: "예약자가 입력한 시간이 불가능해요", isSelected: selectedReason == .contactIssue) {
 //                if selectedReason == .contactIssue {
 //                    selectedReason = nil
@@ -124,8 +131,8 @@ struct CheckButton: View {
 //                    selectedReason = .contactIssue
 //                }
 //            }
-//        
-//            
+//
+//
 //            CheckButton(title: "예약작가 입력한 위치에 갈 수 없어요", isSelected: selectedReason == .wrongSelection) {
 //                if selectedReason == .wrongSelection {
 //                    selectedReason = nil
@@ -134,7 +141,7 @@ struct CheckButton: View {
 //                }
 //            }
 //            .padding(.bottom)
-//            
+//
 //            Button(action: {
 //                // 버튼 액션
 //                showSheet = false
@@ -151,13 +158,13 @@ struct CheckButton: View {
 //                    .background(Color.black)
 //                    .cornerRadius(5)
 //            }
-//            
+//
 //            Spacer()
 //        }
 //    }
 //}
 //
-//    
+//
 
 
 

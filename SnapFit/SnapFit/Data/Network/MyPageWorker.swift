@@ -46,7 +46,7 @@ protocol MyPageWorkingLogic {
     func uploadImages(fileInfos: [ImageInfoResponse.FileInfo], images: [Data]) -> AnyPublisher<[String], ApiError> 
     func fetchImagePaths(ext: String) -> AnyPublisher<[ImageInfoResponse.FileInfo], ApiError>
     func postProduct(request: MakerProductRequest) -> AnyPublisher<PostProductResponse, ApiError>
-    func fetchMakerReservations(limit: Int, offset: Int, makerId: Int) -> AnyPublisher<ReservationResponse, ApiError>
+    func fetchMakerReservations(limit: Int, offset: Int) -> AnyPublisher<ReservationResponse, ApiError>
 }
 
 class MyPageWorker: MyPageWorkingLogic {
@@ -1026,14 +1026,14 @@ class MyPageWorker: MyPageWorkingLogic {
     
     // MARK: - 메이커 예약내역 조회
 
-    func fetchMakerReservations(limit: Int = 10, offset: Int = 0, makerId: Int) -> AnyPublisher<ReservationResponse, ApiError> {
+    func fetchMakerReservations(limit: Int = 10, offset: Int = 0) -> AnyPublisher<ReservationResponse, ApiError> {
         // AccessToken을 가져옴
         guard let accessToken = getAccessToken() else {
             return Fail(error: ApiError.invalidRefreshToken).eraseToAnyPublisher()
         }
         
         // URL 문자열 생성
-        let urlString = "http://34.47.94.218/snapfit/reservation/maker?limit=\(limit)&offset=\(offset)&makerId=\(makerId)"
+        let urlString = "http://34.47.94.218/snapfit/reservation/maker?limit=\(limit)&offset=\(offset)"
         
         // URL 객체 생성
         guard let url = URL(string: urlString) else {

@@ -93,7 +93,6 @@ enum MakerUseCases {
         struct Request {
             var limit: Int
             var offset: Int
-            var makerId: Int
         }
         
         struct Response {

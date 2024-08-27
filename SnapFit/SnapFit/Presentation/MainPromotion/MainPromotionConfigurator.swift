@@ -16,6 +16,7 @@ extension MainPromotionView {
           view.mainPromotionInteractor = interactor
           interactor.presenter = presenter
           presenter.view = view // view를 MainPromotionDisplayLogic으로 캐스팅
+        
           return view
     }
 }
