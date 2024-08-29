@@ -215,37 +215,37 @@ struct MyPageView: View {
                     switch viewName {
                     case "MyProfileEdit":
                         MyProfileEdit(viewModel: myPageViewModel)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                     case "ReservationView" :
                         MyPageReservationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                       
                     case "ReservationManagementView" :
                         ReservationManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                     
                         
                     case "ReservationInfoView" :
                         MyPageReservationInfoView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                        
                         
                     case "DibsView":
                         DibsView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                             
                     case "MyPageAuthorDetailView":
                         MyPageAuthorDetailView(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                            
     
                     case "ProductManagementView":
                         ProductManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                            
                     case "ProductRegistrationView":
                         ProductRegistrationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                         
                     default:
                         EmptyView()
@@ -389,6 +389,7 @@ struct ProfileHeaderView: View {
                     .frame(width: 24, height: 24)
                     .foregroundColor(.white)
             }
+            .hidden()
             .offset(x: 160, y: -30)
         }
     }

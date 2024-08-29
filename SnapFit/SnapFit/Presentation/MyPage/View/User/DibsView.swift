@@ -33,7 +33,14 @@ struct DibsView: View {
                                 stack.append("MyPageAuthorDetailView")
                             }) {
                                 VStack(spacing: 0) {
-                                    DibsMiddleCardView(product: product, mainPromotionInteractor: mypageInteractor)
+                                    DibsMiddleCardView(isLiked: Binding(
+                                        get: { product.like ?? false },
+                                        set: { newValue in
+                                            if let index = myPageViewModel.likeProducts.firstIndex(where: { $0.id == product.id }) {
+                                                myPageViewModel.likeProducts[index].like = newValue
+                                            }
+                                        }
+                                    ) ,productInfo: product, mainPromotionInteractor: mypageInteractor)
                                         .frame(width: itemWidth, height: itemWidth * 1.85) // 카드의 비율 조정
                                         .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
                                 }
@@ -56,6 +63,7 @@ struct DibsView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {

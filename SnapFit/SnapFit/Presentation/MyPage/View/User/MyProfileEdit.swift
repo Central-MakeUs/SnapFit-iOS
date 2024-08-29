@@ -30,6 +30,7 @@ struct MyProfileEdit: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             ToolbarItem(placement: .principal) {
                 Text("프로필 수정")

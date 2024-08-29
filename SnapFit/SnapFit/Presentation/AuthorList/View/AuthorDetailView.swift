@@ -71,6 +71,7 @@ struct AuthorDetailView: View {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
+                    .hidden()
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -309,13 +310,12 @@ struct MainContentView: View {
                             mainPromotionViewModel.selectedProductId = product.id
                             stack.append("AuthorDetailView")
                         }) {
+                            
                             MiddleCardView(isLiked: Binding(
-                                get: {
-                                    mainPromotionViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
-                                },
+                                get: { product.like ?? false },
                                 set: { newValue in
-                                    if let index = mainPromotionViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
-                                        mainPromotionViewModel.productDetailAuthorProducts[index].like = newValue
+                                    if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                        mainPromotionViewModel.products[index].like = newValue
                                     }
                                 }
                             ), product: product, mainPromotionInteractor: productInteractor)

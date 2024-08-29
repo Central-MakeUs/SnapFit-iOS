@@ -72,6 +72,7 @@ struct MyPageAuthorDetailView: View {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
+                    .hidden()
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -287,12 +288,10 @@ struct MyMainContentView: View {
                             stack.append("MyPageAuthorDetailView")
                         }) {
                             MyMiddleCardView(isLiked: Binding(
-                                get: {
-                                    myPageViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
-                                },
+                                get: { product.like ?? false },
                                 set: { newValue in
-                                    if let index = myPageViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
-                                        myPageViewModel.productDetailAuthorProducts[index].like = newValue
+                                    if let index = myPageViewModel.likeProducts.firstIndex(where: { $0.id == product.id }) {
+                                        myPageViewModel.likeProducts[index].like = newValue
                                     }
                                 }
                             ), product: product, mainPromotionInteractor: myPageInteractor)

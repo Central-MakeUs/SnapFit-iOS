@@ -59,6 +59,7 @@ struct MyPageReservationView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {

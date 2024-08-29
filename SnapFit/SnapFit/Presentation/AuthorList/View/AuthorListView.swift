@@ -148,7 +148,15 @@ struct AuthorListView: View {
                                 Button(action: {
                                     handleProductSelection(product)
                                 }) {
-                                    MiddleCardView(isLiked: $product.like, product: product, mainPromotionInteractor: authorListInteractor)
+                                    MiddleCardView(isLiked: Binding(
+                                        get: { product.like ?? false },
+                                        set: { newValue in
+                                            if let index = authorListViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                                authorListViewModel.products[index].like = newValue
+                                            }
+                                        }
+                                    ), product: product, mainPromotionInteractor: authorListInteractor)
+                                    
                                         .frame(width: itemWidth, height: itemWidth * 1.85) // 카드의 비율 조정
                                         .padding(2)
                                 }
@@ -185,24 +193,19 @@ struct AuthorListView: View {
     private func navigateToView(_ viewName: String) -> some View {
         switch viewName {
         case "AuthorDetailView":
-            return AnyView(AuthorDetailView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true))
+            return AnyView(AuthorDetailView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack))
             
         case "AuthorReservationView":
-            return AnyView(AuthorReservationView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true))
+            return AnyView(AuthorReservationView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack))
             
         case "AuthorReservationReceptionView":
-            return AnyView(AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: authorListViewModel)
-                .navigationBarBackButtonHidden(true))
+            return AnyView(AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: authorListViewModel))
        
         case "ReservationView":
-            return AnyView(ReservationView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack)
-                .navigationBarBackButtonHidden(true))
+            return AnyView(ReservationView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack))
           
         case "ReservationInfoView":
-            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack)
-                .navigationBarBackButtonHidden(true))
+            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack))
            
         default:
             return AnyView(EmptyView())
