@@ -185,31 +185,29 @@ struct AuthorListView: View {
     private func navigateToView(_ viewName: String) -> some View {
         switch viewName {
         case "AuthorDetailView":
-            return AnyView(AuthorDetailView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorDetailView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack)
+                .navigationBarBackButtonHidden(true))
+            
         case "AuthorReservationView":
-            return AnyView(AuthorReservationView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorReservationView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack)
+                .navigationBarBackButtonHidden(true))
+            
         case "AuthorReservationReceptionView":
-            return AnyView(AuthorReservationReceptionView(stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: authorListViewModel)
+                .navigationBarBackButtonHidden(true))
+       
         case "ReservationView":
-            return AnyView(ReservationView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(ReservationView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack)
+                .navigationBarBackButtonHidden(true))
+          
         case "ReservationInfoView":
-            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack)
+                .navigationBarBackButtonHidden(true))
+           
         default:
-            return AnyView(SnapFitTabView())
+            return AnyView(EmptyView())
         }
     }
 }
 
-#Preview {
-    AuthorListView(authorListViewModel: MainPromotionViewModel())
-}
+

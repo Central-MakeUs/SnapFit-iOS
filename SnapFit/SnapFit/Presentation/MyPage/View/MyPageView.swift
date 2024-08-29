@@ -217,41 +217,39 @@ struct MyPageView: View {
                         MyProfileEdit(viewModel: myPageViewModel)
                             .navigationBarBackButtonHidden(true)
                     case "ReservationView" :
-                        MyPageReservationView(mypageInteractor: myPageInteractor, stack: $stack)
+                        MyPageReservationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                      
                     case "ReservationManagementView" :
-                        ReservationManagementView(mypageInteractor: myPageInteractor, stack: $stack)
+                        ReservationManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                    
                         
                     case "ReservationInfoView" :
-                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
+                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                       
                         
                     case "DibsView":
-                        DibsView(mypageInteractor: myPageInteractor, stack: $stack)
+                        DibsView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                            
                     case "MyPageAuthorDetailView":
-                        MyPageAuthorDetailView(myPageInteractor: myPageInteractor, stack: $stack)
+                        MyPageAuthorDetailView(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                           
     
                     case "ProductManagementView":
-                        ProductManagementView(mypageInteractor: myPageInteractor, stack: $stack)
+                        ProductManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                           
                     case "ProductRegistrationView":
-                        ProductRegistrationView(mypageInteractor: myPageInteractor, stack: $stack)
+                        ProductRegistrationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
                             .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
-                    case "SnapFitTabView":
-                        SnapFitTabView()
-                            .navigationBarBackButtonHidden(true)
+                        
                     default:
-                        SnapFitTabView()
+                        EmptyView()
+                        //SnapFitTabView()
                     }
                 }
                 .navigationBarHidden(true)

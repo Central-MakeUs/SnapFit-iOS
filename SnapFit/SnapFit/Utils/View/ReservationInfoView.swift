@@ -10,7 +10,7 @@ import SwiftUI
 struct ReservationInfoView: View {
     
     var productInteractor: ProductBusinessLogic?
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     @Binding var stack: NavigationPath
     
     @Environment(\.dismiss) var dismiss

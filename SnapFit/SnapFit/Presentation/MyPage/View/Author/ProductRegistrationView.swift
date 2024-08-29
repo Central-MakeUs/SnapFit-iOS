@@ -10,7 +10,7 @@ import Combine
 
 struct ProductRegistrationView: View {
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     @State private var inputText: String = ""
@@ -36,13 +36,13 @@ struct ProductRegistrationView: View {
                 PhotosSection(selectedImageData: $selectedImageData, validateForm: validateForm)
                 DescriptionSection(descriptionText: $descriptionText, maxCharacterLimit: maxCharacterLimit, validateForm: validateForm)
                 SnapSelectionSection(selectedSnap: $selectedSnap, validateForm: validateForm)
-                MoodSection(selectedMoods: $selectedMoods, validateForm: validateForm)
-                LocationSection(selectedLocations: $selectedLocations, validateForm: validateForm)
+                MoodSection(selectedMoods: $selectedMoods, validateForm: validateForm, myPageViewModel: myPageViewModel)
+                LocationSection(selectedLocations: $selectedLocations, validateForm: validateForm, myPageViewModel: myPageViewModel)
                 OptionSection(timePriceOptions: $timePriceOptions, validateForm: validateForm)
                 AdditionalCostSection(additionalPriceText: $additionalPriceText, validateForm: validateForm)
                 
                 ReserveButton(
-                    selectedImageData: $selectedImageData,
+                    myPageViewModel: myPageViewModel, selectedImageData: $selectedImageData,
                     mypageInteractor: mypageInteractor,
                     selectedMoods: selectedMoods,
                     selectedLocations: selectedLocations,
@@ -224,7 +224,7 @@ struct ProductRegistrationView: View {
         @Binding var selectedMoods: [String]
         var validateForm: () -> Void
         
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "분위기")
@@ -278,7 +278,7 @@ struct ProductRegistrationView: View {
         @Binding var selectedLocations: [String]
         var validateForm: () -> Void
         
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "위치")
@@ -431,7 +431,7 @@ struct ProductRegistrationView: View {
     }
     
     private struct ReserveButton: View {
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         @Binding var selectedImageData: [Data?]
         var mypageInteractor: MyPageBusinessLogic?
         
@@ -512,11 +512,3 @@ struct ProductRegistrationView: View {
     }
 }
 
-struct ProductRegistrationView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductRegistrationView(
-            stack: .constant(NavigationPath())
-        )
-        .environmentObject(MyPageViewModel())
-    }
-}

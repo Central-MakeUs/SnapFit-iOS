@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct NicknameSettingsView: View {
+    
+
+    
     @State private var inputText: String = ""
     @State private var isConfirmButtonEnabled = false
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
     
-    @EnvironmentObject var navigationPath: LoginNavigationModel
-    @EnvironmentObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
+    @ObservedObject var navigationPath: LoginNavigationModel
+    @ObservedObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
     
     var interactor: LoginBusinessLogic?
     
@@ -87,8 +90,4 @@ struct NicknameSettingsView: View {
     }
 }
 
-#Preview {
-    NicknameSettingsView()
-        .environmentObject(LoginViewModel())
-        .environmentObject(LoginNavigationModel()) // 환경 모델 추가
-}
+

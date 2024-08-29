@@ -12,7 +12,7 @@ import WebKit
 struct AuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
@@ -40,7 +40,7 @@ struct AuthorDetailView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             if let detail = mainPromotionViewModel.productDetail {
-                                MainContentView(productInteractor: productInteractor, productDetail: detail, stack: $stack)
+                                MainContentView(productInteractor: productInteractor, mainPromotionViewModel: mainPromotionViewModel, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -199,7 +199,7 @@ struct AuthorDetailView: View {
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
     @Binding var stack: NavigationPath

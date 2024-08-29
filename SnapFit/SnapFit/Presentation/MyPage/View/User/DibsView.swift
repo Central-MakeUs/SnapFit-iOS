@@ -10,7 +10,7 @@ import SwiftUI
 struct DibsView: View {
     
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용

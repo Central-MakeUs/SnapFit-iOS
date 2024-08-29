@@ -118,6 +118,7 @@ struct MainPromotionView: View {
     @State var stack = NavigationPath()
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
+    
     @State private var isLiked: Bool = false // 좋아요 상태를 관리할 변수 추가
     @State private var hasDataLoaded: Bool = false // 데이터 로드 여부를 추적하는 변수 추가
     
@@ -133,7 +134,18 @@ struct MainPromotionView: View {
                     HeaderView(mainPromotionViewModel: mainPromotionViewModel)
                         .padding(.bottom, 30)
                     
-                    SectionHeaderView(title: "이런 사진은 어때요?")
+                    HStack {
+                        SectionHeaderView(title: "이런 사진은 어때요?")
+                        
+                        Spacer()
+                        
+                        Image("mainHeaderIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .padding(.trailing, 16)
+                    }
+                    .padding(.bottom, 16)
                     
                     if let randomProduct = randomProduct {
                         Button(action: {
@@ -144,19 +156,19 @@ struct MainPromotionView: View {
                             }
                         }) {
                             MainPromotionRandomCardView(isLiked: Binding($isLiked), product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
-                                .padding(.vertical, 16)
+                                .padding(.bottom, 16)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .padding(.vertical, 16)
+                       
                     }
                     
-                    SectionMiniCardsView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
+                    SectionMiniCardsView(mainPromotionViewModel: mainPromotionViewModel, mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .padding(.bottom, 40)
                     
                     SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
                         .padding(.bottom, 16)
                     
-                    SectionBigCardsView(stack: $stack)
+                    SectionBigCardsView(mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
                         .padding(.bottom, 40)
                 }
                 .environmentObject(mainPromotionViewModel)
@@ -176,27 +188,28 @@ struct MainPromotionView: View {
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
-                    AuthorDetailView(productInteractor: mainPromotionInteractor, stack: $stack)
+                    AuthorDetailView(mainPromotionViewModel: mainPromotionViewModel, productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+              
                 case "AuthorReservationView":
-                    AuthorReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
+                    AuthorReservationView(mainPromotionViewModel: mainPromotionViewModel, productInteractor: mainPromotionInteractor, stack: $stack)
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                
                 case "AuthorReservationReceptionView":
-                    AuthorReservationReceptionView(stack: $stack)
+                    AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: mainPromotionViewModel)
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                       
                 case "ReservationView":
-                    ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
+                    ReservationView(productInteractor: mainPromotionInteractor, mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                       
                 case "ReservationInfoView":
-                    ReservationInfoView(productInteractor: mainPromotionInteractor, stack: $stack)
+                    ReservationInfoView(productInteractor: mainPromotionInteractor, mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                       
                 default:
-                    SnapFitTabView()
+                    //SnapFitTabView()
+                    EmptyView()
                 }
             }
             
@@ -283,7 +296,7 @@ struct HeaderView: View {
 
 
 struct SectionMiniCardsView: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @Binding var stack: NavigationPath
 
@@ -322,7 +335,7 @@ struct SectionMiniCardsView: View {
 
 
 struct SectionBigCardsView: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @Binding var stack: NavigationPath
 
@@ -362,9 +375,3 @@ struct SectionBigCardsView: View {
 }
 
 
-#Preview {
-    // Preview를 위한 NavigationPath 초기화
-    let path = NavigationPath()
-    
-    return MainPromotionView(mainPromotionViewModel: MainPromotionViewModel())
-}

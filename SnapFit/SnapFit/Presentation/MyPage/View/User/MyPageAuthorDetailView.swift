@@ -12,7 +12,7 @@ import Kingfisher
 struct MyPageAuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
@@ -40,7 +40,7 @@ struct MyPageAuthorDetailView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             if let detail = myPageViewModel.productDetail {
-                                MyMainContentView(myPageInteractor: myPageInteractor, productDetail: detail, stack: $stack)
+                                MyMainContentView(myPageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -176,7 +176,7 @@ struct MyPageAuthorDetailView: View {
 // 주요 콘텐츠 뷰
 struct MyMainContentView: View {
     var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
     @Binding var stack: NavigationPath

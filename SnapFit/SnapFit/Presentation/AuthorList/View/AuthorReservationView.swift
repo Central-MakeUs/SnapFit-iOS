@@ -20,7 +20,7 @@ struct AuthorReservationView: View {
     @State private var selectedPrice: Int = 0
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var productInteractor: ProductBusinessLogic?
     @Binding var stack: NavigationPath
     
@@ -31,14 +31,14 @@ struct AuthorReservationView: View {
             VStack(alignment: .leading) {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
-                        ProductSection()
-                        OptionSection(selectedTime: $selectedTime, selectedPrice: $selectedPrice)
+                        ProductSection(mainPromotionViewModel: mainPromotionViewModel)
+                        OptionSection(mainPromotionViewModel: mainPromotionViewModel, selectedTime: $selectedTime, selectedPrice: $selectedPrice)
                         LocationSection(locationText: $locationText)
                         DateTimeSection(selectedDate: $selectedDate)
-                        PeopleSection(counter: $counter)
+                        PeopleSection(counter: $counter, mainPromotionViewModel: mainPromotionViewModel)
                         EmailSection(emailText: $emailText)
                         PhoneSection(phoneText: $phoneText)
-                        SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete)
+                        SubmitButton(stack: $stack, productInteractor: productInteractor, isFormComplete: isFormComplete, mainPromotionViewModel: mainPromotionViewModel)
                     }
                     .padding(.bottom, 32)
                     .frame(maxWidth: .infinity) // 화면 폭에 맞게 조정
@@ -143,7 +143,7 @@ struct AuthorReservationView: View {
 
 
 struct ProductSection: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -168,7 +168,7 @@ struct ProductSection: View {
 }
 
 struct OptionSection: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     @Binding var selectedTime: String
     @Binding var selectedPrice: Int
 
@@ -289,7 +289,7 @@ struct DatePickerView: View {
 
 struct PeopleSection: View {
     @Binding var counter: Int
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -365,7 +365,7 @@ struct SubmitButton: View {
     @Binding var stack: NavigationPath
     var productInteractor: ProductBusinessLogic?
     let isFormComplete: Bool
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
 
     @State private var isSubmitting = false
     
@@ -421,9 +421,3 @@ struct EmailSection: View {
     }
 }
 
-#Preview {
-    // Preview를 위한 NavigationPath 초기화
-    let path = NavigationPath()
-    
-    return AuthorReservationView(stack: .constant(path))
-}
