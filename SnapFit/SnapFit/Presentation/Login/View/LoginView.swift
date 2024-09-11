@@ -10,13 +10,18 @@ protocol LoginDisplayLogic {
 // 로그인 화면을 정의하는 View
 struct LoginView: View, LoginDisplayLogic {
     
+    // 모달로 올라오면 뷰모델 끊어짐, 스택도 끊어지고
     @ObservedObject var loginviewModel: LoginViewModel
     @ObservedObject var navigationModel: LoginNavigationModel
+    
     var interactor: LoginBusinessLogic?
 
     func display(viewModel: Login.LoadLogin.LoginPresentationViewModel) {
+        
+        // 함수로 나눠자, 뷰모델로 빼던지
         DispatchQueue.main.async {
             var destination = ""
+            print("viewModel.membershipRequired \(viewModel.membershipRequired)")
             if viewModel.membershipRequired == true {
                 destination = "termsView"
                 navigationModel.navigationPath.append(destination)
@@ -50,6 +55,7 @@ struct LoginView: View, LoginDisplayLogic {
                 print("Unsupported social login type")
             }
         }
+        
     }
 
     func displayVibes(viewModel: Login.LoadLogin.VibesPresentationViewModel) {
@@ -86,7 +92,7 @@ struct LoginView: View, LoginDisplayLogic {
                         
                         Spacer()
                         
-                        LoginViewGroup(interactor: interactor)
+                        LoginViewGroup(interactor: interactor, viewModel: loginviewModel)
                         
                         Spacer().frame(height: geometry.size.height * 0.03)
                     }
@@ -98,19 +104,13 @@ struct LoginView: View, LoginDisplayLogic {
             .navigationDestination(for: String.self) { destination in
                 switch destination {
                 case "termsView":
-                    TermsView(interactor: interactor)
-                        .environmentObject(loginviewModel)
-                        .environmentObject(navigationModel)
+                    TermsView(navigationPath: navigationModel, viewModel: loginviewModel, interactor: interactor)
                         .navigationBarBackButtonHidden(true)
                 case "NicknameSettingsView":
-                    NicknameSettingsView(interactor: interactor)
-                        .environmentObject(loginviewModel)
-                        .environmentObject(navigationModel)
+                    NicknameSettingsView(navigationPath: navigationModel, viewModel: loginviewModel, interactor: interactor)
                         .navigationBarBackButtonHidden(true)
                 case "GridSelectionView":
-                    GridSelectionView(columnsCount: 2, interactor: interactor)
-                        .environmentObject(loginviewModel)
-                        .environmentObject(navigationModel)
+                    GridSelectionView(columnsCount: 2, viewModel: loginviewModel, navigationPath: navigationModel, interactor: interactor)
                         .navigationBarBackButtonHidden(true)
                 case "FreelookView":
                     FreelookView() // FreelookView를 네비게이션 링크로 표시
@@ -120,9 +120,8 @@ struct LoginView: View, LoginDisplayLogic {
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .ignoresSafeArea()        }
-        .environmentObject(loginviewModel)
-        .environmentObject(navigationModel)
+            .ignoresSafeArea()
+        }
     }
 }
 
@@ -130,7 +129,7 @@ struct LoginView: View, LoginDisplayLogic {
 // 로그인 버튼 및 로그인 관련 UI를 정의하는 구조체
 private struct LoginViewGroup: View {
     var interactor: LoginBusinessLogic?
-    @EnvironmentObject var viewModel: LoginViewModel
+    @ObservedObject var viewModel: LoginViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -213,9 +212,9 @@ private struct LoginViewGroup: View {
 }
 
 
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView(loginviewModel: LoginViewModel(), navigationModel: LoginNavigationModel())
-            .environmentObject(LoginNavigationModel())  // Preview를 위한 네비게이션 모델 제공
-    }
-}
+//struct LoginView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        LoginView(loginviewModel: LoginViewModel(), navigationModel: LoginNavigationModel())
+//            .environmentObject(LoginNavigationModel())  // Preview를 위한 네비게이션 모델 제공
+//    }
+//}

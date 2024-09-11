@@ -148,8 +148,16 @@ struct AuthorListView: View {
                                 Button(action: {
                                     handleProductSelection(product)
                                 }) {
-                                    MiddleCardView(isLiked: $product.like, product: product, mainPromotionInteractor: authorListInteractor)
-                                        .frame(width: itemWidth, height: itemWidth * 1.85) // 카드의 비율 조정
+                                    MiddleCardView(isLiked: Binding(
+                                        get: { product.like ?? false },
+                                        set: { newValue in
+                                            if let index = authorListViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                                authorListViewModel.products[index].like = newValue
+                                            }
+                                        }
+                                    ), product: product, mainPromotionInteractor: authorListInteractor)
+                                    
+                                        .frame(width: itemWidth, height: itemWidth * 1.65) // 카드의 비율 조정
                                         .padding(2)
                                 }
                                 .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거
@@ -185,31 +193,24 @@ struct AuthorListView: View {
     private func navigateToView(_ viewName: String) -> some View {
         switch viewName {
         case "AuthorDetailView":
-            return AnyView(AuthorDetailView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorDetailView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack))
+            
         case "AuthorReservationView":
-            return AnyView(AuthorReservationView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorReservationView(mainPromotionViewModel: authorListViewModel, productInteractor: authorListInteractor, stack: $stack))
+            
         case "AuthorReservationReceptionView":
-            return AnyView(AuthorReservationReceptionView(stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: authorListViewModel))
+       
         case "ReservationView":
-            return AnyView(ReservationView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(ReservationView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack))
+          
         case "ReservationInfoView":
-            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, stack: $stack)
-                .navigationBarBackButtonHidden(true)
-                .environmentObject(authorListViewModel))
+            return AnyView(ReservationInfoView(productInteractor: authorListInteractor, mainPromotionViewModel: authorListViewModel, stack: $stack))
+           
         default:
-            return AnyView(SnapFitTabView())
+            return AnyView(EmptyView())
         }
     }
 }
 
-#Preview {
-    AuthorListView(authorListViewModel: MainPromotionViewModel())
-}
+

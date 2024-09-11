@@ -176,7 +176,8 @@ struct FreelookView: View {
     func getAccessToken() -> String? {
         // 실제로는 사용자 인증 정보나 토큰 저장소에서 가져오는 로직을 구현
         // 예: UserDefaults 또는 Keychain을 통해
-        let fixedToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjE1LCJyb2xlIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3MjQzMTM1MTYsImV4cCI6MTcyNjM4NzExNn0.vaMTJGgOa_2NIGeio5v6NNPrdA7m0KxD5y7cCtqMxyE"
+        let fixedToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjMyLCJyb2xlIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3MjQ5MTM1OTgsImV4cCI6MTcyNjk4NzE5OH0.iDQAzUU1pQYzSMQL24JzUbudh-GrqATkLmeta2gViJ4"
+        
         return fixedToken
     }
 }

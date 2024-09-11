@@ -12,7 +12,12 @@ import KakaoSDKAuth
 struct SnapFitApp: App {
     
     @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
-
+    
+  
+    
+    @StateObject var loginviewModel = LoginViewModel()           // LoginViewModel 생성
+    @StateObject var navigationModel = LoginNavigationModel()    // LoginNavigationModel 생성
+    
     init() {
         // Kakao SDK 초기화 스유 버전
         //        let kakaoAppKey = Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] ?? ""
@@ -22,7 +27,8 @@ struct SnapFitApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(loginViewModel: loginviewModel, loginNaviModel: navigationModel)
         }
+        
     }
 }

@@ -12,9 +12,10 @@ struct GridSelectionView: View {
     }
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var viewModel: LoginViewModel
+    @ObservedObject var viewModel: LoginViewModel
+    @ObservedObject var navigationPath: LoginNavigationModel
     var interactor: LoginBusinessLogic?
-    @EnvironmentObject var navigationPath: LoginNavigationModel
+
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -97,9 +98,10 @@ struct GridSelectionView: View {
                         moods: viewModel.moods
                     ))
                     
-//                    navigationPath.append("SplashAndTabView")
                     // 로그인 성공 시 모달 닫기
+                    //viewModel.membershipRequired = false
                     viewModel.showLoginModal = false
+                    //navigationPath.navigationPath = .init()
                 }
             } label: {
                 HStack(spacing: 20) {
@@ -146,16 +148,20 @@ struct GridSelectionView: View {
         .onAppear {
             DispatchQueue.main.async {
                 print("GridSelectionView appeared")
-                interactor?.fetchVibes() // Fetch vibes when view appears
+                
+                // Reset selected items and moods
+                selectedItems.removeAll()
+                viewModel.moods.removeAll()
+                
+                // Fetch vibes again if necessary
+                interactor?.fetchVibes()
+                
+                // Disable the confirm button initially
+                isConfirmButtonEnabled = false
             }
         }
+
     }
 }
 
-struct GridSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        GridSelectionView(columnsCount: 2, interactor: nil)
-            .environmentObject(LoginViewModel())
-            .environmentObject(LoginNavigationModel()) // 환경 모델 추가
-    }
-}
+

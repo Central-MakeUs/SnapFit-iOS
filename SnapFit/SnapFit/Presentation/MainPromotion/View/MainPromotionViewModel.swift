@@ -45,4 +45,6 @@ class MainPromotionViewModel: NSObject, ObservableObject {
     func resetReservationSuccess() {
         reservationSuccess = false
     }
+    
+ 
 }

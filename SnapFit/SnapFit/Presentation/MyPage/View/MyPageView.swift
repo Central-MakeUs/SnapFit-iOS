@@ -215,43 +215,41 @@ struct MyPageView: View {
                     switch viewName {
                     case "MyProfileEdit":
                         MyProfileEdit(viewModel: myPageViewModel)
-                            .navigationBarBackButtonHidden(true)
+                            //.navigationBarBackButtonHidden(true)
                     case "ReservationView" :
-                        MyPageReservationView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        MyPageReservationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                      
                     case "ReservationManagementView" :
-                        ReservationManagementView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        ReservationManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                    
                         
                     case "ReservationInfoView" :
-                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        MyPageReservationInfoView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                       
                         
                     case "DibsView":
-                        DibsView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        DibsView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                            
                     case "MyPageAuthorDetailView":
-                        MyPageAuthorDetailView(myPageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        MyPageAuthorDetailView(myPageViewModel: myPageViewModel, myPageInteractor: myPageInteractor, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                           
     
                     case "ProductManagementView":
-                        ProductManagementView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
+                        ProductManagementView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                           
                     case "ProductRegistrationView":
-                        ProductRegistrationView(mypageInteractor: myPageInteractor, stack: $stack)
-                            .navigationBarBackButtonHidden(true)
-                            .environmentObject(myPageViewModel)
-                    case "SnapFitTabView":
-                        SnapFitTabView()
-                            .navigationBarBackButtonHidden(true)
+                        ProductRegistrationView(mypageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, stack: $stack)
+                            //.navigationBarBackButtonHidden(true)
+                        
                     default:
-                        SnapFitTabView()
+                        EmptyView()
+                        //SnapFitTabView()
                     }
                 }
                 .navigationBarHidden(true)
@@ -391,6 +389,7 @@ struct ProfileHeaderView: View {
                     .frame(width: 24, height: 24)
                     .foregroundColor(.white)
             }
+            .hidden()
             .offset(x: 160, y: -30)
         }
     }

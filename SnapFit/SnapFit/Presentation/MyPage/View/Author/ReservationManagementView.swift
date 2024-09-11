@@ -17,7 +17,7 @@ struct ReservationManagementView: View {
     
     @Environment(\.dismiss) var dismiss
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     var body: some View {
@@ -65,6 +65,7 @@ struct ReservationManagementView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {

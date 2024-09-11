@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ProductManagementView: View {
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     // 두 개의 열을 가진 그리드 설정
@@ -87,7 +87,7 @@ struct ProductManagementView: View {
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
-                }
+                } .hidden()
             }
             
             ToolbarItem(placement: .principal) {

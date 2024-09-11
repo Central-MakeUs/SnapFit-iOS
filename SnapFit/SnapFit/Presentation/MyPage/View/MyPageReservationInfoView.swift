@@ -10,7 +10,7 @@ import SwiftUI
 struct MyPageReservationInfoView: View {
     
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     @Environment(\.dismiss) var dismiss  // dismiss 환경 변수를 사용
@@ -153,6 +153,7 @@ struct MyPageReservationInfoView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {

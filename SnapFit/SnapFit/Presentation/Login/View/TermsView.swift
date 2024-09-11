@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct TermsView: View {
+    
+    @ObservedObject var navigationPath: LoginNavigationModel
+    @ObservedObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
+    
     @State private var isAllAgreed = false // 전체동의 토글 상태
     @State private var isTermsAgreed = false // 이용약관 동의 토글 상태
     @State private var isPrivacyPolicyAgreed = false // 개인정보 처리 방침 동의 토글 상태
@@ -10,8 +14,7 @@ struct TermsView: View {
     
     @Environment(\.presentationMode) var presentationMode // Environment variable to dismiss the view
    
-    @EnvironmentObject var navigationPath: LoginNavigationModel
-    @EnvironmentObject var viewModel: LoginViewModel // EnvironmentObject를 사용하여 뷰모델 접근
+   
     var interactor: LoginBusinessLogic?
     
     var body: some View {
@@ -215,9 +218,3 @@ struct TermsToggleButton: View {
     }
 }
 
-struct TermsView_Previews: PreviewProvider {
-    static var previews: some View {
-        TermsView()
-            .environmentObject(LoginViewModel())
-    }
-}

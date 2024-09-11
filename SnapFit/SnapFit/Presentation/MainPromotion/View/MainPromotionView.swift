@@ -118,6 +118,7 @@ struct MainPromotionView: View {
     @State var stack = NavigationPath()
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
+    
     @State private var isLiked: Bool = false // 좋아요 상태를 관리할 변수 추가
     @State private var hasDataLoaded: Bool = false // 데이터 로드 여부를 추적하는 변수 추가
     
@@ -133,7 +134,18 @@ struct MainPromotionView: View {
                     HeaderView(mainPromotionViewModel: mainPromotionViewModel)
                         .padding(.bottom, 30)
                     
-                    SectionHeaderView(title: "이런 사진은 어때요?")
+                    HStack {
+                        SectionHeaderView(title: "이런 사진은 어때요?")
+                        
+                        Spacer()
+                        
+                        Image("mainHeaderIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .padding(.trailing, 16)
+                    }
+                    .padding(.bottom, 16)
                     
                     if let randomProduct = randomProduct {
                         Button(action: {
@@ -143,20 +155,27 @@ struct MainPromotionView: View {
                                 stack.append("AuthorDetailView")
                             }
                         }) {
-                            MainPromotionRandomCardView(isLiked: Binding($isLiked), product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
-                                .padding(.vertical, 16)
+                            MainPromotionRandomCardView(isLiked: Binding(
+                                get: { randomProduct.like ?? false },
+                                set: { newValue in
+                                    if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == randomProduct.id }) {
+                                        mainPromotionViewModel.products[index].like = newValue
+                                    }
+                                }
+                            ), product: randomProduct, mainPromotionInteractor: mainPromotionInteractor)
+                                .padding(.bottom, 16)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .padding(.vertical, 16)
+                       
                     }
                     
-                    SectionMiniCardsView(mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
+                    SectionMiniCardsView(mainPromotionViewModel: mainPromotionViewModel, mainPromotionInteractor: mainPromotionInteractor, stack: $stack)
                         .padding(.bottom, 40)
                     
                     SectionHeaderView(title: "메이커와 소중한 추억을 만들어보세요")
                         .padding(.bottom, 16)
                     
-                    SectionBigCardsView(stack: $stack)
+                    SectionBigCardsView(mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
                         .padding(.bottom, 40)
                 }
                 .environmentObject(mainPromotionViewModel)
@@ -176,27 +195,27 @@ struct MainPromotionView: View {
             .navigationDestination(for: String.self) { viewName in
                 switch viewName {
                 case "AuthorDetailView":
-                    AuthorDetailView(productInteractor: mainPromotionInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                    AuthorDetailView(mainPromotionViewModel: mainPromotionViewModel, productInteractor: mainPromotionInteractor, stack: $stack)
+                  
+              
                 case "AuthorReservationView":
-                    AuthorReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                    AuthorReservationView(mainPromotionViewModel: mainPromotionViewModel, productInteractor: mainPromotionInteractor, stack: $stack)
+                  
                 case "AuthorReservationReceptionView":
-                    AuthorReservationReceptionView(stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                    AuthorReservationReceptionView(stack: $stack, mainPromotionViewModel: mainPromotionViewModel)
+                   
+                       
                 case "ReservationView":
-                    ReservationView(productInteractor: mainPromotionInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                    ReservationView(productInteractor: mainPromotionInteractor, mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
+                       
+                       
                 case "ReservationInfoView":
-                    ReservationInfoView(productInteractor: mainPromotionInteractor, stack: $stack)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(mainPromotionViewModel)
+                    ReservationInfoView(productInteractor: mainPromotionInteractor, mainPromotionViewModel: mainPromotionViewModel, stack: $stack)
+                      
+                       
                 default:
-                    SnapFitTabView()
+                    //SnapFitTabView()
+                    EmptyView()
                 }
             }
             
@@ -283,16 +302,15 @@ struct HeaderView: View {
 
 
 struct SectionMiniCardsView: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @Binding var stack: NavigationPath
 
-    let layout: [GridItem] = [GridItem(.fixed(130))] // Fixed size layout
+    let layout: [GridItem] = [GridItem(.fixed(130))]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHGrid(rows: layout, spacing: 8) {
-                // 처음 10개의 상품만 가져오기
                 ForEach(Array(mainPromotionViewModel.products.prefix(10))) { product in
                     Button(action: {
                         mainPromotionViewModel.selectedProductId = product.id
@@ -300,15 +318,23 @@ struct SectionMiniCardsView: View {
                             stack.append("AuthorDetailView")
                         }
                     }) {
-                        MiniCardView(isLiked: Binding(
-                            get: { product.like ?? false },
-                            set: { newValue in
-                                if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
-                                    mainPromotionViewModel.products[index].like = newValue
+                        MiniCardView( isLiked: Binding(
+                                get: { product.like ?? false },
+                                set: { newValue in
+                                    if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                        mainPromotionViewModel.products[index].like = newValue
+                                    }
                                 }
+                            ), // 초기 좋아요 상태를 전달
+                            product: product,
+                            mainPromotionInteractor: mainPromotionInteractor
+                        )
+                        .onChange(of: product.like) { newValue in
+                            if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                mainPromotionViewModel.products[index].like = newValue
                             }
-                        ), product: product, mainPromotionInteractor: mainPromotionInteractor)
-                            .frame(width: 130, height: 204)
+                        }
+                        .frame(width: 130, height: 204)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -322,12 +348,12 @@ struct SectionMiniCardsView: View {
 
 
 struct SectionBigCardsView: View {
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var mainPromotionInteractor: MainPromotionBusinessLogic?
     @Binding var stack: NavigationPath
 
     let columns: [GridItem] = [
-        GridItem(.fixed(175), spacing: 10), // 고정된 크기 설정
+        GridItem(.fixed(175), spacing: 10),
         GridItem(.fixed(175), spacing: 10)
     ]
 
@@ -343,15 +369,23 @@ struct SectionBigCardsView: View {
                         }
                     }) {
                         BigCardView(isLiked: Binding(
-                            get: { product.like ?? false },
-                            set: { newValue in
-                                if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
-                                    mainPromotionViewModel.products[index].like = newValue
+                                get: { product.like ?? false },
+                                set: { newValue in
+                                    if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                        mainPromotionViewModel.products[index].like = newValue
+                                    }
                                 }
+                            ), // 초기 좋아요 상태 전달
+                            product: product,
+                            mainPromotionInteractor: mainPromotionInteractor
+                        )
+                        .onChange(of: product.like) { newValue in
+                            if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                mainPromotionViewModel.products[index].like = newValue
                             }
-                        ), product: product, mainPromotionInteractor: mainPromotionInteractor)
-                            .frame(width: 175, height: 256)
-                            .padding(.bottom, 32)
+                        }
+                        .frame(width: 175, height: 256)
+                        .padding(.bottom, 32)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -359,12 +393,4 @@ struct SectionBigCardsView: View {
             .padding(.horizontal, 16)
         }
     }
-}
-
-
-#Preview {
-    // Preview를 위한 NavigationPath 초기화
-    let path = NavigationPath()
-    
-    return MainPromotionView(mainPromotionViewModel: MainPromotionViewModel())
 }

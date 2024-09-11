@@ -10,7 +10,7 @@ import SwiftUI
 struct AuthorReservationReceptionView: View {
     
     @Binding var stack: NavigationPath
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     
     private var reservationRequest: ReservationRequest? {
         mainPromotionViewModel.reservationRequest
@@ -37,7 +37,7 @@ struct AuthorReservationReceptionView: View {
                     CustomDividerView()
                         .padding(.bottom, 32)
                     
-                    ProductSection()
+                    ProductSection(mainPromotionViewModel: mainPromotionViewModel)
                         .padding(.bottom, 40)
                     
                     VStack(alignment: .leading, spacing: 24) {
@@ -111,9 +111,3 @@ struct AuthorReservationReceptionView: View {
     }
 }
 
-struct AuthorReservationReceptionView_Previews: PreviewProvider {
-    static var previews: some View {
-        AuthorReservationReceptionView(stack: .constant(NavigationPath()))
-            .environmentObject(MainPromotionViewModel()) // Preview에서 뷰 모델을 주입합니다.
-    }
-}

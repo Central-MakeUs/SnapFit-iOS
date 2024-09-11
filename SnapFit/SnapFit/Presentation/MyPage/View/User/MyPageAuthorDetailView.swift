@@ -12,7 +12,7 @@ import Kingfisher
 struct MyPageAuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
@@ -40,7 +40,7 @@ struct MyPageAuthorDetailView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             if let detail = myPageViewModel.productDetail {
-                                MyMainContentView(myPageInteractor: myPageInteractor, productDetail: detail, stack: $stack)
+                                MyMainContentView(myPageInteractor: myPageInteractor, myPageViewModel: myPageViewModel, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -72,6 +72,7 @@ struct MyPageAuthorDetailView: View {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
+                    .hidden()
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -176,7 +177,7 @@ struct MyPageAuthorDetailView: View {
 // 주요 콘텐츠 뷰
 struct MyMainContentView: View {
     var myPageInteractor: MyPageBusinessLogic? // 공통 프로토콜 타입으로 변경
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
     @Binding var stack: NavigationPath
@@ -287,12 +288,10 @@ struct MyMainContentView: View {
                             stack.append("MyPageAuthorDetailView")
                         }) {
                             MyMiddleCardView(isLiked: Binding(
-                                get: {
-                                    myPageViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
-                                },
+                                get: { product.like ?? false },
                                 set: { newValue in
-                                    if let index = myPageViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
-                                        myPageViewModel.productDetailAuthorProducts[index].like = newValue
+                                    if let index = myPageViewModel.likeProducts.firstIndex(where: { $0.id == product.id }) {
+                                        myPageViewModel.likeProducts[index].like = newValue
                                     }
                                 }
                             ), product: product, mainPromotionInteractor: myPageInteractor)

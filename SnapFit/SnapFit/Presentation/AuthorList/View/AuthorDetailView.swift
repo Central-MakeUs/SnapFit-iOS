@@ -12,7 +12,7 @@ import WebKit
 struct AuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
@@ -40,7 +40,7 @@ struct AuthorDetailView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             if let detail = mainPromotionViewModel.productDetail {
-                                MainContentView(productInteractor: productInteractor, productDetail: detail, stack: $stack)
+                                MainContentView(productInteractor: productInteractor, mainPromotionViewModel: mainPromotionViewModel, productDetail: detail, stack: $stack)
                             } else {
                                 ProgressView() // 여전히 데이터가 없는 경우를 대비해 ProgressView 추가
                                     .padding()
@@ -71,6 +71,7 @@ struct AuthorDetailView: View {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                     }
+                    .hidden()
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -199,7 +200,7 @@ struct AuthorDetailView: View {
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
     var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]
     @Binding var stack: NavigationPath
@@ -258,7 +259,7 @@ struct MainContentView: View {
         
         // 가격
         if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
-            Text("\(minPrice) - \(price)")
+            Text("\(minPrice)분 - \(price)원")
                 .font(.system(size: 24))
                 .bold()
                 .padding(.horizontal)
@@ -309,19 +310,19 @@ struct MainContentView: View {
                             mainPromotionViewModel.selectedProductId = product.id
                             stack.append("AuthorDetailView")
                         }) {
+                            
                             MiddleCardView(isLiked: Binding(
-                                get: {
-                                    mainPromotionViewModel.productDetailAuthorProducts.first { $0.id == product.id }?.like ?? false
-                                },
+                                get: { product.like ?? false },
                                 set: { newValue in
-                                    if let index = mainPromotionViewModel.productDetailAuthorProducts.firstIndex(where: { $0.id == product.id }) {
-                                        mainPromotionViewModel.productDetailAuthorProducts[index].like = newValue
+                                    if let index = mainPromotionViewModel.products.firstIndex(where: { $0.id == product.id }) {
+                                        mainPromotionViewModel.products[index].like = newValue
                                     }
                                 }
                             ), product: product, mainPromotionInteractor: productInteractor)
                             .frame(width: 175, height: 324)
                         }
                     }
+                    .padding(.leading, 6)
                 }
             }
             .padding(.horizontal)

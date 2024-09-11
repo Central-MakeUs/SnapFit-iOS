@@ -10,7 +10,7 @@ import Combine
 
 struct ProductRegistrationView: View {
     var mypageInteractor: MyPageBusinessLogic?
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel: MyPageViewModel
     @Binding var stack: NavigationPath
     
     @State private var inputText: String = ""
@@ -36,12 +36,13 @@ struct ProductRegistrationView: View {
                 PhotosSection(selectedImageData: $selectedImageData, validateForm: validateForm)
                 DescriptionSection(descriptionText: $descriptionText, maxCharacterLimit: maxCharacterLimit, validateForm: validateForm)
                 SnapSelectionSection(selectedSnap: $selectedSnap, validateForm: validateForm)
-                MoodSection(selectedMoods: $selectedMoods, validateForm: validateForm)
-                LocationSection(selectedLocations: $selectedLocations, validateForm: validateForm)
+                MoodSection(selectedMoods: $selectedMoods, validateForm: validateForm, myPageViewModel: myPageViewModel)
+                LocationSection(selectedLocations: $selectedLocations, validateForm: validateForm, myPageViewModel: myPageViewModel)
                 OptionSection(timePriceOptions: $timePriceOptions, validateForm: validateForm)
                 AdditionalCostSection(additionalPriceText: $additionalPriceText, validateForm: validateForm)
                 
                 ReserveButton(
+                    myPageViewModel: myPageViewModel,
                     selectedImageData: $selectedImageData,
                     mypageInteractor: mypageInteractor,
                     selectedMoods: selectedMoods,
@@ -55,7 +56,8 @@ struct ProductRegistrationView: View {
                     studio: selectedSnap == "indoor",
                     isUploading: $isUploading,
                     cancellables: $cancellables,
-                    isConfirmButtonEnabled: $isConfirmButtonEnabled
+                    isConfirmButtonEnabled: $isConfirmButtonEnabled,
+                    resetForm: resetForm // Pass the closure here
                 )
             }
         }
@@ -72,6 +74,7 @@ struct ProductRegistrationView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {
@@ -97,6 +100,21 @@ struct ProductRegistrationView: View {
                                  timePriceOptions.allSatisfy { $0.selectedPrice > 0 } &&
                                  (Int(additionalPriceText) ?? 0) >= 0
     }
+    
+    
+    func resetForm() {
+        inputText = ""
+        priceText = ""
+        additionalPriceText = ""
+        isConfirmButtonEnabled = false
+        selectedSnap = "indoor"
+        descriptionText = ""
+        selectedImageData = []
+        selectedMoods = []
+        selectedLocations = []
+        timePriceOptions = []
+    }
+
     
     private struct TitleSection: View {
         @Binding var inputText: String
@@ -224,7 +242,7 @@ struct ProductRegistrationView: View {
         @Binding var selectedMoods: [String]
         var validateForm: () -> Void
         
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "분위기")
@@ -278,7 +296,7 @@ struct ProductRegistrationView: View {
         @Binding var selectedLocations: [String]
         var validateForm: () -> Void
         
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         
         var body: some View {
             SectionHeaderView(title: "위치")
@@ -431,7 +449,7 @@ struct ProductRegistrationView: View {
     }
     
     private struct ReserveButton: View {
-        @EnvironmentObject var myPageViewModel: MyPageViewModel
+        @ObservedObject var myPageViewModel: MyPageViewModel
         @Binding var selectedImageData: [Data?]
         var mypageInteractor: MyPageBusinessLogic?
         
@@ -449,6 +467,8 @@ struct ProductRegistrationView: View {
         @Binding var cancellables: Set<AnyCancellable>
         @Binding var isConfirmButtonEnabled: Bool
         
+        var resetForm: () -> Void // Accept the closure here
+
         var body: some View {
             Button(action: {
                 if isConfirmButtonEnabled {
@@ -487,6 +507,9 @@ struct ProductRegistrationView: View {
                                 
                                 mypageInteractor?.postProduct(request: MakerUseCases.RequestMakerProduct.productRequest(product: request))
                                 
+                                // Reset form after successful registration
+                                resetForm() // Call the closure here
+                                myPageViewModel.postImages = []
                                 isUploading = false
                             }
                         }
@@ -510,13 +533,7 @@ struct ProductRegistrationView: View {
             .disabled(!isConfirmButtonEnabled || isUploading)
         }
     }
+
+
 }
 
-struct ProductRegistrationView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductRegistrationView(
-            stack: .constant(NavigationPath())
-        )
-        .environmentObject(MyPageViewModel())
-    }
-}

@@ -16,7 +16,7 @@ struct ReservationView: View {
     
     @Environment(\.dismiss) var dismiss
     var productInteractor: ProductBusinessLogic?
-    @EnvironmentObject var mainPromotionViewModel: MainPromotionViewModel
+    @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     @Binding var stack: NavigationPath
     
     var body: some View {
@@ -63,6 +63,7 @@ struct ReservationView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
                 }
+                .hidden()
             }
             
             ToolbarItem(placement: .principal) {

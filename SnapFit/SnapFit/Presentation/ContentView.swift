@@ -9,14 +9,15 @@ import _AuthenticationServices_SwiftUI
 
 struct ContentView: View {
     
-    @StateObject var loginVM = LoginViewModel()
-    @StateObject var loginNaviModel = LoginNavigationModel() // 독립적인 네비게이션 모델
+    @ObservedObject var loginViewModel: LoginViewModel
+    @ObservedObject var loginNaviModel: LoginNavigationModel
+    
     @State private var isLoggedIn: Bool = false // 자동 로그인 여부를 확인하기 위한 상태 변수
 
     var body: some View {
         VStack {
             if isLoggedIn {
-                SplashAndTabView() // 토큰이 있으면 SplashAndTabView로 이동
+                SnapFitTabView(loginViewModel: loginViewModel, loginNaviModel: loginNaviModel) // 토큰이 있으면 SplashAndTabView로 이동
             } else {
                 Text("로그인 상태가 아닙니다.") // 실제로는 모달로 로그인 뷰를 표시할 부분입니다.
                     .hidden()
@@ -26,8 +27,8 @@ struct ContentView: View {
             //clearTokens()
             checkForSavedTokens() // 토큰 확인 로직 호출
         }
-        .fullScreenCover(isPresented: $loginVM.showLoginModal) {
-            LoginView(loginviewModel: loginVM, navigationModel: loginNaviModel)
+        .fullScreenCover(isPresented: $loginViewModel.showLoginModal) {
+            LoginView(loginviewModel: loginViewModel, navigationModel: loginNaviModel)
                 .configureView() // VIP 패턴에 맞게 뷰를 구성
                 .onDisappear {
                     // 모달이 닫힐 때 다시 토큰을 확인
@@ -39,7 +40,7 @@ struct ContentView: View {
         }
         .onChange(of: isLoggedIn) { newValue in
             if !newValue {
-                loginVM.showLoginModal = true // 로그인 상태가 아닐 때 모달 표시
+                loginViewModel.showLoginModal = true // 로그인 상태가 아닐 때 모달 표시
             }
         }
     }
@@ -51,11 +52,11 @@ struct ContentView: View {
            !accessToken.isEmpty, !refreshToken.isEmpty {
             // 토큰이 비어있지 않다면 로그인 상태로 설정
             isLoggedIn = true
-            loginVM.showLoginModal = false
+            loginViewModel.showLoginModal = false
         } else {
             // 토큰이 없으면 로그인 화면으로 이동
             isLoggedIn = false
-            loginVM.showLoginModal = true // 로그인 모달 표시
+            loginViewModel.showLoginModal = true // 로그인 모달 표시
         }
     }
     
@@ -68,6 +69,6 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}

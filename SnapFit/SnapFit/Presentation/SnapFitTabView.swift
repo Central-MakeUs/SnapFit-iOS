@@ -9,12 +9,13 @@ import SwiftUI
 struct SnapFitTabView: View {
     @State private var selectedTab = 0
     
+    @ObservedObject var loginViewModel: LoginViewModel
+    @ObservedObject var loginNaviModel: LoginNavigationModel
+
     @StateObject var mainPromotionViewModel = MainPromotionViewModel()
     @StateObject var authorListViewModel = MainPromotionViewModel()
-    
     @StateObject var myPageViewModel = MyPageViewModel()
-    @StateObject var loginViewModel = LoginViewModel()
-    @StateObject var loginNaviModel = LoginNavigationModel()
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             MainPromotionView(mainPromotionViewModel: mainPromotionViewModel)
@@ -50,6 +51,6 @@ struct SnapFitTabView: View {
     }
 }
 
-#Preview {
-    SnapFitTabView()
-}
+//#Preview {
+//    SnapFitTabView()
+//}
