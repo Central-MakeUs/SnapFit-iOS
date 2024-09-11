@@ -69,6 +69,9 @@ struct SelectPhotosView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            selectedItems = []
+        })
         .onChange(of: selectedItems) { newValue in
             DispatchQueue.main.async {
                 imageData.removeAll()

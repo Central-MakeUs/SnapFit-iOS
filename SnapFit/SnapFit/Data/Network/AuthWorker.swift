@@ -5,12 +5,6 @@
 //  Created by 정정욱 on 7/14/24.
 //
 
-//
-//  AuthWorker.swift
-//  SnapFit
-//
-//  Created by 정정욱 on 7/14/24.
-//
 
 import Foundation
 import KakaoSDKAuth

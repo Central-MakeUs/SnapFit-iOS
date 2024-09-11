@@ -259,7 +259,7 @@ struct MainContentView: View {
         
         // 가격
         if let prices = productDetail.prices, let minPrice = prices.first?.min, let price = prices.first?.price {
-            Text("\(minPrice) - \(price)")
+            Text("\(minPrice)분 - \(price)원")
                 .font(.system(size: 24))
                 .bold()
                 .padding(.horizontal)
@@ -322,6 +322,7 @@ struct MainContentView: View {
                             .frame(width: 175, height: 324)
                         }
                     }
+                    .padding(.leading, 6)
                 }
             }
             .padding(.horizontal)

@@ -148,9 +148,19 @@ struct GridSelectionView: View {
         .onAppear {
             DispatchQueue.main.async {
                 print("GridSelectionView appeared")
-                interactor?.fetchVibes() // Fetch vibes when view appears
+                
+                // Reset selected items and moods
+                selectedItems.removeAll()
+                viewModel.moods.removeAll()
+                
+                // Fetch vibes again if necessary
+                interactor?.fetchVibes()
+                
+                // Disable the confirm button initially
+                isConfirmButtonEnabled = false
             }
         }
+
     }
 }
 

@@ -157,7 +157,7 @@ struct AuthorListView: View {
                                         }
                                     ), product: product, mainPromotionInteractor: authorListInteractor)
                                     
-                                        .frame(width: itemWidth, height: itemWidth * 1.85) // 카드의 비율 조정
+                                        .frame(width: itemWidth, height: itemWidth * 1.65) // 카드의 비율 조정
                                         .padding(2)
                                 }
                                 .buttonStyle(PlainButtonStyle())  // 기본 버튼 스타일 제거

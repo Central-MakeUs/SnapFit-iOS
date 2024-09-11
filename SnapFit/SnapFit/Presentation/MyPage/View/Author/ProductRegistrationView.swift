@@ -42,7 +42,8 @@ struct ProductRegistrationView: View {
                 AdditionalCostSection(additionalPriceText: $additionalPriceText, validateForm: validateForm)
                 
                 ReserveButton(
-                    myPageViewModel: myPageViewModel, selectedImageData: $selectedImageData,
+                    myPageViewModel: myPageViewModel,
+                    selectedImageData: $selectedImageData,
                     mypageInteractor: mypageInteractor,
                     selectedMoods: selectedMoods,
                     selectedLocations: selectedLocations,
@@ -55,7 +56,8 @@ struct ProductRegistrationView: View {
                     studio: selectedSnap == "indoor",
                     isUploading: $isUploading,
                     cancellables: $cancellables,
-                    isConfirmButtonEnabled: $isConfirmButtonEnabled
+                    isConfirmButtonEnabled: $isConfirmButtonEnabled,
+                    resetForm: resetForm // Pass the closure here
                 )
             }
         }
@@ -98,6 +100,21 @@ struct ProductRegistrationView: View {
                                  timePriceOptions.allSatisfy { $0.selectedPrice > 0 } &&
                                  (Int(additionalPriceText) ?? 0) >= 0
     }
+    
+    
+    func resetForm() {
+        inputText = ""
+        priceText = ""
+        additionalPriceText = ""
+        isConfirmButtonEnabled = false
+        selectedSnap = "indoor"
+        descriptionText = ""
+        selectedImageData = []
+        selectedMoods = []
+        selectedLocations = []
+        timePriceOptions = []
+    }
+
     
     private struct TitleSection: View {
         @Binding var inputText: String
@@ -450,6 +467,8 @@ struct ProductRegistrationView: View {
         @Binding var cancellables: Set<AnyCancellable>
         @Binding var isConfirmButtonEnabled: Bool
         
+        var resetForm: () -> Void // Accept the closure here
+
         var body: some View {
             Button(action: {
                 if isConfirmButtonEnabled {
@@ -488,6 +507,9 @@ struct ProductRegistrationView: View {
                                 
                                 mypageInteractor?.postProduct(request: MakerUseCases.RequestMakerProduct.productRequest(product: request))
                                 
+                                // Reset form after successful registration
+                                resetForm() // Call the closure here
+                                myPageViewModel.postImages = []
                                 isUploading = false
                             }
                         }
@@ -511,5 +533,7 @@ struct ProductRegistrationView: View {
             .disabled(!isConfirmButtonEnabled || isUploading)
         }
     }
+
+
 }
 
