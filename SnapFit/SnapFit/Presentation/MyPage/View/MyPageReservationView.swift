@@ -49,7 +49,7 @@ struct MyPageReservationView: View {
         }
         .onAppear(perform: {
             // 예약 내역 불러오기
-            mypageInteractor?.fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
+            mypageInteractor?.fetchUserReservations(request: MainPromotionUseCase.LoadMainPromotion.Request(limit: 30, offset: 0))
         })
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

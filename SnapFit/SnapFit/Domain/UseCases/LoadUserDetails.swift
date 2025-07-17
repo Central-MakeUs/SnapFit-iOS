@@ -1,13 +1,14 @@
 //
-//  LoadUserModel.swift
+//  LoadUserDetails.swift
 //  SnapFit
 //
-//  Created by 정정욱 on 8/19/24.
+//  Created by MAC on 7/18/25.
 //
+
 
 import Foundation
 
-enum LoadUserDetails {
+enum LoadUserUseCase {
     struct Request {
         // 요청에 필요한 정보가 있다면 여기에 정의
     }

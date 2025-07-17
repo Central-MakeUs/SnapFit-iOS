@@ -86,11 +86,11 @@ struct CustomTopTabbar: View {
     }
     
     private func fetchProducts(for vibe: String) {
-        authorListInteractor?.fetchProductsFromServerWithFilter(request: MainPromotion.LoadMainPromotion.VibesRequest(vibes: vibe))
+        authorListInteractor?.fetchProductsFromServerWithFilter(request: MainPromotionUseCase.LoadMainPromotion.VibesRequest(vibes: vibe))
     }
     
     private func fetchAllProducts() {
-        authorListInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
+        authorListInteractor?.fetchProductAll(request: MainPromotionUseCase.LoadMainPromotion.Request(limit: 30, offset: 0))
     }
 }
 

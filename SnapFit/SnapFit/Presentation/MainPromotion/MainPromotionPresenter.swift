@@ -11,20 +11,20 @@ protocol MainPromotionPresentationLogic {
     
     
     // MARK: - 사용자 조회관련
-    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response)
+    func presentFetchUserDetailsSuccess(response: LoadUserUseCase.Response)
     func presentFetchUserDetailsFailure(error: ApiError)
     
     
     
     // MARK: - 상품 조회관련
 
-    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response)
+    func presentFetchProductAllSuccess(response : MainPromotionUseCase.LoadMainPromotion.Response)
     func presentFetchProductAllFailure(error: ApiError)
     
-    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
+    func presentFetchPostDetailByIdSuccess(response: MainPromotionUseCase.LoadDetailProduct.Response)
     func presentFetchPostDetailByIdFailure(error: ApiError)
     
-    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse)
+    func presentFetchProductsForMakerSuccess(response: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerResponse)
     func presentFetchProductsForMakerFailure(error: ApiError)
     
     func presentVibes(_ vibes: [Vibe])
@@ -32,18 +32,18 @@ protocol MainPromotionPresentationLogic {
     
     // MARK: - 상품 예약관련
     func presentReservationFailure(error: ApiError)
-    func presentReservationSuccess(response: MainPromotion.ReservationProduct.Response)
+    func presentReservationSuccess(response: MainPromotionUseCase.ReservationProduct.Response)
     
     // 유저 예약 내역 리스트 조회
     func presentFetchUserReservationsFailure(error: ApiError)
-    func presentFetchUserReservationsSuccess(response : MainPromotion.CheckReservationProducts.Response)
+    func presentFetchUserReservationsSuccess(response : MainPromotionUseCase.CheckReservationProducts.Response)
     
     // 유저 예약 내역 리스트 단일 조회
-    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
+    func presentFetchReservationDetailSuccess(response: MainPromotionUseCase.CheckReservationDetailProduct.Response)
     func presentFetchReservationDetailFailure(error: ApiError)
 
     // 유저 예약 내역 취소
-    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response)
+    func presentDeleteReservationSuccess(response: MainPromotionUseCase.DeleteReservationProduct.Response)
     func presentDeleteReservationFailure(error: ApiError)
     
     
@@ -57,8 +57,8 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     
     // MARK: - 사용자 조회 관련
     
-    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response) {
-        let viewModel = LoadUserDetails.ViewModel(userDetails: response.userDetails)
+    func presentFetchUserDetailsSuccess(response: LoadUserUseCase.Response) {
+        let viewModel = LoadUserUseCase.ViewModel(userDetails: response.userDetails)
         // View에 전달
         view?.displayUserDetails(viewModel: viewModel)
 
@@ -70,9 +70,9 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     
     // MARK: - 상품 조회 관련
     
-    func presentFetchProductAllSuccess(response : MainPromotion.LoadMainPromotion.Response) {
+    func presentFetchProductAllSuccess(response : MainPromotionUseCase.LoadMainPromotion.Response) {
         // Response를 ViewModel로 변환
-                let viewModel = MainPromotion.LoadMainPromotion.ViewModel(products: response.products)
+                let viewModel = MainPromotionUseCase.LoadMainPromotion.ViewModel(products: response.products)
                 // View에 전달
                 view?.display(viewModel: viewModel)
     }
@@ -82,8 +82,8 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     }
     
     
-    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response) {
-        let viewModel = MainPromotion.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
+    func presentFetchPostDetailByIdSuccess(response: MainPromotionUseCase.LoadDetailProduct.Response) {
+        let viewModel = MainPromotionUseCase.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
         // View에 전달
         view?.displayDetail(viewModel: viewModel)
     }
@@ -94,8 +94,8 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     
     
     // 작가 등록 상품 조회
-    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse) {
-        let viewModel = MainPromotion.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
+    func presentFetchProductsForMakerSuccess(response: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerResponse) {
+        let viewModel = MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
         view?.displayDetailProductsForMaker(viewModel: viewModel)
     }
     
@@ -106,7 +106,7 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     
     // 분위기 정보를 View에 전달
     func presentVibes(_ vibes: [Vibe]) {
-        let viewModel = MainPromotion.LoadMainPromotion.VibesPresentationViewModel(vibes: vibes)
+        let viewModel = MainPromotionUseCase.LoadMainPromotion.VibesPresentationViewModel(vibes: vibes)
         view?.displayVibes(viewModel: viewModel)
     }
     
@@ -118,9 +118,9 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     
     // MARK: - 상품예약 관련
     
-    func presentReservationSuccess(response: MainPromotion.ReservationProduct.Response) {
+    func presentReservationSuccess(response: MainPromotionUseCase.ReservationProduct.Response) {
         // ViewModel에 예약 성공 여부와 예약 상세 정보를 포함
-        let viewModel = MainPromotion.ReservationProduct.ViewModel(
+        let viewModel = MainPromotionUseCase.ReservationProduct.ViewModel(
             reservationSuccess: response.reservationSuccess,
             reservationDetails: response.reservationDetails // 추가된 예약 상세 정보
         )
@@ -141,16 +141,16 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
         print("Error occurred: \(error)")
     }
 
-    func presentFetchUserReservationsSuccess(response: MainPromotion.CheckReservationProducts.Response) {
+    func presentFetchUserReservationsSuccess(response: MainPromotionUseCase.CheckReservationProducts.Response) {
       
-        let viewModel = MainPromotion.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
+        let viewModel = MainPromotionUseCase.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
         // View에 전달
         view?.displayFetchUserReservation(viewModel: viewModel)
     }
     
     // 유저 예약 내역 리스트 단일 조회
-    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response) {
-        let viewModel = MainPromotion.CheckReservationDetailProduct.ViewModel(reservationDetail: response.reservationDetail)
+    func presentFetchReservationDetailSuccess(response: MainPromotionUseCase.CheckReservationDetailProduct.Response) {
+        let viewModel = MainPromotionUseCase.CheckReservationDetailProduct.ViewModel(reservationDetail: response.reservationDetail)
         // View에 전달
         view?.displayFetchUserReservationDetail(viewModel: viewModel)
     }
@@ -162,8 +162,8 @@ class MainPromotionPresenter: MainPromotionPresentationLogic {
     }
     
     // MARK: - 유저 예약 취소
-    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response) {
-        let viewModel = MainPromotion.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
+    func presentDeleteReservationSuccess(response: MainPromotionUseCase.DeleteReservationProduct.Response) {
+        let viewModel = MainPromotionUseCase.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
         // View에 전달
         view?.displayDeleteUserReservation(viewModel: viewModel)
     }

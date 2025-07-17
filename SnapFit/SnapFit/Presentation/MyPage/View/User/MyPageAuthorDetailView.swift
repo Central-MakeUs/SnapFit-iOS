@@ -123,7 +123,7 @@ struct MyPageAuthorDetailView: View {
     private func fetchProductDetails(productId: Int) async {
         // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
         await myPageInteractor?.fetchPostDetailById(
-            request: MainPromotion.LoadDetailProduct.Request(id: productId)
+            request: MainPromotionUseCase.LoadDetailProduct.Request(id: productId)
         )
         
         // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
@@ -143,7 +143,7 @@ struct MyPageAuthorDetailView: View {
         // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
         if let makerId = myPageViewModel.productDetail?.maker?.id {
             await myPageInteractor?.fetchProductsForMaker(
-                request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
+                request: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerRequest(
                     makerid: makerId,
                     limit: 30,
                     offset: 0
@@ -164,7 +164,7 @@ struct MyPageAuthorDetailView: View {
             return
         }
         
-        let request = MainPromotion.Like.Request(postId: productId)
+        let request = MainPromotionUseCase.Like.Request(postId: productId)
         
         if isLiked {
             interactor.likePost(request: request)

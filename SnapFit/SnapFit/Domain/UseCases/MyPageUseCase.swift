@@ -7,7 +7,7 @@
 //
 import Foundation
 
-enum MyPage {
+enum MyPageUseCase {
     enum LoadMyPage {
         struct Request {}
         

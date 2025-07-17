@@ -19,15 +19,15 @@ protocol MyPageBusinessLogic {
     func cancelmembership()
     
     // MARK: - 상품 예약관련
-    func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request)
-    func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request)
-    func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request)
+    func fetchUserReservations(request: MainPromotionUseCase.LoadMainPromotion.Request)
+    func fetchReservationDetail(request: MainPromotionUseCase.CheckReservationDetailProduct.Request)
+    func deleteReservation(request: MainPromotionUseCase.DeleteReservationProduct.Request)
     
     // 상품 찜하기, 취소
-    func likePost(request: MainPromotion.Like.Request)
-    func unlikePost(request: MainPromotion.Like.Request)
-    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request)
-    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest)
+    func likePost(request: MainPromotionUseCase.Like.Request)
+    func unlikePost(request: MainPromotionUseCase.Like.Request)
+    func fetchPostDetailById(request: MainPromotionUseCase.LoadDetailProduct.Request)
+    func fetchProductsForMaker(request: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerRequest)
     
     // MARK: - 메이커 관련
     func fetchMakerPosts(request: MakerUseCases.LoadProducts.ProductsForMakerRequest)
@@ -35,7 +35,7 @@ protocol MyPageBusinessLogic {
     func fetchLocations()
     func getImages(request: MakerUseCases.RequestMakerImage.ImageURLRequest)
     func postProduct(request: MakerUseCases.RequestMakerProduct.productRequest)
-    func fetchUserLikes(request: MainPromotion.Like.LikeListRequest)
+    func fetchUserLikes(request: MainPromotionUseCase.Like.LikeListRequest)
     func fetchMakerReservations(request: MakerUseCases.LoadReservation.Request)
 }
 
@@ -46,8 +46,8 @@ final class MyPageInteractor: MyPageBusinessLogic {
 
     
     
-    typealias Request = MyPage.LoadMyPage.Request
-    typealias Response = MyPage.LoadMyPage.Response
+    typealias Request = MyPageUseCase.LoadMyPage.Request
+    typealias Response = MyPageUseCase.LoadMyPage.Response
     var presenter: MyPagePresentationLogic?
     
     private let myPageWorker: MyPageWorkingLogic
@@ -73,7 +73,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
             } receiveValue: { [weak self] userDetails in
                 print("사용자 정보 조회 성공")
                 // Response 객체 생성
-                let response = LoadUserDetails.Response(userDetails: userDetails)
+                let response = LoadUserUseCase.Response(userDetails: userDetails)
                 // Presenter에 전달
                 self?.presenter?.presentFetchUserDetailsSuccess(response: response)
             }
@@ -97,7 +97,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] likeCountResponse, reservationCountResponse in
                 // CombinedResponse 객체 생성
-                let response = LoadUserDetails.CountResponse(userCount: UserCountCombinedResponse(
+                let response = LoadUserUseCase.CountResponse(userCount: UserCountCombinedResponse(
                     likeCount: likeCountResponse.count,
                     reservationCount: reservationCountResponse.count
                 ))
@@ -177,7 +177,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     // 유저 예약내역 리스트
-    func fetchUserReservations(request: MainPromotion.LoadMainPromotion.Request) {
+    func fetchUserReservations(request: MainPromotionUseCase.LoadMainPromotion.Request) {
         myPageWorker.fetchUserReservations(limit: request.limit, offset: request.offset)
             .sink { [weak self] completion in
                 switch completion {
@@ -189,14 +189,14 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] products in
                 print("유저 예약 내역 로드 성공: \(products)")
-                let response = MainPromotion.CheckReservationProducts.Response(reservationSuccess: true, reservationProducts: products)
+                let response = MainPromotionUseCase.CheckReservationProducts.Response(reservationSuccess: true, reservationProducts: products)
                 self?.presenter?.presentFetchUserReservationsSuccess(response: response)
             }
             .store(in: &cancellables)
     }
     
     // 유저 찜 리스트
-    func fetchUserLikes(request: MainPromotion.Like.LikeListRequest) {
+    func fetchUserLikes(request: MainPromotionUseCase.Like.LikeListRequest) {
         myPageWorker.fetchUserLikes(limit: request.limit, offset: request.offset)
             .sink { [weak self] completion in
                 switch completion {
@@ -208,14 +208,14 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] products in
                 print("유저 찜 내역 로드 성공: \(products)")
-                let response = MainPromotion.Like.LikeListResponse(likeProducts: products)
+                let response = MainPromotionUseCase.Like.LikeListResponse(likeProducts: products)
                 self?.presenter?.presentFetchUserLikesSuccess(response: response)
             }
             .store(in: &cancellables)
     }
     
     // 찜 상품 보기
-    func fetchPostDetailById(request: MainPromotion.LoadDetailProduct.Request) {
+    func fetchPostDetailById(request: MainPromotionUseCase.LoadDetailProduct.Request) {
         myPageWorker.fetchPostDetailById(postId: request.id)
             .sink { [weak self] completion in
                 switch completion {
@@ -228,14 +228,14 @@ final class MyPageInteractor: MyPageBusinessLogic {
             } receiveValue: { [weak self] productDetail in
                 print("상품 조회 성공")
                 // Response 객체 생성
-                let response = MainPromotion.LoadDetailProduct.Response(productDetail: productDetail)
+                let response = MainPromotionUseCase.LoadDetailProduct.Response(productDetail: productDetail)
                 // Presenter에 전달
                 self?.presenter?.presentFetchPostDetailByIdSuccess(response: response)
             }
             .store(in: &cancellables) // cancellables는 클래스 내에서 선언된 Set<AnyCancellable>
     }
     
-    func fetchProductsForMaker(request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest) {
+    func fetchProductsForMaker(request: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerRequest) {
         myPageWorker.fetchProductsForMaker(userId: request.makerid, limit: request.limit, offset: request.offset)
             .sink { [weak self] completion in
                 switch completion {
@@ -248,7 +248,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
             } receiveValue: { [weak self] products in
                 print("작가 등록한 상품 조회 성공")
                 // Response 객체 생성
-                let response = MainPromotion.LoadDetailProduct.ProductsForMakerResponse(products: products)
+                let response = MainPromotionUseCase.LoadDetailProduct.ProductsForMakerResponse(products: products)
                 // Presenter에 전달
                 self?.presenter?.presentFetchProductsForMakerSuccess(response: response)
             }
@@ -258,7 +258,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     
     
     // 상세내역 조회
-    func fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request) {
+    func fetchReservationDetail(request: MainPromotionUseCase.CheckReservationDetailProduct.Request) {
         myPageWorker.fetchReservationDetail(id: request.selectedReservationId)
             .sink { [weak self] completion in
                 switch completion {
@@ -270,7 +270,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] product in
                 print("예약 상세내역 조회 성공 : \(product)")
-                let response = MainPromotion.CheckReservationDetailProduct.Response(reservationDetail: product)
+                let response = MainPromotionUseCase.CheckReservationDetailProduct.Response(reservationDetail: product)
                 self?.presenter?.presentFetchReservationDetailSuccess(response: response)
             }
             .store(in: &cancellables)
@@ -278,7 +278,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     // 예약 내역 취소
-    func deleteReservation(request: MainPromotion.DeleteReservationProduct.Request) {
+    func deleteReservation(request: MainPromotionUseCase.DeleteReservationProduct.Request) {
         myPageWorker.deleteReservation(id: request.selectedReservationId, message: request.message)
             .sink { [weak self] completion in
                 switch completion {
@@ -290,14 +290,14 @@ final class MyPageInteractor: MyPageBusinessLogic {
                 }
             } receiveValue: { [weak self] success in
                 print("예약 상세내역 조회 성공 : \(success)")
-                let response = MainPromotion.DeleteReservationProduct.Response(deleteReservationSuccess: success)
+                let response = MainPromotionUseCase.DeleteReservationProduct.Response(deleteReservationSuccess: success)
                 self?.presenter?.presentDeleteReservationSuccess(response: response)
             }
             .store(in: &cancellables)
     }
     
     // 좋아요 요청
-    func likePost(request: MainPromotion.Like.Request) {
+    func likePost(request: MainPromotionUseCase.Like.Request) {
         myPageWorker.likePost(postId: request.postId)
             .sink { [weak self] completion in
                 switch completion {
@@ -315,7 +315,7 @@ final class MyPageInteractor: MyPageBusinessLogic {
     }
     
     // 좋아요 취소 요청
-    func unlikePost(request: MainPromotion.Like.Request) {
+    func unlikePost(request: MainPromotionUseCase.Like.Request) {
         myPageWorker.unlikePost(postId: request.postId)
             .sink { [weak self] completion in
                 switch completion {

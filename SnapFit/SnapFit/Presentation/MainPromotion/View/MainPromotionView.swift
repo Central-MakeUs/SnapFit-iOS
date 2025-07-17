@@ -10,33 +10,33 @@ protocol MainPromotionDisplayLogic {
     
     
     // MARK: - 사용자 조회관련
-    func displayUserDetails(viewModel: LoadUserDetails.ViewModel)
+    func displayUserDetails(viewModel: LoadUserUseCase.ViewModel)
     
     
     // MARK: - 상품 조회관련
-    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
-    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
+    func display(viewModel: MainPromotionUseCase.LoadMainPromotion.ViewModel) // 유즈케이스 수정필요
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel) // 유즈케이스 수정필요
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel)
+    func displayVibes(viewModel: MainPromotionUseCase.LoadMainPromotion.VibesPresentationViewModel)
     
     // MARK: - 상품 예약관련
-    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel)
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
+    func displayReservationSuccess(viewModel: MainPromotionUseCase.ReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel)
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel)
     
 }
 
 extension MainPromotionView: MainPromotionDisplayLogic {
     
-    func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
+    func displayUserDetails(viewModel: LoadUserUseCase.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.userDetails = viewModel.userDetails
             print("mainPromotionViewModel.userDetails \( mainPromotionViewModel.userDetails)")
         }
     }
 
-    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
+    func display(viewModel: MainPromotionUseCase.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.products = viewModel.products.data
             print("viewModel.products.data \(viewModel.products.data)")
@@ -45,28 +45,28 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     }
     
     // 상품 들어가고 나서 보여지는 정보
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetail = viewModel.productDetail
             //print("mainPromotionViewModel.productDetail \( mainPromotionViewModel.productDetail)")
         }
     }
     
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.productDetailAuthorProducts = viewModel.products.data
             print("작가가 등록한 상품 \( mainPromotionViewModel.productDetailAuthorProducts)")
         }
     }
     
-    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {
+    func displayVibes(viewModel: MainPromotionUseCase.LoadMainPromotion.VibesPresentationViewModel) {
         print()
     }
     
     // MARK: - 상품 예약관련
     
     // 예약이후 예약성공 상세화면에 값 전달
-    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel) {
+    func displayReservationSuccess(viewModel: MainPromotionUseCase.ReservationProduct.ViewModel) {
         DispatchQueue.main.async {
             self.mainPromotionViewModel.reservationSuccess = viewModel.reservationSuccess
             self.mainPromotionViewModel.reservationDetails = viewModel.reservationDetails
@@ -77,7 +77,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     
     
     // 유저 예약내역 리스트 조회
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화 후 id로 정렬
             mainPromotionViewModel.reservationproducts = (viewModel.reservationProducts?.data ?? []).sorted(by: {
@@ -91,7 +91,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
 
     
     
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
             mainPromotionViewModel.reservationproductDetail = viewModel.reservationDetail
@@ -102,7 +102,7 @@ extension MainPromotionView: MainPromotionDisplayLogic {
     }
     
     // 유저 예약 삭제
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel) {
         DispatchQueue.main.async {
             mainPromotionViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
             print("mainPromotionViewModel.deleteReservationSuccess \(mainPromotionViewModel.deleteReservationSuccess)")
@@ -225,7 +225,7 @@ struct MainPromotionView: View {
     func performDataFetch() {
         DispatchQueue.main.async {
             mainPromotionInteractor?.fetchUserDetails()
-            mainPromotionInteractor?.fetchProductAll(request: MainPromotion.LoadMainPromotion.Request(limit: 30, offset: 0))
+            mainPromotionInteractor?.fetchProductAll(request: MainPromotionUseCase.LoadMainPromotion.Request(limit: 30, offset: 0))
             mainPromotionViewModel.resetAllDetails() // 예약하고 돌아온 사용자 데이터 초기화
             if stack.isEmpty {
                 stack = NavigationPath()

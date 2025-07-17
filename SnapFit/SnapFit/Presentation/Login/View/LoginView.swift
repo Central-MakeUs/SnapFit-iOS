@@ -3,8 +3,8 @@ import _AuthenticationServices_SwiftUI
 
 // View가 Presenter로부터 받는 정보를 정의하는 프로토콜
 protocol LoginDisplayLogic {
-    func display(viewModel: Login.LoadLogin.LoginPresentationViewModel)
-    func displayVibes(viewModel: Login.LoadLogin.VibesPresentationViewModel)
+    func display(viewModel: LoginUseCase.LoadLogin.LoginPresentationViewModel)
+    func displayVibes(viewModel: LoginUseCase.LoadLogin.VibesPresentationViewModel)
 }
 
 // 로그인 화면을 정의하는 View
@@ -16,7 +16,7 @@ struct LoginView: View, LoginDisplayLogic {
     
     var interactor: LoginBusinessLogic?
 
-    func display(viewModel: Login.LoadLogin.LoginPresentationViewModel) {
+    func display(viewModel: LoginUseCase.LoadLogin.LoginPresentationViewModel) {
         
         // 함수로 나눠자, 뷰모델로 빼던지
         DispatchQueue.main.async {
@@ -58,7 +58,7 @@ struct LoginView: View, LoginDisplayLogic {
         
     }
 
-    func displayVibes(viewModel: Login.LoadLogin.VibesPresentationViewModel) {
+    func displayVibes(viewModel: LoginUseCase.LoadLogin.VibesPresentationViewModel) {
         DispatchQueue.main.async {
             self.loginviewModel.vibes = viewModel.vibes
         }

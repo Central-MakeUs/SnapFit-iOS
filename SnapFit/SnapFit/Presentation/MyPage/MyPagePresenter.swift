@@ -10,13 +10,13 @@ import Foundation
 protocol MyPagePresentationLogic {
     
     // MARK: - 사용자 조회 관련
-    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response)
+    func presentFetchUserDetailsSuccess(response: LoadUserUseCase.Response)
     func presentFetchUserDetailsFailure(error: ApiError)
     
-    func presentFetchCountsSuccess(response: LoadUserDetails.CountResponse)
+    func presentFetchCountsSuccess(response: LoadUserUseCase.CountResponse)
     func presentFetchCountsFailure(error: ApiError)
         
-    func present(response: MyPage.LoadMyPage.Response)
+    func present(response: MyPageUseCase.LoadMyPage.Response)
     func presentLogoutFailure(error: ApiError)
     func presentLogoutSuccess()
     
@@ -28,25 +28,25 @@ protocol MyPagePresentationLogic {
     
     // 유저 예약 내역 리스트 조회
     func presentFetchUserReservationsFailure(error: ApiError)
-    func presentFetchUserReservationsSuccess(response : MainPromotion.CheckReservationProducts.Response)
+    func presentFetchUserReservationsSuccess(response : MainPromotionUseCase.CheckReservationProducts.Response)
     
     // 유저 예약 내역 리스트 단일 조회
-    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response)
+    func presentFetchReservationDetailSuccess(response: MainPromotionUseCase.CheckReservationDetailProduct.Response)
     func presentFetchReservationDetailFailure(error: ApiError)
     
     // 유저 예약 내역 취소
-    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response)
+    func presentDeleteReservationSuccess(response: MainPromotionUseCase.DeleteReservationProduct.Response)
     func presentDeleteReservationFailure(error: ApiError)
     
     // 유저 찜 내역 리스트 조회
     func presentFetchUserLikesFailure(error: ApiError)
-    func presentFetchUserLikesSuccess(response: MainPromotion.Like.LikeListResponse)
+    func presentFetchUserLikesSuccess(response: MainPromotionUseCase.Like.LikeListResponse)
     
     // 유저 찜한 상품 보기
-    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response)
+    func presentFetchPostDetailByIdSuccess(response: MainPromotionUseCase.LoadDetailProduct.Response)
     func presentFetchPostDetailByIdFailure(error: ApiError)
     
-    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse)
+    func presentFetchProductsForMakerSuccess(response: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerResponse)
     func presentFetchProductsForMakerFailure(error: ApiError)
     
     
@@ -71,8 +71,8 @@ protocol MyPagePresentationLogic {
 }
 
 final class MyPagePresenter {
-    typealias Response = MyPage.LoadMyPage.Response
-    typealias ViewModel = MyPage.LoadMyPage.ViewModel
+    typealias Response = MyPageUseCase.LoadMyPage.Response
+    typealias ViewModel = MyPageUseCase.LoadMyPage.ViewModel
     var view: MyPageDisplayLogic?
 }
 
@@ -82,7 +82,7 @@ extension MyPagePresenter: MyPagePresentationLogic {
    
     // 사용자 탈퇴후 로그인뷰 보이게
     func presentCancelMembershipSuccess() {
-        let viewModel = MyPage.LoadMyPage.ViewModel(logOut: true)
+        let viewModel = MyPageUseCase.LoadMyPage.ViewModel(logOut: true)
         view?.display(viewModel: viewModel)
     }
     
@@ -93,8 +93,8 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     // MARK: - 사용자 조회 관련
     
-    func presentFetchUserDetailsSuccess(response: LoadUserDetails.Response) {
-        let viewModel = LoadUserDetails.ViewModel(userDetails: response.userDetails)
+    func presentFetchUserDetailsSuccess(response: LoadUserUseCase.Response) {
+        let viewModel = LoadUserUseCase.ViewModel(userDetails: response.userDetails)
         // View에 전달
         view?.displayUserDetails(viewModel: viewModel)
 
@@ -106,9 +106,9 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     
     // 카운트 관련
-    func presentFetchCountsSuccess(response: LoadUserDetails.CountResponse) {
+    func presentFetchCountsSuccess(response: LoadUserUseCase.CountResponse) {
         // CombineResponse의 데이터를 뷰에 전달
-        let viewModel = LoadUserDetails.CountViewModel(userCount: response.userCount)
+        let viewModel = LoadUserUseCase.CountViewModel(userCount: response.userCount)
         view?.displayCounts(viewModel: viewModel)
     }
     
@@ -120,7 +120,7 @@ extension MyPagePresenter: MyPagePresentationLogic {
     func presentLogoutSuccess() {
         
         print("로그아웃 성공")
-        let viewModel = MyPage.LoadMyPage.ViewModel(logOut: true)
+        let viewModel = MyPageUseCase.LoadMyPage.ViewModel(logOut: true)
         view?.display(viewModel: viewModel)
     }
     
@@ -137,9 +137,9 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("Error occurred: \(error)")
     }
 
-    func presentFetchUserReservationsSuccess(response: MainPromotion.CheckReservationProducts.Response) {
+    func presentFetchUserReservationsSuccess(response: MainPromotionUseCase.CheckReservationProducts.Response) {
       
-        let viewModel = MainPromotion.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
+        let viewModel = MainPromotionUseCase.CheckReservationProducts.ViewModel(reservationSuccess: response.reservationSuccess, reservationProducts: response.reservationProducts)
         // View에 전달
         view?.displayFetchUserReservation(viewModel: viewModel)
     }
@@ -147,8 +147,8 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     
     // MARK: - 유저 예약 취소
-    func presentDeleteReservationSuccess(response: MainPromotion.DeleteReservationProduct.Response) {
-        let viewModel = MainPromotion.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
+    func presentDeleteReservationSuccess(response: MainPromotionUseCase.DeleteReservationProduct.Response) {
+        let viewModel = MainPromotionUseCase.DeleteReservationProduct.ViewModel(deleteReservationSuccess: response.deleteReservationSuccess)
         // View에 전달
         view?.displayDeleteUserReservation(viewModel: viewModel)
     }
@@ -164,16 +164,16 @@ extension MyPagePresenter: MyPagePresentationLogic {
         print("Error occurred: \(error)")
     }
 
-    func presentFetchUserLikesSuccess(response: MainPromotion.Like.LikeListResponse) {
+    func presentFetchUserLikesSuccess(response: MainPromotionUseCase.Like.LikeListResponse) {
       
-        let viewModel = MainPromotion.Like.LikeListViewModel(likeProducts: response.likeProducts)
+        let viewModel = MainPromotionUseCase.Like.LikeListViewModel(likeProducts: response.likeProducts)
         // View에 전달
         view?.displayFetchUserLikeProduct(viewModel: viewModel)
     }
     
     
-    func presentFetchPostDetailByIdSuccess(response: MainPromotion.LoadDetailProduct.Response) {
-        let viewModel = MainPromotion.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
+    func presentFetchPostDetailByIdSuccess(response: MainPromotionUseCase.LoadDetailProduct.Response) {
+        let viewModel = MainPromotionUseCase.LoadDetailProduct.ViewModel(productDetail: response.productDetail)
         // View에 전달
         view?.displayDetail(viewModel: viewModel)
     }
@@ -184,8 +184,8 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     
     
-    func presentFetchProductsForMakerSuccess(response: MainPromotion.LoadDetailProduct.ProductsForMakerResponse) {
-        let viewModel = MainPromotion.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
+    func presentFetchProductsForMakerSuccess(response: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerResponse) {
+        let viewModel = MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel(products: response.products)
         view?.displayDetailProductsForMaker(viewModel: viewModel)
     }
     
@@ -195,8 +195,8 @@ extension MyPagePresenter: MyPagePresentationLogic {
     
     
     // 유저 예약 내역 리스트 단일 조회
-    func presentFetchReservationDetailSuccess(response: MainPromotion.CheckReservationDetailProduct.Response) {
-        let viewModel = MainPromotion.CheckReservationDetailProduct.ViewModel(reservationDetail: response.reservationDetail)
+    func presentFetchReservationDetailSuccess(response: MainPromotionUseCase.CheckReservationDetailProduct.Response) {
+        let viewModel = MainPromotionUseCase.CheckReservationDetailProduct.ViewModel(reservationDetail: response.reservationDetail)
         // View에 전달
         view?.displayFetchUserReservationDetail(viewModel: viewModel)
     }

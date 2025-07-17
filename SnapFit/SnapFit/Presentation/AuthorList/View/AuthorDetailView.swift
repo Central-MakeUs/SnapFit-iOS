@@ -13,7 +13,7 @@ struct AuthorDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
-    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
+    var productInteractor: ProductUseCase? // 공통 프로토콜 타입으로 변경
     
     @Binding var stack: NavigationPath
     @State private var isShowingMailView = false
@@ -147,7 +147,7 @@ struct AuthorDetailView: View {
     private func fetchProductDetails(productId: Int) async {
         // 첫 번째 API 호출: 제품 상세 정보를 가져옵니다.
         await productInteractor?.fetchPostDetailById(
-            request: MainPromotion.LoadDetailProduct.Request(id: productId)
+            request: MainPromotionUseCase.LoadDetailProduct.Request(id: productId)
         )
         
         // 제품 상세 정보가 로드될 때까지 대기하되, 최대 5초 대기 (타임아웃 메커니즘 추가)
@@ -167,7 +167,7 @@ struct AuthorDetailView: View {
         // 두 번째 API 호출: Maker의 제품 목록을 가져옵니다.
         if let makerId = mainPromotionViewModel.productDetail?.maker?.id {
             await productInteractor?.fetchProductsForMaker(
-                request: MainPromotion.LoadDetailProduct.ProductsForMakerRequest(
+                request: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerRequest(
                     makerid: makerId,
                     limit: 30,
                     offset: 0
@@ -188,7 +188,7 @@ struct AuthorDetailView: View {
             return
         }
         
-        let request = MainPromotion.Like.Request(postId: productId)
+        let request = MainPromotionUseCase.Like.Request(postId: productId)
         
         if isLiked {
             interactor.likePost(request: request)
@@ -199,7 +199,7 @@ struct AuthorDetailView: View {
 }
 // 주요 콘텐츠 뷰
 struct MainContentView: View {
-    var productInteractor: ProductBusinessLogic? // 공통 프로토콜 타입으로 변경
+    var productInteractor: ProductUseCase? // 공통 프로토콜 타입으로 변경
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
     let productDetail: PostDetailResponse
     let layout: [GridItem] = [GridItem(.flexible())]

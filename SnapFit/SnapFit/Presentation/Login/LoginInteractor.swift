@@ -9,7 +9,7 @@ protocol LoginBusinessLogic {
     func loginWithKakao()  // 카카오 로그인 처리
     func loginWithApple(request: ASAuthorizationAppleIDRequest)  // 애플 로그인 처리
     func completeAppleLogin(result: Result<ASAuthorization, Error>)  // 애플 로그인 완료 처리
-    func registerUser(request: Login.LoadLogin.Request)  // 사용자 등록
+    func registerUser(request: LoginUseCase.LoadLogin.Request)  // 사용자 등록
     func fetchVibes()  // 분위기 정보 가져오기
 }
 
@@ -84,7 +84,7 @@ class LoginInteractor: LoginBusinessLogic {
     }
     
     // 사용자 등록 처리
-    func registerUser(request: Login.LoadLogin.Request) {
+    func registerUser(request: LoginUseCase.LoadLogin.Request) {
         authWorker.registerUser(request: request)
             .sink(receiveCompletion: { completion in
                 switch completion {

@@ -8,7 +8,7 @@
 import Foundation
 
 
-enum MainPromotion {
+enum MainPromotionUseCase {
     enum LoadMainPromotion {
         
         struct Request {

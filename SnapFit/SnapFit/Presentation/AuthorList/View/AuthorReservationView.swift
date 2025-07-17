@@ -21,7 +21,7 @@ struct AuthorReservationView: View {
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
-    var productInteractor: ProductBusinessLogic?
+    var productInteractor: ProductUseCase?
     @Binding var stack: NavigationPath
     
     private let horizontalPadding: CGFloat = 16
@@ -365,7 +365,7 @@ struct PhoneSection: View {
 
 struct SubmitButton: View {
     @Binding var stack: NavigationPath
-    var productInteractor: ProductBusinessLogic?
+    var productInteractor: ProductUseCase?
     let isFormComplete: Bool
     @ObservedObject var mainPromotionViewModel: MainPromotionViewModel
 
@@ -397,7 +397,7 @@ struct SubmitButton: View {
         
         // 예약 요청을 서버에 보내기
         if let reservationRequest = mainPromotionViewModel.reservationRequest {
-            productInteractor?.makeReservation(request: MainPromotion.ReservationProduct.Request(reservationRequest: reservationRequest))
+            productInteractor?.makeReservation(request: MainPromotionUseCase.ReservationProduct.Request(reservationRequest: reservationRequest))
             isSubmitting = false // 요청 후 상태를 리셋
         }
     }

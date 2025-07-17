@@ -121,7 +121,7 @@ struct MyPageReservationInfoView: View {
             .onAppear {
                 // 상품 상세 조회
                 if let selectedId = myPageViewModel.selectedReservationId {
-                    mypageInteractor?.fetchReservationDetail(request: MainPromotion.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
+                    mypageInteractor?.fetchReservationDetail(request: MainPromotionUseCase.CheckReservationDetailProduct.Request(selectedReservationId: selectedId))
                 }
             }
             .padding(.bottom, 20)
@@ -137,7 +137,7 @@ struct MyPageReservationInfoView: View {
                     // 취소 이유를 받아서 메시지로 전송
                     cancelMessage = reason
                     if let selectedId = myPageViewModel.selectedReservationId {
-                        mypageInteractor?.deleteReservation(request: MainPromotion.DeleteReservationProduct.Request(selectedReservationId: selectedId, message: cancelMessage))
+                        mypageInteractor?.deleteReservation(request: MainPromotionUseCase.DeleteReservationProduct.Request(selectedReservationId: selectedId, message: cancelMessage))
                         showAlert = true // 알림 표시
                     }
                 }

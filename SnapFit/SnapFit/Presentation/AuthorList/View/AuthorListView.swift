@@ -10,22 +10,22 @@ import SwiftUI
 
 // View가 Presenter로부터 받는 정보를 정의하는 프로토콜
 protocol AuthorListDisplayLogic {
-    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel)
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
-    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel)
+    func display(viewModel: MainPromotionUseCase.LoadMainPromotion.ViewModel)
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel)
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel)
+    func displayVibes(viewModel: MainPromotionUseCase.LoadMainPromotion.VibesPresentationViewModel)
     
     
     // MARK: - 상품 예약관련
-    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel)
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel)
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
+    func displayReservationSuccess(viewModel: MainPromotionUseCase.ReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel)
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel)
 }
 
 extension AuthorListView: AuthorListDisplayLogic {
     
-    func display(viewModel: MainPromotion.LoadMainPromotion.ViewModel) {
+    func display(viewModel: MainPromotionUseCase.LoadMainPromotion.ViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.products = viewModel.products.data
             //print("viewModel.products.data \(viewModel.products.data)")
@@ -33,14 +33,14 @@ extension AuthorListView: AuthorListDisplayLogic {
         }
     }
     
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.productDetail = viewModel.productDetail
             //print("authorListViewModel.productDetail \( authorListViewModel.productDetail)")
         }
     }
     
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.productDetailAuthorProducts = viewModel.products.data
             //print("authorListViewModel.productDetailAuthorProducts \( authorListViewModel.productDetailAuthorProducts)")
@@ -49,7 +49,7 @@ extension AuthorListView: AuthorListDisplayLogic {
     
     
     // Presenter가 제공한 분위기 ViewModel을 기반으로 UI 업데이트
-    func displayVibes(viewModel: MainPromotion.LoadMainPromotion.VibesPresentationViewModel) {
+    func displayVibes(viewModel: MainPromotionUseCase.LoadMainPromotion.VibesPresentationViewModel) {
         DispatchQueue.main.async {
             // 분위기 상태 업데이트
             self.authorListViewModel.vibes = viewModel.vibes
@@ -61,7 +61,7 @@ extension AuthorListView: AuthorListDisplayLogic {
     // MARK: - 상품 예약관련
     
     // 예약이후 예약성공 상세화면에 값 전달
-    func displayReservationSuccess(viewModel: MainPromotion.ReservationProduct.ViewModel) {
+    func displayReservationSuccess(viewModel: MainPromotionUseCase.ReservationProduct.ViewModel) {
         DispatchQueue.main.async {
             self.authorListViewModel.reservationSuccess = viewModel.reservationSuccess
             self.authorListViewModel.reservationDetails = viewModel.reservationDetails
@@ -72,7 +72,7 @@ extension AuthorListView: AuthorListDisplayLogic {
     
     
     // 유저 예약내역 리스트 조회
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
             authorListViewModel.reservationproducts = viewModel.reservationProducts?.data ?? []
@@ -83,7 +83,7 @@ extension AuthorListView: AuthorListDisplayLogic {
     }
     
     // 유저 예약내역 단일 조회
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
             authorListViewModel.reservationproductDetail = viewModel.reservationDetail
@@ -94,7 +94,7 @@ extension AuthorListView: AuthorListDisplayLogic {
     }
     
     // 유저 예약 삭제
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel) {
         DispatchQueue.main.async {
             authorListViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
             print("authorListViewModel.deleteReservationSuccess \(authorListViewModel.deleteReservationSuccess)")

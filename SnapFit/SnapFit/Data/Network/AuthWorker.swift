@@ -27,7 +27,7 @@ protocol AuthWorkingLogic {
     
     // 회원 가입
     func fetchVibes() -> AnyPublisher<Vibes, ApiError>
-    func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
+    func registerUser(request: LoginUseCase.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError>
     
     // 로그아웃, 탈퇴
     func logoutFromKakao(completion: @escaping (Result<Void, Error>) -> Void)
@@ -71,7 +71,7 @@ class AuthWorker: AuthWorkingLogic {
     }
     
     // MARK: - 스냅핏 서버에 사용자 등록 요청
-    func registerUser(request: Login.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
+    func registerUser(request: LoginUseCase.LoadLogin.Request) -> AnyPublisher<Tokens, ApiError> {
         let urlString = AuthWorker.baseURL + "/user"
         
         guard let url = URL(string: urlString) else {

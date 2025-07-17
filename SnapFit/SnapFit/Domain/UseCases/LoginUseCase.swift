@@ -8,7 +8,7 @@
 import Foundation
 
 //use case 정의 - 로그인
-enum Login {
+enum LoginUseCase {
     enum LoadLogin {
         struct Request {
             let social: String

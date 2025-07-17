@@ -39,7 +39,7 @@ class LoginPresenter: LoginPresentationLogic {
     // 이미 등록된 사용자를 View에 전달
     func presentAlreadyregisteredusers(socialLoginType: String, oauthToken: String?, error: Error?) {
         // ViewModel을 생성하여 View에 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
             socialAccessToken: nil,
@@ -52,7 +52,7 @@ class LoginPresenter: LoginPresentationLogic {
     // 소셜 로그인 성공
     func presentSocialLoginSuccess(socialLoginType: String, accessToken: String, oauthToken: String?) {
         // ViewModel을 생성하여 View에 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
             socialAccessToken: accessToken,
@@ -64,7 +64,7 @@ class LoginPresenter: LoginPresentationLogic {
     // 로그인 실패를 View에 전달
     func presentSocialLoginFailure(_ error: Error, socialLoginType: String, accessToken: String) {
         
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: "",
             socialAccessToken: accessToken,
@@ -76,7 +76,7 @@ class LoginPresenter: LoginPresentationLogic {
     // 소셜 회원가입 성공을 View에 전달
     func presentSocialregisterSuccess(socialLoginType: String, accessToken: String, oauthToken: String?) {
         // ViewModel을 생성하여 View에 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
             socialAccessToken: accessToken,
@@ -89,7 +89,7 @@ class LoginPresenter: LoginPresentationLogic {
     func presentSocialregisterFailure(_ error: Error, socialLoginType: String, accessToken: String, oauthToken: String?) {
         print("회원가입 실패 \(error)")
         // ViewModel을 생성하여 View에 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: socialLoginType,
             oauthToken: oauthToken,
             socialAccessToken: accessToken,
@@ -101,7 +101,7 @@ class LoginPresenter: LoginPresentationLogic {
     // 카카오 로그인 실패를 View에 전달
     func presentKakaoLoginFailure(_ loginState: Bool, accessToken: String) {
         // ViewModel을 생성하여 View에 전달
-        let viewModel = Login.LoadLogin.LoginPresentationViewModel(
+        let viewModel = LoginUseCase.LoadLogin.LoginPresentationViewModel(
             socialLoginType: "kakao",
             oauthToken: accessToken,
             socialAccessToken: nil,
@@ -112,7 +112,7 @@ class LoginPresenter: LoginPresentationLogic {
     
     // 분위기 정보를 View에 전달
     func presentVibes(_ vibes: [Vibe]) {
-        let viewModel = Login.LoadLogin.VibesPresentationViewModel(vibes: vibes)
+        let viewModel = LoginUseCase.LoadLogin.VibesPresentationViewModel(vibes: vibes)
         view?.displayVibes(viewModel: viewModel)
     }
     

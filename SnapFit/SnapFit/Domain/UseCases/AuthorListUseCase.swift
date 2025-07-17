@@ -7,7 +7,7 @@
 //
 import Foundation
 
-enum AuthorList {
+enum AuthorListUseCase {
     enum LoadAuthorList {
         struct Request {}
         

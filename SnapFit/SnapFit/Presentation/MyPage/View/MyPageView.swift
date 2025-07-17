@@ -7,14 +7,14 @@ protocol MyPageDisplayLogic {
     
     
     // MARK: - 사용자 조회관련
-    func displayUserDetails(viewModel: LoadUserDetails.ViewModel)
-    func displayCounts(viewModel: LoadUserDetails.CountViewModel)
-    func display(viewModel: MyPage.LoadMyPage.ViewModel)
+    func displayUserDetails(viewModel: LoadUserUseCase.ViewModel)
+    func displayCounts(viewModel: LoadUserUseCase.CountViewModel)
+    func display(viewModel: MyPageUseCase.LoadMyPage.ViewModel)
     
     // MARK: - 상품 예약관련
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel)
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) 
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel)
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel)
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel) 
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel)
 
    
     // MARK: - 메이커 관련
@@ -24,9 +24,9 @@ protocol MyPageDisplayLogic {
     func displayPostImages(viewModel: MakerUseCases.RequestMakerImage.ImageURLViewModel)
  
     // 좋아요
-    func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel)
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel)
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel)
+    func displayFetchUserLikeProduct(viewModel: MainPromotionUseCase.Like.LikeListViewModel)
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel)
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel)
     func displayFetchMakerReservations(viewModel: MakerUseCases.LoadReservation.ViewModel)
 }
 
@@ -36,14 +36,14 @@ extension MyPageView: MyPageDisplayLogic {
     
 
     
-    func displayUserDetails(viewModel: LoadUserDetails.ViewModel) {
+    func displayUserDetails(viewModel: LoadUserUseCase.ViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.userDetails = viewModel.userDetails
             print("myPageViewModel.userDetails \( myPageViewModel.userDetails)")
         }
     }
 
-    func displayCounts(viewModel: LoadUserDetails.CountViewModel) {
+    func displayCounts(viewModel: LoadUserUseCase.CountViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.userCounts = viewModel.userCount
             print("myPageViewModel.userCount \( myPageViewModel.userCounts)")
@@ -51,7 +51,7 @@ extension MyPageView: MyPageDisplayLogic {
     }
     
     
-    func display(viewModel: MyPage.LoadMyPage.ViewModel) {
+    func display(viewModel: MyPageUseCase.LoadMyPage.ViewModel) {
         // 로그아웃 성공 여부 확인
         if viewModel.logOut {
             print("로그아웃 성공")
@@ -66,7 +66,7 @@ extension MyPageView: MyPageDisplayLogic {
 
     
     // 유저 예약내역 리스트 조회
-    func displayFetchUserReservation(viewModel: MainPromotion.CheckReservationProducts.ViewModel) {
+    func displayFetchUserReservation(viewModel: MainPromotionUseCase.CheckReservationProducts.ViewModel) {
         DispatchQueue.main.async {
             // 데이터를 불러오기 전에 기존 데이터를 초기화하여 중복을 방지
             myPageViewModel.reservationproducts.removeAll()
@@ -84,7 +84,7 @@ extension MyPageView: MyPageDisplayLogic {
     
     
     // 유저 예약 삭제
-    func displayDeleteUserReservation(viewModel: MainPromotion.DeleteReservationProduct.ViewModel) {
+    func displayDeleteUserReservation(viewModel: MainPromotionUseCase.DeleteReservationProduct.ViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.deleteReservationSuccess = viewModel.deleteReservationSuccess
             print("myPageViewModel.deleteReservationSuccess \(myPageViewModel.deleteReservationSuccess)")
@@ -94,7 +94,7 @@ extension MyPageView: MyPageDisplayLogic {
 
     
     // 유저 예약내역 단일 조회
-    func displayFetchUserReservationDetail(viewModel: MainPromotion.CheckReservationDetailProduct.ViewModel) {
+    func displayFetchUserReservationDetail(viewModel: MainPromotionUseCase.CheckReservationDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             // 옵셔널 처리: data가 nil일 경우 빈 배열로 초기화
             myPageViewModel.reservationproductDetail = viewModel.reservationDetail
@@ -105,21 +105,21 @@ extension MyPageView: MyPageDisplayLogic {
     }
     
     // 찜관련
-    func displayFetchUserLikeProduct(viewModel: MainPromotion.Like.LikeListViewModel) {
+    func displayFetchUserLikeProduct(viewModel: MainPromotionUseCase.Like.LikeListViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.likeProducts = viewModel.likeProducts.data
             print("찜 리스트 \(myPageViewModel.likeProducts)")
         }
     }
     
-    func displayDetail(viewModel: MainPromotion.LoadDetailProduct.ViewModel) {
+    func displayDetail(viewModel: MainPromotionUseCase.LoadDetailProduct.ViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.productDetail = viewModel.productDetail
             print("찜 상품 상세 \( myPageViewModel.productDetail)")
         }
     }
     
-    func displayDetailProductsForMaker(viewModel: MainPromotion.LoadDetailProduct.ProductsForMakerViewModel) {
+    func displayDetailProductsForMaker(viewModel: MainPromotionUseCase.LoadDetailProduct.ProductsForMakerViewModel) {
         DispatchQueue.main.async {
             myPageViewModel.productDetailAuthorProducts = viewModel.products.data
             print("찜 상품 작가 사진 \( myPageViewModel.productDetailAuthorProducts)")
@@ -270,7 +270,7 @@ struct MyPageView: View {
                     myPageInteractor?.fetchUserDetails()
                     myPageInteractor?.fetchCounts()
                     // 예약 내역 불러오기
-                    myPageInteractor?.fetchUserLikes(request: MainPromotion.Like.LikeListRequest(limit: 50, offset: 0))
+                    myPageInteractor?.fetchUserLikes(request: MainPromotionUseCase.Like.LikeListRequest(limit: 50, offset: 0))
                 }
                 checkForSavedTokens()
             }
